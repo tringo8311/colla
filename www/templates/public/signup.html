@@ -1,0 +1,43 @@
+<ion-view view-title="Sign Up" name="sign-up-view" class="login-page">
+    <ion-nav-bar class="bar-balanced"></ion-nav-bar>
+    <ion-nav-buttons side="left">
+        <a href="/#/login" class="button icon-left ion-home"></a>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div class="logo-body">
+            <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
+        </div>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <input type="text" placeholder="Username" ng-model="data.username">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="First Name" ng-model="data.firstname">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Last Name" ng-model="data.lastname">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Email" ng-model="data.email">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Mobile Phone" ng-model="data.mobile_phone">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Address" ng-model="data.address">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Zipcode" ng-model="data.zipcode">
+            </label>
+            <label class="item item-input">
+                <input type="password" placeholder="Password" ng-model="data.password">
+            </label>
+            <label class="item item-input">
+                <input type="password" placeholder="Confirm Password" ng-model="data.confirm_password">
+            </label>
+        </div>
+        <div class="button-bar">
+            <button class="button button-positive" ng-click="">Submit</button>
+        </div>
+    </ion-content>
+</ion-view>

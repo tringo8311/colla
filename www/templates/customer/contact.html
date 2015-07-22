@@ -1,0 +1,21 @@
+<ion-view view-title="Contact" name="customer-contact-view">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content has-header="true" class="padding">
+        <div class="list list-inset">
+            <label class="item item-input">
+                <input type="text" placeholder="Full Name" ng-model="data.fullname">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Email" ng-model="data.email">
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Subject" ng-model="data.subject">
+            </label>
+            <label class="item item-input">
+                <textarea class="" type="text" placeholder="Content" rows="8" cols="40" ng-model="data.content"></textarea>
+            </label>
+        </div>
+    </ion-content>
+</ion-view>
