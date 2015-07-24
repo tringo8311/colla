@@ -101,7 +101,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
                 views: {
                     'main-content': {
                         templateUrl: 'templates/customer/receipt.html',
-                        controller: 'PlaceCtrl'
+                        controller: 'ReceiptCtrl'
                     }
                 },
                 data: {
@@ -114,6 +114,17 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
                     'main-content': {
                         templateUrl: 'templates/customer/feedback.html',
                         controller: 'PlaceCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
+                }
+            })
+            .state('customer.profile', {
+                url: 'customer/profile',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/customer/profile.html'
                     }
                 },
                 data: {
@@ -175,6 +186,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
             .respond(403, {message: "Not Authorized"});
         $httpBackend.whenGET('/stores/1')
             .respond(STORE_LIST[0]);
+        $httpBackend.whenGET('/receipts')
+            .respond(RECEIPT_LIST);
 
         $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
     })
@@ -218,12 +231,3 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
             });
         };
     });
-
-
-/**
- * Returns a random integer between min (inclusive) and max (inclusive)
- * Using Math.round() will give you a non-uniform distribution!
- */
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}

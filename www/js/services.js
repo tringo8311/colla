@@ -97,10 +97,40 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
     .config(["$httpProvider", function ($httpProvider) {
         $httpProvider.interceptors.push('AuthInterceptor');
     }]);
-/*************** Store Model ******************/
-services.factory('Store', ['$resource', function($resource) {
-        return $resource('/stores/:id', {id: '@id'});
+
+/*************** Profile Model ******************/
+services.factory('Profile', ['$resource', function($resource) {
+    return $resource('/profiles/:id', {id: '@id'});
+}]);
+services.factory('MultiProfileLoader', ['Profile', '$q',
+    function(Store, $q) {
+        return function() {
+            var delay = $q.defer();
+            Store.query(function(stores) {
+                delay.resolve(stores);
+            }, function() {
+                delay.reject('Unable to fetch stores');
+            });
+            return delay.promise;
+        };
     }]);
+services.factory('ProfileLoader', ['Profile', '$route', '$q',
+    function(Profile, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            Profile.get({id: $route.current.params.profileId}, function(profile) {
+                delay.resolve(profile);
+            }, function() {
+                delay.reject('Unable to fetch store ' + $route.current.params.profileId);
+            });
+            return delay.promise;
+        };
+    }]);
+/*************** End Profile Model ******************/
+/*************** Begin Store Model ******************/
+services.factory('Store', ['$resource', function($resource) {
+    return $resource('/stores/:id', {id: '@id'});
+}]);
 services.factory('MultiStoreLoader', ['Store', '$q',
     function(Store, $q) {
         return function() {
@@ -121,6 +151,35 @@ services.factory('StoreLoader', ['Store', '$route', '$q',
                 delay.resolve(store);
             }, function() {
                 delay.reject('Unable to fetch store ' + $route.current.params.storeId);
+            });
+            return delay.promise;
+        };
+    }]);
+/*************** End Store Model ******************/
+/*************** Receipt Model ******************/
+services.factory('Receipt', ['$resource', function($resource) {
+    return $resource('/receipts/:id', {id: '@id'});
+}]);
+services.factory('MultiReceiptLoader', ['Receipt', '$q',
+    function(Store, $q) {
+        return function() {
+            var delay = $q.defer();
+            Store.query(function(stores) {
+                delay.resolve(stores);
+            }, function() {
+                delay.reject('Unable to fetch receipts');
+            });
+            return delay.promise;
+        };
+    }]);
+services.factory('ReceiptLoader', ['Receipt', '$route', '$q',
+    function(Store, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            Store.get({id: $route.current.params.receiptId}, function(store) {
+                delay.resolve(store);
+            }, function() {
+                delay.reject('Unable to fetch store ' + $route.current.params.receiptId);
             });
             return delay.promise;
         };

@@ -2,8 +2,17 @@
     <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
     <ion-content class="padding">
         <div class="list">
-
-            <a class="item item-avatar" href="#">
+            <div ng-repeat="group in groups">
+                <ion-item class="item-stable" ng-click="toggleGroup(group)" ng-class="{active: isGroupShown(group)}">
+                    <i class="icon" ng-class="isGroupShown(group)? 'ion-minus' : 'ion-plus'"></i>
+                    {{ group.title }} in {{group.date | date:"MMM-yyyy"}}
+                    <span class="badge badge-assertive"> {{ group.total | currency }}</span>
+                </ion-item>
+                <ion-item class="item-accordion" ng-repeat="item in group.items" ng-show="isGroupShown(group)">
+                    {{item.title}}
+                </ion-item>
+            </div>
+            <!--a class="item item-avatar" href="#">
                 <span class="number">1</span>
                 <h2>Ultimate Bloody Mary</h2>
                 <p>Tomato juice, habanero, aquavit and Lea & Perrins Worcestershire Sauce</p>
@@ -17,7 +26,7 @@
                 <span class="number">23</span>
                 <h2>Wasabi Bloody Marys</h2>
                 <p>Ice, tomato juice, vodka, wasabi powder, soy sauce, lemon juice and more</p>
-            </a>
+            </a-->
         </div>
     </ion-content>
 </ion-view>

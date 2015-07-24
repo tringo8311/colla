@@ -26,7 +26,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             $scope.username = name;
         };
     })
-    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, AuthService) {
+    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, Util, AuthService) {
         $scope.data = {};
 
         $scope.login = function(data) {
@@ -41,10 +41,10 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             });
         };
         var backImgArr = ["bg1.jpg","bg2.jpg","bg3.jpg","bg4.jpg","bg5.jpg"];
-        $scope.backImg = backImgArr[getRandomInt(0, backImgArr.length - 1)];
+        $scope.backImg = backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
 
         $interval(function(){
-            $scope.backImg = backImgArr[getRandomInt(0, backImgArr.length - 1)];
+            $scope.backImg = backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
         }, 1000, 5);
     })
     .controller('NavController', function($scope, $ionicSideMenuDelegate) {
@@ -93,20 +93,46 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         });*/
         $scope.$on('$ionicView.loaded', function (viewInfo, state) {
             console.log('CTRL - $ionicView.loaded', viewInfo, state);
-            angular.element(document.querySelector("#qrcode")).empty();
-            new QRCode("qrcode", {
-                text: "http://jindo.dev.naver.com/collie",
-                width: 128,
-                height: 128,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
+            if(document.querySelector("#qrcode")){
+                angular.element(document.querySelector("#qrcode")).empty();
+                new QRCode("qrcode", {
+                    text: "http://jindo.dev.naver.com/collie",
+                    width: 220,
+                    height: 220,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
         });
         $scope.$on('$ionicView.unloaded', function (viewInfo, state) {
             console.log('CTRL - $ionicView.unloaded', viewInfo, state);
         });
     })
+    .controller('ReceiptCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Receipt", function($scope, $state, $http, $ionicPopup, AuthService, Receipt) {
+        $scope.groups = Receipt.query();
+        /*for( var i = 0; i < 10; i++){
+            $scope.groups[i] = {
+                number: i + 1,
+                name: i,
+                items: []
+            }
+            for( var j = 0; j < 3; j++){
+                $scope.groups[i].items.push(i + ' - ' + j);
+            }
+        }*/
+
+        $scope.toggleGroup = function(group) {
+            if ($scope.isGroupShown(group)) {
+                $scope.shownGroup = null;
+            } else {
+                $scope.shownGroup = group;
+            }
+        }
+        $scope.isGroupShown = function(group){
+            return $scope.shownGroup === group;
+        }
+    }])
     .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", function($scope, $state, $http, $ionicPopup, AuthService, Store) {
         $scope.store = Store.get({id:1});
         $scope.heomoi = [
@@ -121,8 +147,8 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
         ]
     }])
-    .controller('AroundCtrl', function($scope, $ionicLoading) {
-        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+    .controller('AroundCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "ServiceMap", function($scope, $state, $http, $ionicPopup, AuthService, ServiceMap) {
+        /*var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
 
         var mapOptions = {
             center: myLatlng,
@@ -140,7 +166,8 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 title: "My Location"
             });
         });
-        $scope.map = map;
-    });
+        $scope.map = map;*/
+        ServiceMap.initialize("map");
+    }]);
 
 ;

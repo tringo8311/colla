@@ -34,3 +34,29 @@ STORE_LIST.push({
     "zipcode" : "94109",
     "distance" : "1.250054674024049"
 });
+
+var RECEIPT_LIST =  new Array();
+RECEIPT_LIST.push({
+    "number" : 1,
+    "title": "Hand Job Nails",
+    "date" : "1288323623006",
+    "total" : "10000",
+    "items" : []
+});
+RECEIPT_LIST.push({
+    "number" : 2,
+    "title" : "Silk",
+    "date" : "1288326625006",
+    "total" : "10000",
+    "items" : []
+});
+RECEIPT_LIST[0].items = [
+    { "id" : 1, title: "a", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" },
+    { "id" : 2, title: "s", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" },
+    { "id" : 3, title: "c", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" }
+]
+RECEIPT_LIST[1].items = [
+    { "id" : 4, title: "a", price: "", "content" : "0.9819907734464064", "date" : "1288326625006" },
+    { "id" : 5, title: "s", price: "", "content" : "0.9819907734464064", "date" : "1288326625006" },
+    { "id" : 6, title: "c", price: "", "content" : "0.9819907734464064", "date" : "12883236625006" }
+]

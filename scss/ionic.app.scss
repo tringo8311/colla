@@ -70,6 +70,20 @@ $ion-img-path: "../img" !default;
 /**************************/
 .list{
   .item{
+    &.item-accordion{
+      line-height: 38px;
+      padding-top: 0%;
+      padding-bottom: 0;
+      transition: 0.09s all linear;
+    }
+    &.item-accordion.ng-hide{
+      line-height: 0;
+    }
+    &.item-accordion.ng-hide-add, &.item-accordion.ng-hide-remove{
+      display: block !important;
+    }
+  }
+  /*.item{
     border-top: none;
     border-right: none;
     .number{
@@ -90,6 +104,6 @@ $ion-img-path: "../img" !default;
       display: table-cell;
       color: white;
     }
-  }
+  }*/
 }
 
