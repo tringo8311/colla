@@ -6,7 +6,7 @@
 // bower install angular-mocks --save
 // <script src="lib/angular-mocks/angular-mocks.js"></script>
 // https://docs.angularjs.org/api/ngMockE2E
-angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
+angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', 'ngMap'])
     .run(function($ionicPlatform) {
         $ionicPlatform.ready(function() {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -124,7 +124,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
                 url: 'customer/profile',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/profile.html'
+                        templateUrl: 'templates/customer/profile.html',
+                        controller: 'ProfileCtrl'
                     }
                 },
                 data: {
@@ -188,11 +189,11 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
             .respond(STORE_LIST[0]);
         $httpBackend.whenGET('/receipts')
             .respond(RECEIPT_LIST);
-
         $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
     })
     .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {
+            // page required authentication
             if ('data' in next && 'authorizedRoles' in next.data) {
                 var authorizedRoles = next.data.authorizedRoles;
                 if (!AuthService.isAuthorized(authorizedRoles)) {
@@ -201,6 +202,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
                     $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
                 }
             }else if(EXCLUDE_PATH.indexOf(next.name) > -1){
+
                 return;
             }else if (!AuthService.isAuthenticated()) {
                 if (next.name !== 'login') {
@@ -222,12 +224,31 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery'])
                 });
             }
         };
-    }).directive('backImg', function(){
-        return function(scope, element, attrs){
-            var url = attrs.backImg;
-            element.css({
-                'background-image': 'url(' + url +')',
-                'background-size' : 'cover'
-            });
+    }).directive('backImg', function($interval, Util){
+        return {
+            restrict: "A",
+            scope:{
+                title: "@",
+                author: "@",
+                content: "@",
+                backUrl: "@"
+            },
+            templateUrl: '',
+            link: function(scope, element, attrs) {
+                var backImgArr = attrs.backImg.split(',');
+                var newBackGround = scope.backUrl + backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
+                $interval(function () {
+                    newBackGround = scope.backUrl + backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
+                    element.css({
+                        'background-image': 'url(' + newBackGround + ')',
+                        'background-size': 'cover'
+                    });
+                }, 1200, 5);
+
+                element.css({
+                    'background-image': 'url(' + newBackGround + ')',
+                    'background-size': 'cover'
+                });
+            }
         };
     });

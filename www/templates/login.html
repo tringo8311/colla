@@ -1,4 +1,4 @@
-<ion-view view-title="Sign-In" name="login-view" class="login-page" back-img="img/{{backImg}}">
+<ion-view view-title="Sign-In" name="login-view" class="login-page" back-img="bg1.jpg,bg2.jpg,bg3.jpg,bg4.jpg,bg5.jpg" back-url="/img/">
     <ion-nav-bar class="bar-balanced"></ion-nav-bar>
     <ion-content class="padding">
         <div class="logo-body">
@@ -9,9 +9,13 @@
                 <label class="item item-input">
                     <input type="text" placeholder="Username" ng-model="data.username" autofocus=""/>
                 </label>
+            </div>
+            <div class="list list-inset">
                 <label class="item item-input">
                     <input type="password" placeholder="Password" ng-model="data.password"/>
                 </label>
+            </div>
+            <div class="list list-inset">
                 <div class="item item-checkbox">
                     <label class="checkbox">
                         <input type="checkbox">
@@ -19,11 +23,9 @@
                     Remember me?
                 </div>
             </div>
-            <div class="button-bar">
-                <button class="button button-positive" ng-click="login(data)">Login</button>
-                <button class="button button-balanced" ui-sref="signup">Sign Up</button>
-                <button class="button button-royal" ui-sref="forgotpassword">Forgot Password</button>
-            </div>
+            <button class="button button-block button-positive" ng-click="login(data)">Login</button>
+            <button class="button button-block button-balanced" ui-sref="signup">Sign Up</button>
+            <button class="button button-block button-royal" ui-sref="forgotpassword">Forgot Password</button>
         </form>
     </ion-content>
 </ion-view>

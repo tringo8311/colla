@@ -6,3 +6,7 @@ node_modules/
 platforms/
 plugins/
 resources/
+www/lib/ngmap/
+www/lib/angular-timer/
+www/lib/momentjs/
+www/lib/humanize-duration/

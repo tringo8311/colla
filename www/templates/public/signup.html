@@ -7,37 +7,55 @@
         <div class="logo-body">
             <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
         </div>
-        <div class="list list-inset">
-            <label class="item item-input">
-                <input type="text" placeholder="Username" ng-model="data.username">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="First Name" ng-model="data.firstname">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Last Name" ng-model="data.lastname">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Email" ng-model="data.email">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Mobile Phone" ng-model="data.mobile_phone">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Address" ng-model="data.address">
-            </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Zipcode" ng-model="data.zipcode">
-            </label>
-            <label class="item item-input">
-                <input type="password" placeholder="Password" ng-model="data.password">
-            </label>
-            <label class="item item-input">
-                <input type="password" placeholder="Confirm Password" ng-model="data.confirm_password">
-            </label>
-        </div>
-        <div class="button-bar">
-            <button class="button button-positive" ng-click="">Submit</button>
-        </div>
+        <form ng-submit="doSignUp(data)">
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Username" ng-model="data.username" required="true" maxlength="16"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="First Name" ng-model="data.firstname" required="true" maxlength="32"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Last Name" ng-model="data.lastname" required="true" maxlength="32"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="email" placeholder="Email" ng-model="data.email" required="true" maxlength="32"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Mobile Phone" ng-model="data.mobile_phone" maxlength="32"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Address" ng-model="data.address" maxlength="128"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Zipcode" ng-model="data.zipcode" maxlength="10"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="password" placeholder="Password" ng-model="data.password" required="true" maxlength="32"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="password" placeholder="Confirm Password" ng-model="data.confirm_password" required="true" maxlength="32"/>
+                </label>
+            </div>
+            <div class="button-bar">
+                <button class="button button-positive" ng-click="">Submit</button>
+            </div>
+        </form>
     </ion-content>
 </ion-view>

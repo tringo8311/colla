@@ -12,6 +12,36 @@ angular.module('collaApp')
     customer: 'customer_role',
     public: 'public_role'
 });
+// Set up environment
+var env = "dev";
+if(env == "dev"){
+    var baseUrl = "http://devgmap.capri14.com/";
+    angular.module('collaApp').constant('ENV_PARAM', {
+        baseUrl : baseUrl,
+        basePath : "/",
+        searchUrl : baseUrl + "place/search",
+        favouriteUrl : baseUrl + "place/favourite",
+        imgNotFound : "http://localhost:9000/images/place_item.jpg"
+    });
+}else if(env == "staging"){
+    var baseUrl = "http://gmap.capri14.com/";
+    angular.module('collaApp').constant('ENV_PARAM', {
+        baseUrl : baseUrl,
+        basePath : "/sximo/themes/gmap/",
+        searchUrl : baseUrl + "place/search",
+        favouriteUrl : baseUrl + "place/favourite",
+        imgNotFound : baseUrl + "images/place_item.jpg"
+    });
+}else if(env == "product"){
+    var baseUrl = "http://www.nails-finder.com/";
+    angular.module('collaApp').constant('ENV_PARAM', {
+        baseUrl : baseUrl,
+        basePath :  "/gmap/",
+        searchUrl : "/gmap/place/search.php",
+        favouriteUrl : "/gmap/place/favourite.php",
+        imgNotFound : baseUrl + "gmap/images/place_item.jpg"
+    });
+}
 
 var STORE_LIST = new Array();
 STORE_LIST.push({
@@ -51,12 +81,12 @@ RECEIPT_LIST.push({
     "items" : []
 });
 RECEIPT_LIST[0].items = [
-    { "id" : 1, title: "a", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" },
-    { "id" : 2, title: "s", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" },
-    { "id" : 3, title: "c", price: "", "content" : "0.9819907734464064", "date" : "1288323623006" }
+    { "id" : 1, title: "a", price: "123", "content" : "0.9819907734464064", "date" : "1288323623006" },
+    { "id" : 2, title: "s", price: "312", "content" : "0.9819907734464064", "date" : "1288323623006" },
+    { "id" : 3, title: "c", price: "45", "content" : "0.9819907734464064", "date" : "1288323623006" }
 ]
 RECEIPT_LIST[1].items = [
-    { "id" : 4, title: "a", price: "", "content" : "0.9819907734464064", "date" : "1288326625006" },
-    { "id" : 5, title: "s", price: "", "content" : "0.9819907734464064", "date" : "1288326625006" },
-    { "id" : 6, title: "c", price: "", "content" : "0.9819907734464064", "date" : "12883236625006" }
+    { "id" : 4, title: "a", price: "23", "content" : "0.9819907734464064", "date" : "1288326625006" },
+    { "id" : 5, title: "s", price: "56", "content" : "0.9819907734464064", "date" : "1288326625006" },
+    { "id" : 6, title: "c", price: "76", "content" : "0.9819907734464064", "date" : "12883236625006" }
 ]

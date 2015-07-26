@@ -10,6 +10,7 @@
                 </ion-item>
                 <ion-item class="item-accordion" ng-repeat="item in group.items" ng-show="isGroupShown(group)">
                     {{item.title}}
+                    <span class="badge badge-assertive"> {{ item.price | currency }}</span>
                 </ion-item>
             </div>
             <!--a class="item item-avatar" href="#">

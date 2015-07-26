@@ -4,7 +4,8 @@
 var services = angular.module('collaApp');
 
 services.service('AuthService', function($q, $http, USER_ROLES) {
-        var LOCAL_TOKEN_KEY = 'yourTokenKey';
+        var LOCAL_TOKEN_KEY = 'LOCAL_TOKEN_KEY';
+        var LOCAL_USERPROFILE_KEY = 'LOCAL_USERPROFILE_KEY';
         var username = '';
         var isAuthenticated = false;
         var role = '';
@@ -17,12 +18,14 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
             }
         }
 
-        function storeUserCredentials(token) {
+        function storeUserCredentials(token, profile) {
             window.localStorage.setItem(LOCAL_TOKEN_KEY, token);
-            useCredentials(token);
+            console.log(profile);
+            window.localStorage.setItem(LOCAL_USERPROFILE_KEY, JSON.stringify(profile));
+            useCredentials(token, profile);
         }
 
-        function useCredentials(token) {
+        function useCredentials(token, profile) {
             username = token.split('.')[0];
             isAuthenticated = true;
             authToken = token;
@@ -45,15 +48,17 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
             authToken = undefined;
             username = '';
             isAuthenticated = false;
+            userProfile = {};
             $http.defaults.headers.common['X-Auth-Token'] = undefined;
             window.localStorage.removeItem(LOCAL_TOKEN_KEY);
+            window.localStorage.removeItem(LOCAL_USERPROFILE_KEY);
         }
 
         var login = function(name, pw) {
             return $q(function(resolve, reject) {
                 if ((name == 'admin' && pw == '1') || (name == 'user' && pw == '1') || (name == 'customer' && pw == '1')) {
                     // Make a request and receive your auth token from your server
-                    storeUserCredentials(name + '.yourServerToken');
+                    storeUserCredentials(name + '.yourServerToken', {"username": name});
                     resolve('Login success.');
                 } else {
                     reject('Login Failed.');
@@ -72,6 +77,10 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
             return (isAuthenticated && authorizedRoles.indexOf(role) !== -1);
         };
 
+        var loadUserProfile = function(){
+            return JSON.parse(window.localStorage.getItem(LOCAL_USERPROFILE_KEY));
+        }
+
         loadUserCredentials();
 
         return {
@@ -80,7 +89,8 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
             isAuthorized: isAuthorized,
             isAuthenticated: function() {return isAuthenticated;},
             username: function() {return username;},
-            role: function() {return role;}
+            role: function() {return role;},
+            loadUserProfile: loadUserProfile
         };
     })
     .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
@@ -98,7 +108,31 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
         $httpProvider.interceptors.push('AuthInterceptor');
     }]);
 
-/*************** Profile Model ******************/
+/*************** Profile Service/Model ******************/
+services.service('ProfileService', function($q, $http, USER_ROLES) {
+    var confirmResetPassword = function(username) {
+        return $q(function(resolve, reject) {
+            if (username == 'admin' || username == 'customer') {
+                resolve('success');
+            } else {
+                reject('failed');
+            }
+        });
+    };
+    var doSignUp = function(data){
+        return $q(function(resolve, reject) {
+            if (data.username == 'admin') {
+                resolve('success');
+            } else {
+                reject('failed');
+            }
+        });
+    }
+    return {
+        confirmResetPassword: confirmResetPassword,
+        doSignUp: doSignUp
+    };
+});
 services.factory('Profile', ['$resource', function($resource) {
     return $resource('/profiles/:id', {id: '@id'});
 }]);
@@ -127,6 +161,7 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
         };
     }]);
 /*************** End Profile Model ******************/
+
 /*************** Begin Store Model ******************/
 services.factory('Store', ['$resource', function($resource) {
     return $resource('/stores/:id', {id: '@id'});

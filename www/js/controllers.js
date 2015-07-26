@@ -40,23 +40,73 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 });
             });
         };
-        var backImgArr = ["bg1.jpg","bg2.jpg","bg3.jpg","bg4.jpg","bg5.jpg"];
-        $scope.backImg = backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
-
-        $interval(function(){
-            $scope.backImg = backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
-        }, 1000, 5);
     })
     .controller('NavController', function($scope, $ionicSideMenuDelegate) {
         $scope.toggleLeft = function() {
             $ionicSideMenuDelegate.toggleLeft();
         };
     })
-    .controller('ForgotPasswordCtrl', function($scope, $ionicSideMenuDelegate) {
+    .controller('ForgotPasswordCtrl', function($scope, $ionicPopup, $ionicSideMenuDelegate, ProfileService) {
+        $scope.data = { username: "", code: ""};
+        $scope.securityCode = false;
+        $scope.resetPassword = function(data){
+            ProfileService.confirmResetPassword(data.username).then(function(answer) {
+                //var alertPopup = null;
+                if("success"==answer){
+                    $scope.securityCode = true;
+                    $ionicPopup.alert({
+                        title: 'Reset password!',
+                        template: 'Please check your email!'
+                    });
+                }else{
+                    $ionicPopup.alert({
+                        title: 'Reset password!',
+                        template: 'Your email/user is not exist. Please type another!'
+                    });
+                }
+            }, function(err) {
 
+            });
+        }
+        $scope.isSecurityCodeShown = function(){
+            return $scope.securityCode;
+        }
     })
-    .controller('SignUpCtrl', function($scope, $ionicSideMenuDelegate) {
-
+    .controller('SignUpCtrl', function($scope, $state, $ionicSideMenuDelegate, $ionicPopup, ProfileService, AuthService) {
+        $scope.data = {}
+        /**
+         * do validate and save data
+         * @param data
+         */
+        $scope.doSignUp = function(data) {
+            // Go to login page
+            ProfileService.doSignUp(data).then(function(answer){
+                if(answer=="success"){
+                    $ionicPopup.alert({
+                        title: 'Sign up',
+                        template: 'Please check your email!'
+                    });
+                }else{
+                    $ionicPopup.alert({
+                        title: 'Sign up',
+                        template: 'Your email/user is not exist. Please type another!'
+                    });
+                }
+            }, function(err) {
+                console.error(err);
+            });
+        }
+        if(AuthService.isAuthorized){
+            $state.go('customer.dash');
+        }
+    })
+    .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
+        if(AuthService.isAuthenticated()){
+            $scope.data = AuthService.loadUserProfile();
+            console.log($scope.data);
+        }else{
+            $scope.go("login");
+        }
     })
     .controller('DashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
         $scope.logout = function() {
@@ -92,7 +142,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             viewData.enableBack = true;
         });*/
         $scope.$on('$ionicView.loaded', function (viewInfo, state) {
-            console.log('CTRL - $ionicView.loaded', viewInfo, state);
+            //console.log('CTRL - $ionicView.loaded', viewInfo, state);
             if(document.querySelector("#qrcode")){
                 angular.element(document.querySelector("#qrcode")).empty();
                 new QRCode("qrcode", {
@@ -105,23 +155,9 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 });
             }
         });
-        $scope.$on('$ionicView.unloaded', function (viewInfo, state) {
-            console.log('CTRL - $ionicView.unloaded', viewInfo, state);
-        });
     })
     .controller('ReceiptCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Receipt", function($scope, $state, $http, $ionicPopup, AuthService, Receipt) {
         $scope.groups = Receipt.query();
-        /*for( var i = 0; i < 10; i++){
-            $scope.groups[i] = {
-                number: i + 1,
-                name: i,
-                items: []
-            }
-            for( var j = 0; j < 3; j++){
-                $scope.groups[i].items.push(i + ' - ' + j);
-            }
-        }*/
-
         $scope.toggleGroup = function(group) {
             if ($scope.isGroupShown(group)) {
                 $scope.shownGroup = null;
@@ -147,7 +183,86 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
         ]
     }])
-    .controller('AroundCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "ServiceMap", function($scope, $state, $http, $ionicPopup, AuthService, ServiceMap) {
+    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$window", "GeoCoder", "AuthService",
+        function($scope, $q, $state, $http, $interval, $ionicPopup, $window, GeoCoder, AuthService) {
+            var currentMap = null;
+            $scope.dimenstion = {
+                dev_width : $window.innerWidth,
+                dev_height : $window.innerHeight
+            }
+            $scope.addressInput = "";
+            $scope.currentPosition = {coords:{lat:44.7032,lng:-74.0052}, heading:"",address:""};
+            var currentPositionMarker = null, currentInfoWindow = null;
+            $scope.$on('mapInitialized', function(evt, evtMap) {
+                currentMap = evtMap;
+                currentPositionMarker = currentMap.markers[0];
+                currentInfoWindow = new google.maps.InfoWindow();
+                google.maps.event.addListener(currentPositionMarker, 'dragend', function (event) {
+                    updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow).then(function(answer){
+                        if(answer.status == "success"){
+                            $scope.addressInput = answer.result;
+                        }
+                        currentInfoWindow.open(currentMap, currentPositionMarker);
+                    });
+                });
+                updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow);
+                currentInfoWindow.open(currentMap, currentPositionMarker);
+                /**
+                 *
+                 * Init autocomplete
+                 *
+                  */
+                var addressInput = document.getElementById("addressInput");
+                var autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                    types: ["geocode"]
+                });
+                autocomplete.bindTo('bounds', currentMap);
+
+                google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                    currentInfoWindow.close();
+                    var place = autocomplete.getPlace();
+                    if (place.geometry.viewport) {
+                        currentMap.fitBounds(place.geometry.viewport);
+                    } else {
+                        currentMap.setCenter(place.geometry.location);
+                    }
+                    $scope.currentPosition.coords = place.geometry.location;
+                    currentPositionMarker.setPosition($scope.currentPosition.coords);
+                    //d.searchLocations(place.geometry.location);
+                });
+        });
+        /**
+         *
+         * @param infoWindow
+         * @param addresInput
+         */
+        var updateInfoWindow = function(newLatLng, infoWindow){
+            return $q(function(resolve, reject) {
+                GeoCoder.geocode({latLng: newLatLng}).then(function (results) {
+                    infoWindow.setContent(results[0].formatted_address);
+                    resolve({ status: "success", result: results[0].formatted_address });
+                });
+            });
+        }
+        $scope.clearAddressInput = function(){
+            $scope.addressInput = "";
+        }
+        // Get current address
+        $scope.getCurrentAddress = function(evt) {
+            if(evt != undefined){
+                var self = this;
+                if (self.getAnimation() != null) {
+                    self.setAnimation(null);
+                } else {
+                    self.setAnimation(google.maps.Animation.BOUNCE);
+                    $interval(function () {
+                        self.setAnimation(null);
+                    }, 2000, 1);
+                }
+                currentInfoWindow.open(currentMap, currentPositionMarker);
+            }
+            updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow);
+        }
         /*var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
 
         var mapOptions = {
@@ -167,7 +282,12 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             });
         });
         $scope.map = map;*/
-        ServiceMap.initialize("map");
+        /*$scope.$on('viewState.viewEnter', function(e, d) {
+            var mapEl = angular.element(document.querySelector('.angular-google-map'));
+            var iScope = mapEl.isolateScope();
+            var map = iScope.map;
+            google.maps.event.trigger(map, "resize");
+        });*/
     }]);
 
 ;
