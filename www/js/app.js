@@ -6,7 +6,7 @@
 // bower install angular-mocks --save
 // <script src="lib/angular-mocks/angular-mocks.js"></script>
 // https://docs.angularjs.org/api/ngMockE2E
-angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', 'ngMap'])
+angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', 'ngMap', 'underscore'])
     .run(function($ionicPlatform) {
         $ionicPlatform.ready(function() {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -189,6 +189,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
             .respond(STORE_LIST[0]);
         $httpBackend.whenGET('/receipts')
             .respond(RECEIPT_LIST);
+        //$httpBackend.whenGET('http://devgmap.capri14.com/place/search?lat=37.7749295&lng=-122.41941550000001&radius=50').respond('<?xml version="1.0" encoding="UTF-8"?><markers><marker name="Hand Job Nails" address="565 Castro Street" city="San Francisco" state="CA" zipcode="94114" phone="4128632243" fax="" email="" website="handjobspa.com" store_link="" lat="37.764049" lng="-122.431297" distance="0.99317265541378"/></markers>');
+
         $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
     })
     .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
@@ -224,7 +226,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                 });
             }
         };
-    }).directive('backImg', function($interval, Util){
+    }).directive('backImg', function($interval, UtilService){
         return {
             restrict: "A",
             scope:{
@@ -236,9 +238,9 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
             templateUrl: '',
             link: function(scope, element, attrs) {
                 var backImgArr = attrs.backImg.split(',');
-                var newBackGround = scope.backUrl + backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
+                var newBackGround = scope.backUrl + backImgArr[UtilService.getRandomInt(0, backImgArr.length - 1)];
                 $interval(function () {
-                    newBackGround = scope.backUrl + backImgArr[Util.getRandomInt(0, backImgArr.length - 1)];
+                    newBackGround = scope.backUrl + backImgArr[UtilService.getRandomInt(0, backImgArr.length - 1)];
                     element.css({
                         'background-image': 'url(' + newBackGround + ')',
                         'background-size': 'cover'

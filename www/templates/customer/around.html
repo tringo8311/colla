@@ -6,13 +6,16 @@
         <ion-header-bar class="bar bar-header item-input-inset">
             <label class="item-input-wrapper">
                 <i class="icon ion-ios-search placeholder-icon"></i>
-                <input id="addressInput" type="search" placeholder="Search" ng-model="addressInput"/>
+                <input id="addressInput" type="search" placeholder="Search" ng-model="addressInput" ng-required=""/>
             </label>
-            <button class="button button-clear" ng-click="clearAddressInput()">Cancel</button>
+            <button class="button button-clear" ng-click="searchLocationsNear()">Search</button>
         </ion-header-bar>
         <div id="map_canvas">
-            <map center="44.7032, -74.0052" center="current-location" zoom="9" data-tap-disabled="true" style="height: {{ dimenstion.dev_height }}">
+            <map center="37.7749295,-122.41941550000001" center="current-location" zoom="9" data-tap-disabled="true" style="height: {{ dimenstion.dev_height }}">
                 <marker position="{{currentPosition.coords.lat}}, {{currentPosition.coords.lng}}" on-click="getCurrentAddress()" animation="DROP" draggable="true"></marker>
+                <custom-control id="detectLocationId" position="TOP_RIGHT" index="1" on-click="detectLocationClick()">
+                    <button class="button button-positive"><i class="ion ion-compass"></i></button>
+                </custom-control>
             </map>
         </div>
     </ion-content>

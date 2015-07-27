@@ -12,37 +12,6 @@ angular.module('collaApp')
     customer: 'customer_role',
     public: 'public_role'
 });
-// Set up environment
-var env = "dev";
-if(env == "dev"){
-    var baseUrl = "http://devgmap.capri14.com/";
-    angular.module('collaApp').constant('ENV_PARAM', {
-        baseUrl : baseUrl,
-        basePath : "/",
-        searchUrl : baseUrl + "place/search",
-        favouriteUrl : baseUrl + "place/favourite",
-        imgNotFound : "http://localhost:9000/images/place_item.jpg"
-    });
-}else if(env == "staging"){
-    var baseUrl = "http://gmap.capri14.com/";
-    angular.module('collaApp').constant('ENV_PARAM', {
-        baseUrl : baseUrl,
-        basePath : "/sximo/themes/gmap/",
-        searchUrl : baseUrl + "place/search",
-        favouriteUrl : baseUrl + "place/favourite",
-        imgNotFound : baseUrl + "images/place_item.jpg"
-    });
-}else if(env == "product"){
-    var baseUrl = "http://www.nails-finder.com/";
-    angular.module('collaApp').constant('ENV_PARAM', {
-        baseUrl : baseUrl,
-        basePath :  "/gmap/",
-        searchUrl : "/gmap/place/search.php",
-        favouriteUrl : "/gmap/place/favourite.php",
-        imgNotFound : baseUrl + "gmap/images/place_item.jpg"
-    });
-}
-
 var STORE_LIST = new Array();
 STORE_LIST.push({
     "name": "Hand Job Nails",

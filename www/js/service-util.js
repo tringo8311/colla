@@ -1,4 +1,4 @@
-angular.module('collaApp').factory('Util', ['$resource', function($resource) {
+angular.module('collaApp').factory('UtilService', ['$resource', function($resource) {
     return {
         /**
          * Returns a random integer between min (inclusive) and max (inclusive)
