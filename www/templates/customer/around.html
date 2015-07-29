@@ -19,4 +19,9 @@
             </map>
         </div>
     </ion-content>
+    <div class="bar bar-footer">
+        <button class="button button-clear" ng-show="markerList.length" ng-click="openPopoverResult($event)">Results</button>
+        <div class="title">-</div>
+        <button class="button button-clear" ng-click="openPopoverDirection($event)">Direction</button>
+    </div>
 </ion-view>

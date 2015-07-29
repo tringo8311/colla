@@ -1,0 +1,13 @@
+<ion-popover-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> Search Results</div>
+    </ion-header-bar>
+    <ion-content>
+        <ion-list ng-repeat="item in markerList" class="list odd-background">
+            <ion-item ng-class-odd="'odd'" ng-class-even="'even'" class="list-item item-avatar item-text-wrap">
+                <img src="/img/venkman.jpg"/>
+                <span>{{item.name}}</span><span class="item-note">{{item.address}}</span>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-popover-view>

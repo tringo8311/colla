@@ -18,6 +18,7 @@ STORE_LIST.push({
     "address" : "565 Castro Street",
     "lat" : "37.764049",
     "lng" : "122.431297",
+    "business_hour" : "Mon - Fri: 08:00 - 20:00 \n Sat - Sun: 08:00 - 18:00 ",
     "phone" : "4128632243",
     "website" : "handjobspa.com",
     "zipcode" : "94114",
@@ -26,6 +27,7 @@ STORE_LIST.push({
 STORE_LIST.push({
     "name" : "Silk",
     "address" : "1425 Franklin St.",
+    "business_hour" : "Mon - Fri: 08:00 - 20:00 \n Sat - Sun: 08:00 - 18:00 ",
     "lat" : "37.792728",
     "lng" : "-122.423186",
     "phone" : "4158853277",

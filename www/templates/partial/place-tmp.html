@@ -1,0 +1,27 @@
+<div class="place-window">
+    <div class="place-heading">
+        <img src="{{ dataPopup.imgPath }}" width="80" height="80" class="pull-left"/>
+        <h4>{{ dataPopup.name }}</h4>
+        <address>{{ dataPopup.address }}, {{ dataPopup.zipcode }}</address>
+        <div class="clearfix"></div>
+    </div>
+    <div class="place-body">
+        <ul class="list">
+            <li class="item item-icon-left">
+                <i class="icon ion-clock"></i>
+                <div>
+                    <h4>Business hours:</h4>
+                    <p>{{ dataPopup.business_hour }}</p>
+                </div>
+            </li>
+            <li class="item item-icon-left">
+                <i class="icon ion-ios-telephone-outline"></i>
+                <a href="tel:<%= dataPopup.phone%>">{{ dataPopup.phone }}</a>
+            </li>
+            <li class="item item-icon-left">
+                <i class="icon ion-earth"></i>
+                <a href="{{ dataPopup.website }}" target="_blank">{{ dataPopup.website }}</a>
+            </li>
+        </ul>
+    </div>
+</div>

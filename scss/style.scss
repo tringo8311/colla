@@ -1,5 +1,30 @@
 /* Empty. Add your own CSS if you like */
 $ion-img-path: "../img" !default;
+.center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pull-right {
+  float: right !important;
+}
+.pull-left {
+  float: left !important;
+}
+.clearfix::before, .clearfix::after{
+  content: " ";
+  display: table;
+}
+.clearfix::after{
+  clear: both;
+}
+.scroll {
+  height: 100%;
+}
+.popup-container .popup{
+  width: 350px;
+}
+/***********************************/
 .login-page{
   background: url("#{$ion-img-path}/bg3.jpg") no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -8,9 +33,7 @@ $ion-img-path: "../img" !default;
   background-size: cover;
   transition: background-image 2s ease-in-out;
 }
-.pull-right{
-  float: right;
-}
+.logo-body { text-align: center; }
 .button-halfwidth{
   width: 49%;
 }
@@ -20,8 +43,17 @@ $ion-img-path: "../img" !default;
 .tabbed-content-within-sidemenu-app{
   z-index: 5;
 }
-.logo-body { text-align: center; }
-
+/************ Place-window ****************/
+.place-window{
+  .place-heading{
+    img.pull-left{
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+  }
+}
+/************ End Place-window ****************/
+/************ QR Code****************/
 .card-circle{
   border: 4px solid #ff3b30;
   padding: 10px;
@@ -58,32 +90,11 @@ $ion-img-path: "../img" !default;
     &.item-accordion.ng-hide-add, &.item-accordion.ng-hide-remove{
       display: block !important;
     }
-  }
-  /*.item{
-    border-top: none;
-    border-right: none;
-    .number{
-      background-color: #FF662D;
-      position: absolute;
-      top: -1px;
-      left: -1px;
-      max-width: 70px;
-      max-height: 80px;
-      padding: 16px;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 1.5em;
-      font-weight: 600;
-      line-height: 1.5em;
-      display: table-cell;
-      color: white;
+
+    &.odd {
+      background-color: rgb(170, ​ 170, ​ 170) !important;
     }
-  }*/
-}
-.scroll {
-  height: 100%;
+  }
 }
 #map_canvas {
   width: 100%;

@@ -183,8 +183,8 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
         ]
     }])
-    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "_",
-        function($scope, $q, $state, $http, $interval, $ionicPopup, $window, GeoCoder, UtilService, AuthService, MapService, _) {
+    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "_",
+        function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, _) {
             var currentMap = null, currentPositionMarker = null, currentInfoWindow = null;
             $scope.dimenstion = {
                 dev_width : $window.innerWidth,
@@ -192,6 +192,8 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
             $scope.addressInput = "";
             $scope.currentPosition = {coords:{lat:37.7749295,lng:-122.41941550000001}, heading:"",address:""};
+            $scope.markerList = [];
+            $scope.mapDirection = {};
             $scope.$on('mapInitialized', function(evt, evtMap) {
                 currentMap = evtMap;
                 currentPositionMarker = currentMap.markers[0];
@@ -204,7 +206,9 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                         currentInfoWindow.open(currentMap, currentPositionMarker);
                     });
                 });
-                updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow);
+                updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow).then(function(result){
+                    $scope.addressInput = result.result;
+                });
                 currentInfoWindow.open(currentMap, currentPositionMarker);
                 /**
                  *
@@ -227,9 +231,53 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                     }
                     $scope.currentPosition.coords = place.geometry.location;
                     currentPositionMarker.setPosition($scope.currentPosition.coords);
-                    //d.searchLocations(place.geometry.location);
                     $scope.searchLocationsNear();
                 });
+                MapService.directionService.init(currentMap, "directionsPanel", [{"name": 'directions_changed', "callback": function(total){
+                   $scope.mapDirection.path_length = total;
+                }}]);
+                MapService.directionService.run();
+
+                /**
+                 * Search near store
+                 */
+                var showPopup = function (marker) {
+                    $scope.dataPopup = marker.storeObj;
+                    var directionClick = function () {
+                        MapService.directionService.calcRoute(currentPositionMarker.getPosition(), $scope.dataPopup.latlng);
+                    }
+                    var favouriteClick = function () {
+
+                    }
+                    $ionicPopup.show({
+                        title: "Information",
+                        cssClass: '',
+                        subTitle: '',
+                        template: '',
+                        templateUrl: '/templates/partial/place-tmp.html',
+                        scope: $scope,
+                        buttons: [{
+                            text: 'Direction',
+                            type: 'button-calm button-outline',
+                            onTap: function (e) {
+                                directionClick();
+                            }
+                        }, {
+                            text: 'Favourite',
+                            type: 'button-positive button-outline',
+                            onTap: function (e) {
+                                favouriteClick();
+                                return true;
+                            }
+                        }, {
+                            text: 'Close',
+                            type: 'button-positive button-outline'
+                        }]
+                    });
+                }
+                MapService.markerService.init(currentMap, [{name: "click", callback: function(storeObj){
+                    showPopup(storeObj);
+                }}]);
             });
 
             $scope.clearAddressInput = function(){
@@ -267,22 +315,17 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                     }
                 });
             }
-            /**
-             *
-             * Search near store
-             *
-             */
             $scope.searchLocationsNear = function(){
                 var needleLatLng = currentPositionMarker.getPosition();
-                MapService.locationService.searchLocationsNear(needleLatLng).then(function(markerNodes){
+                $scope.markerList = [];
+                MapService.locationService.searchLocationsNear(needleLatLng, 50).then(function(markerNodes){
                     if( 0 < markerNodes.length){
-                        var  makerNode, bounds = new google.maps.LatLngBounds();
-                        //$(".nav-found .number", "#accordionBasicMap").text("(" + markerNodes.length + ")");
+                        var makerNode, bounds = new google.maps.LatLngBounds();
                         for (var i = 0; i < markerNodes.length; i++) {
                             makerNode = markerNodes[i];
-                            var name = makerNode.getAttribute("name");
-                            var address = makerNode.getAttribute("address");
-                            var distance = parseFloat(makerNode.getAttribute("distance"));
+                            var name = makerNode.getAttribute("name"),
+                                address = makerNode.getAttribute("address"),
+                                distance = parseFloat(makerNode.getAttribute("distance"));
                             var latlng = new google.maps.LatLng(parseFloat(makerNode.getAttribute("lat")),
                                 parseFloat(makerNode.getAttribute("lng")));
                             var extra = {
@@ -293,16 +336,11 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                                 website: makerNode.getAttribute("website"),
                                 business_hour: makerNode.getAttribute("business_hour")
                             }
-                            //d.createOption(name, distance, i, latlng, address);
-                            createMarker(latlng, name, address, extra);
-                            bounds.extend(latlng);
+                            $scope.markerList.push(angular.extend({name: name, address: address},extra));
+                            MapService.markerService.createMarker(latlng, name, address, extra);
                         }
-                        //capriMap.fitBounds(bounds);
-                        /*locationSelect.style.visibility = "visible";
-                        locationSelect.onchange = function () {
-                            var markerNum = locationSelect.options[locationSelect.selectedIndex].value;
-                            google.maps.event.trigger(capriMarkers[markerNum], 'click');
-                        };*/
+                        bounds.extend(latlng);
+                        currentMap.setZoom(14);
                     }
                 });
             }
@@ -320,79 +358,29 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 });
             }
 
-            var pinMapUrl = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=";
-            var paletteColor = [
-                "4e67c8", "5eccf3", "a7ea52", "5dceaf", "ff8021", "f14124",
-                "b8c2e9", "beeafa", "dbf6b9", "beebdf", "ffcca6", "f9b3a7",
-                "94a3de", "9ee0f7", "caf297", "9de1cf", "ffb279", "f68d7b",
-                "31479f", "11b2eb", "81d319", "34ac8b", "d85c00", "c3260c",
-                "202f6a", "0b769c", "568c11", "22725c", "903d00", "821908"
-            ];
-            var serviceIcon = {
-                url: "/img/beachflag.png",
-                // This marker is 20 pixels wide by 32 pixels tall.
-                size: new google.maps.Size(28, 40),
-                // The origin for this image is 0,0.
-                origin: new google.maps.Point(0,0),
-                // The anchor for this image is the base of the flagpole at 0,32.
-                anchor: new google.maps.Point(0, 32)
+            $ionicPopover.fromTemplateUrl('/templates/partial/result-tmp.html', {
+                scope: $scope
+            }).then(function(popover) {
+                $scope.popoverResult = popover;
+            });
+            $scope.openPopoverResult = function($event) {
+                $scope.popoverResult.show($event);
             };
-            /**
-             *
-             * @param latlng
-             * @param name
-             * @param address
-             */
-            var createMarker = function (latlng, name, address, extra) {
-                var placeItemTmp = _.template(document.getElementById("placeItemTmp").innerHTML);
-                var imgPath = typeof extra.imgPath == "undefined" ? "/img/icon.jpg" : extra.imgPath;
-                //var html = "store content";
-                var html = placeItemTmp({imgPath: imgPath, name:name, address: address, zipcode: extra.zipcode,
-                    phone: UtilService.phoneFormat(extra.phone), email:extra.email, website: UtilService.addHttp(extra.website)});
-                var firstChar = name.charAt(0) ? name.charAt(0) : "0",
-                    randomPalette = Math.floor(Math.random() * (paletteColor.length - 1));
-                    serviceIcon.url = pinMapUrl + firstChar + "|" + paletteColor[randomPalette] + "|000000";
+            $scope.closePopoverResult = function() {
+                $scope.popoverResult.hide();
+            };
 
-                var marker = new google.maps.Marker({
-                    icon: serviceIcon,
-                    map: currentMap,
-                    position: latlng,
-                    storeContent: html,
-                    animation: google.maps.Animation.DROP
-                });
-                google.maps.event.addListener(marker, 'click', function (evt) {
-                    currentInfoWindow.setContent(marker.storeContent);
-                    currentInfoWindow.open(currentMap, marker);
-                    /*$(".js-btn-direction").off("click").on("click", function(evt){
-                        directionModule.calcRoute(myLatlng, latlng);
-                        return false;
-                    });
-                    $(".js-btn-favourite").off("click").on("click", function(evt){
-                        var myTitle = $(this).attr("title");
-                        var l = Ladda.create(this);
-                        l.start();
-                        favouriteModule.addFavourite(null, {title: myTitle, lat: latlng.lat(), lng: latlng.lng()});
-                        setTimeout(function(){l.stop();}, 500);
-                        return false;
-                    });*/
-                });
-                var menuItems=[],contextMenuOptions={};
-                contextMenuOptions.classNames={menu:'context_menu', menuSeparator:'context_menu_separator'};
-                menuItems.push({className:'context_menu_item', eventName:'directions_destination_click', id:'directionsDestinationItem', label:'Directions to here'});
-                contextMenuOptions.menuItems=menuItems;
-                //var contextMenu = new ContextMenu(capriMap, contextMenuOptions);
-
-                /*google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
-                    directionModule.calcRoute(myLatlng, latLng);
-                });*/
-
-                /*google.maps.event.addListener(marker, 'rightclick', function (evt) {
-                    //d.contextMenuMarker(evt, marker, latlng);
-                    contextMenu.show(evt.latLng);
-                    return false;
-                });*/
-                /*capriMarkers.push(marker);*/
-            }
+           $ionicPopover.fromTemplateUrl('/templates/partial/direction-tmp.html', {
+                scope: $scope
+            }).then(function(popover) {
+                $scope.popoverDirection = popover;
+            });
+            $scope.openPopoverDirection = function($event) {
+                $scope.popoverDirection.show($event);
+            };
+            $scope.closePopoverDirection = function() {
+                $scope.popoverDirection.hide();
+            };
         /*var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
         /*$scope.$on('viewState.viewEnter', function(e, d) {
             var mapEl = angular.element(document.querySelector('.angular-google-map'));
