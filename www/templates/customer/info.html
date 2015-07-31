@@ -3,6 +3,7 @@
     <ion-content class="padding">
         <div class="list card">
             <div class="item item-avatar">
+                <img src="/img/venkman.jpg"/>
                 <h2 class="strong">{{ store.name }}</h2>
                 <p class="address">{{ store.address }}, {{ store.zipcode }}</p>
             </div>
@@ -14,16 +15,16 @@
                     consists of tabs, icons aligned left, within the card-footer.
                 </p>
             </div>
-            <div class="item item-icon-left">
+            <div class="item item-icon-left energized">
                 <i class="icon ion-clock"></i>
                 <h3>Business hour</h3>
                 <p>{{ store.business_hour }}</p>
             </div>
-            <a href="tel:{{ store.phone }}" class="item item-icon-left" title="Phone">
+            <a href="tel:{{ store.phone }}" class="item item-icon-left balanced" title="Phone">
                 <i class="icon ion-ios-telephone-outline"></i>
                 {{ store.phone }}
             </a>
-            <a href="tel:{{ store.website }}" class="item item-icon-left" title="Website">
+            <a href="{{ store.website }}" class="item item-icon-left positive" title="Website">
                 <i class="icon ion-earth"></i>
                 {{ store.website }}
             </a>

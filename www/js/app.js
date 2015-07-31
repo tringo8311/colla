@@ -245,7 +245,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                         'background-image': 'url(' + newBackGround + ')',
                         'background-size': 'cover'
                     });
-                }, 1200, 5);
+                }, 2000, 5);
 
                 element.css({
                     'background-image': 'url(' + newBackGround + ')',

@@ -169,8 +169,15 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             return $scope.shownGroup === group;
         }
     }])
-    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", function($scope, $state, $http, $ionicPopup, AuthService, Store) {
-        $scope.store = Store.get({id:1});
+    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, Store, UtilService) {
+        $scope.store = {};
+        Store.get({id:1}, function(store) {
+            var myStore = store;
+            angular.extend($scope.store, myStore, {
+                phone: UtilService.phoneFormat(myStore.phone),
+                website: UtilService.addHttp(myStore.website)
+            });
+        });
         $scope.heomoi = [
             {
                 src:'/img/bg1.jpg',

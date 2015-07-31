@@ -1,4 +1,29 @@
 /* Empty. Add your own CSS if you like */
+.center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto; }
+
+.pull-right {
+  float: right !important; }
+
+.pull-left {
+  float: left !important; }
+
+.clearfix::before, .clearfix::after {
+  content: " ";
+  display: table; }
+
+.clearfix::after {
+  clear: both; }
+
+.scroll {
+  height: 100%; }
+
+.popup-container .popup {
+  width: 350px; }
+
+/***********************************/
 .login-page {
   background: url("../img/bg3.jpg") no-repeat center center fixed;
   -webkit-background-size: cover;
@@ -7,8 +32,8 @@
   background-size: cover;
   transition: background-image 2s ease-in-out; }
 
-.pull-right {
-  float: right; }
+.logo-body {
+  text-align: center; }
 
 .button-halfwidth {
   width: 49%; }
@@ -19,11 +44,21 @@
 .tabbed-content-within-sidemenu-app {
   z-index: 5; }
 
-.logo-body {
-  text-align: center; }
+/************** well ***************/
+.well {
+  padding: 10px;
+  line-height: 20px;
+  background-color: rgba(255, 255, 225, 0.5); }
 
+/************ Place-window ****************/
+.place-window .place-heading img.pull-left {
+  margin-right: 10px;
+  margin-bottom: 10px; }
+
+/************ End Place-window ****************/
+/************ QR Code****************/
 .card-circle {
-  border: 4px solid #ff3b30;
+  border: 10px solid #ff3b30;
   padding: 10px;
   border-radius: 999em; }
   .card-circle #qrcode {
@@ -42,42 +77,18 @@
   margin: 0; }
 
 /**************************/
-.list {
-  /*.item{
-    border-top: none;
-    border-right: none;
-    .number{
-      background-color: #FF662D;
-      position: absolute;
-      top: -1px;
-      left: -1px;
-      max-width: 70px;
-      max-height: 80px;
-      padding: 16px;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 1.5em;
-      font-weight: 600;
-      line-height: 1.5em;
-      display: table-cell;
-      color: white;
-    }
-  }*/ }
-  .list .item.item-accordion {
-    line-height: 38px;
-    padding-top: 0%;
-    padding-bottom: 0;
-    transition: 0.09s all linear;
-    min-height: 52px; }
-  .list .item.item-accordion.ng-hide {
-    line-height: 0; }
-  .list .item.item-accordion.ng-hide-add, .list .item.item-accordion.ng-hide-remove {
-    display: block !important; }
-
-.scroll {
-  height: 100%; }
+.list .item.item-accordion {
+  line-height: 38px;
+  padding-top: 0%;
+  padding-bottom: 0;
+  transition: 0.09s all linear;
+  min-height: 52px; }
+.list .item.item-accordion.ng-hide {
+  line-height: 0; }
+.list .item.item-accordion.ng-hide-add, .list .item.item-accordion.ng-hide-remove {
+  display: block !important; }
+.list .item.odd {
+  background-color: #c0c0c0 !important; }
 
 #map_canvas {
   width: 100%;

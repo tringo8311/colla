@@ -1,5 +1,5 @@
 <ion-view view-title="Sign-In" name="login-view" class="login-page" back-img="bg1.jpg,bg2.jpg,bg3.jpg,bg4.jpg,bg5.jpg" back-url="/img/">
-    <ion-nav-bar class="bar-balanced"></ion-nav-bar>
+    <ion-nav-bar class="bar-positive"></ion-nav-bar>
     <ion-content class="padding">
         <div class="logo-body">
             <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
@@ -25,11 +25,11 @@
             </div>
             <button class="button button-block button-positive" ng-click="login(data)">Login</button>
             <br/>
-            <div class="text-center">
-                Don't have an account yet? <a href="#" class="" ui-sref="signup">Sign Up</a>
-            </div><br/>
-            <div class="text-center">
-                Don't remember your password? <a href="#" class="" ui-sref="forgotpassword">Forgot Password</a>
+            <div class="well">
+                <div class="well-body text-center">
+                    <p>Don't have an account yet? <a href="#" class="" ui-sref="signup">Sign Up</a></p>
+                    <p>Don't remember your password? <a href="#" class="" ui-sref="forgotpassword">Forgot Password</a></p>
+                </div>
             </div>
         </form>
     </ion-content>
