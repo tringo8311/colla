@@ -6,7 +6,7 @@
 // bower install angular-mocks --save
 // <script src="lib/angular-mocks/angular-mocks.js"></script>
 // https://docs.angularjs.org/api/ngMockE2E
-angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', 'ngMap', 'underscore'])
+angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', 'ngMap', 'underscore', 'ui.router', 'satellizer'])
     .run(function($ionicPlatform) {
         $ionicPlatform.ready(function() {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -19,7 +19,46 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
             }
         });
     })
-    .config(function ($stateProvider, $urlRouterProvider, USER_ROLES) {
+    .config(function ($stateProvider, $urlRouterProvider, $authProvider, USER_ROLES) {
+        $authProvider.baseUrl = 'http://localhost:8000';
+        $authProvider.loginUrl = 'v1/api/authenticate';
+        $authProvider.signupUrl = 'v1/user/signup';
+        $authProvider.facebook({
+            clientId: '624059410963642'
+        });
+
+        $authProvider.google({
+            clientId: '631036554609-v5hm2amv4pvico3asfi97f54sc51ji4o.apps.googleusercontent.com'
+        });
+
+        $authProvider.github({
+            clientId: '0ba2600b1dbdb756688b'
+        });
+
+        $authProvider.linkedin({
+            clientId: '77cw786yignpzj'
+        });
+
+        $authProvider.yahoo({
+            clientId: 'dj0yJmk9dkNGM0RTOHpOM0ZsJmQ9WVdrOVlVTm9hVk0wTkRRbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0wMA--'
+        });
+
+        $authProvider.live({
+            clientId: '000000004C12E68D'
+        });
+
+        $authProvider.twitter({
+            url: '/auth/twitter'
+        });
+
+        $authProvider.oauth2({
+            name: 'foursquare',
+            url: '/auth/foursquare',
+            redirectUri: window.location.origin,
+            clientId: 'MTCEJ3NGW2PNNB31WOSBFDSAD4MTHYVAZ1UKIULXZ2CVFC2K',
+            authorizationEndpoint: 'https://foursquare.com/oauth2/authenticate',
+        });
+
         $stateProvider
             .state('login', {
                 url: '/login',
@@ -96,12 +135,12 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                     authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
                 }
             })
-            .state('customer.receipt', {
-                url: 'customer/receipt',
+            .state('customer.note', {
+                url: 'customer/note',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/receipt.html',
-                        controller: 'ReceiptCtrl'
+                        templateUrl: 'templates/customer/note.html',
+                        controller: 'CustomerNoteCtrl'
                     }
                 },
                 data: {
@@ -185,13 +224,16 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
             .respond(401, {message: "Not Authenticated"});
         $httpBackend.whenGET('http://localhost:8100/notauthorized')
             .respond(403, {message: "Not Authorized"});
-        $httpBackend.whenGET('/stores/1')
-            .respond(STORE_LIST[0]);
+        /*$httpBackend.whenGET('/stores/1')
+            .respond(STORE_LIST[0]);*/
         $httpBackend.whenGET('/receipts')
             .respond(RECEIPT_LIST);
         //$httpBackend.whenGET('http://devgmap.capri14.com/place/search?lat=37.7749295&lng=-122.41941550000001&radius=50').respond('<?xml version="1.0" encoding="UTF-8"?><markers><marker name="Hand Job Nails" address="565 Castro Street" city="San Francisco" state="CA" zipcode="94114" phone="4128632243" fax="" email="" website="handjobspa.com" store_link="" lat="37.764049" lng="-122.431297" distance="0.99317265541378"/></markers>');
 
         $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
+        $httpBackend.whenPOST(/localhost:8000\/.*/).passThrough();
+        $httpBackend.whenGET(/localhost:8000\/.*/).passThrough();
+        //$httpBackend.whenPOST('http://localhost:8000/api/authenticate').passThrough();
     })
     .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {
@@ -200,8 +242,12 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                 var authorizedRoles = next.data.authorizedRoles;
                 if (!AuthService.isAuthorized(authorizedRoles)) {
                     event.preventDefault();
-                    $state.go($state.current, {}, {reload: true});
-                    $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+                    if($state.abstract){
+                        $state.go('login');
+                    }else{
+                        $state.go($state.current, {}, {reload: true});
+                        $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+                    }
                 }
             }else if(EXCLUDE_PATH.indexOf(next.name) > -1){
 

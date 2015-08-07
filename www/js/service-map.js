@@ -1,12 +1,12 @@
 // Set up environment
 var env = "dev";
 if(env == "dev"){
-    var baseUrl = "http://devgmap.capri14.com/";
+    var baseUrl = "http://localhost:8000/v1/api/";
     angular.module('collaApp').constant('ENV_PARAM', {
         baseUrl : baseUrl,
         basePath : "/",
-        searchUrl : baseUrl + "place/search",
-        favouriteUrl : baseUrl + "place/favourite",
+        searchUrl : baseUrl + "stores/near",
+        favouriteUrl : baseUrl + "stores/favourite",
         imgNotFound : "http://localhost:8100/images/place_item.jpg"
     });
 }else if(env == "staging"){
@@ -212,21 +212,23 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
              * @param name
              * @param address
              */
-            createMarker : function (latlng, name, address, extra) {
+            createMarker : function (latlng, title, address, extra) {
                 var d= this, imgPath = typeof extra.imgPath == "undefined" || extra.imgPath == "" ? "/img/icon.jpg" : extra.imgPath;
                 var storeObj = {
                     latlng: latlng,
                     imgPath: imgPath,
-                    name: name,
+                    title: title,
                     address: address,
                     zipcode: extra.zipcode,
                     business_hour: extra.business_hour,
                     phone: UtilService.phoneFormat(extra.phone),
                     email: extra.email,
-                    website: UtilService.addHttp(extra.website)
+                    website: UtilService.addHttp(extra.website),
+                    distance: extra.distance,
+                    firstChar: extra.firstChar
                 };
 
-                var firstChar = name.charAt(0) ? name.charAt(0) : "0",
+                var firstChar = title.charAt(0) ? title.charAt(0) : "0",
                     randomPalette = Math.floor(Math.random() * (paletteColor.length - 1));
                 serviceIcon.url = pinMapUrl + firstChar + "|" + paletteColor[randomPalette] + "|000000";
 

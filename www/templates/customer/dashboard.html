@@ -1,4 +1,4 @@
-<ion-view name="dashboard-view" view-title="Dashboard">
+<ion-view name="dashboard-view" view-title="Home">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -9,11 +9,12 @@
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
         <div class="row">
             <div class="col text-center">
-                <h3 class="title">Welcome {{username}}!</h3>
+                <h3 class="title">Welcome {{userProfile.username}}!</h3>
                     This could be your Dashboard.
                 <br><br><br>
                 <div class="card-circle text-center">
                     <div id="qrcode"></div>
+                    <h4 class="strong">46178469187891</h4>
                 </div>
                 <!--<button class="button button-full button-positive" ng-click="performValidRequest()">
                     Make Valid Request
@@ -27,21 +28,21 @@
                 <br><br>
                 {{response}}
                 <div class="button-bar">
-                    <button class="button button-outline icon-left ion-information-circled button-calm" ui-sref="customer.info">Information</button>
-                    <button class="button button-outline icon-left ion-android-list button-calm" ui-sref="customer.receipt">Receipt</button>
-                    <button class="button button-outline icon-left ion-android-star-outline button-calm" ui-sref="customer.feedback">Feedback</button>
+                    <button class="button button-outline icon-left ion-android-checkmark-circle button-energized" ui-sref="customer.info">My place</button>
+                    <button class="button button-outline icon-left ion-android-list button-balanced" ui-sref="customer.note">Note</button>
+                    <!--button class="button button-outline icon-left ion-android-star-outline button-calm" ui-sref="customer.feedback">Feedback</button-->
                 </div>
             </div>
         </div>
     </ion-content>
     <ion-tabs class="tabs-icon-top tabs-light">
-        <ion-tab title="My Place" icon="ion-home" href="#/customer/dash">
+        <ion-tab title="Home" class="assertive" icon="ion-home" href="#/customer/dash">
             <ion-nav-view name="dash-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Around" icon="ion-map" href="#/customer/around">
+        <ion-tab title="Around" class="energized" icon="ion-map" href="#/customer/around">
             <ion-nav-view name="around-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="My Offer" icon="ion-android-subway" href="#/customer/offer">
+        <ion-tab title="My Offer" class="balanced" icon="ion-android-subway" href="#/customer/offer">
             <ion-nav-view name="offer-tab"></ion-nav-view>
         </ion-tab>
     </ion-tabs>

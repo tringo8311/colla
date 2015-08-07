@@ -2,6 +2,9 @@
  * Created by Root on 12/7/2015.
  */
 angular.module('collaApp')
+.constant('API_PARAM', {
+    baseUrl : 'http://localhost:8000/v1/api/'
+})
 .constant('AUTH_EVENTS', {
     notAuthenticated: 'auth-not-authenticated',
     notAuthorized: 'auth-not-authorized'

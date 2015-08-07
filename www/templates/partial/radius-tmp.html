@@ -1,0 +1,14 @@
+<ion-popover-view>
+    <ion-header-bar>
+        <div class="title">Select radius (miles)</div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list">
+            <div ng-repeat="radius in radiusList">
+                <ion-item class="" ng-click="selectRadius($event, radius)" ng-class="{active: selectedRadius(radius)}">
+                    {{ radius.name }}
+                </ion-item>
+            </div>
+        </div>
+    </ion-content>
+</ion-popover-view>

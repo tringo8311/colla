@@ -4,10 +4,10 @@
         <div class="logo-body">
             <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
         </div>
-        <form ng-submit="login(data)">
+        <form>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Username" ng-model="data.username" autofocus=""/>
+                    <input type="email" placeholder="Username/Email" ng-model="data.email" autofocus=""/>
                 </label>
             </div>
             <div class="list list-inset">
@@ -18,12 +18,17 @@
             <div class="list list-inset">
                 <div class="item item-checkbox">
                     <label class="checkbox">
-                        <input type="checkbox">
+                        <input type="checkbox" name="remember" ng-model="remember">
                     </label>
                     Remember me?
                 </div>
             </div>
-            <button class="button button-block button-positive" ng-click="login(data)">Login</button>
+            <button class="button button-block button-positive" ng-click="login()">Login</button>
+            <div class="button-bar">
+                <button class="button button-outline button-positive" ng-click="authenticate('facebook')">with Facebook</button>
+                <button class="button button-outline button-positive" ng-click="authenticate('google')">with Google</button>
+                <button class="button button-outline button-positive" ng-click="authenticate('twitter')">with Twitter</button>
+            </div>
             <br/>
             <div class="well">
                 <div class="well-body text-center">

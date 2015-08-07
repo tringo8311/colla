@@ -3,8 +3,8 @@
     <ion-content class="padding">
         <div class="list card">
             <div class="item item-avatar">
-                <img src="/img/venkman.jpg"/>
-                <h2 class="strong">{{ store.name }}</h2>
+                <div class="item-char">{{store.firstChar}}</div>
+                <h2 class="strong">{{ store.title }}</h2>
                 <p class="address">{{ store.address }}, {{ store.zipcode }}</p>
             </div>
             <div class="item item-body">
@@ -18,15 +18,15 @@
             <div class="item item-icon-left energized">
                 <i class="icon ion-clock"></i>
                 <h3>Business hour</h3>
-                <p>{{ store.business_hour }}</p>
+                <p>{{ store.business_hour }}&nbsp;</p>
             </div>
             <a href="tel:{{ store.phone }}" class="item item-icon-left balanced" title="Phone">
                 <i class="icon ion-ios-telephone-outline"></i>
-                {{ store.phone }}
+                {{ store.phone }}&nbsp;
             </a>
             <a href="{{ store.website }}" class="item item-icon-left positive" title="Website">
                 <i class="icon ion-earth"></i>
-                {{ store.website }}
+                {{ store.website }}&nbsp;
             </a>
         </div>
     </ion-content>

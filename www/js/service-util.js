@@ -12,6 +12,10 @@ angular.module('collaApp').factory('UtilService', ['$resource', function($resour
             phone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
             return phone;
         },
+        toFixed: function(value, precision){
+            var power = Math.pow(10, precision || 0);
+            return String(Math.round(value * power) / power);
+        },
         /**
          *
          *

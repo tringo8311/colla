@@ -3,10 +3,9 @@
  */
 var services = angular.module('collaApp');
 
-services.service('AuthService', function($q, $http, USER_ROLES) {
+services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
         var LOCAL_TOKEN_KEY = 'LOCAL_TOKEN_KEY';
         var LOCAL_USERPROFILE_KEY = 'LOCAL_USERPROFILE_KEY';
-        var username = '';
         var isAuthenticated = false;
         var role = '';
         var authToken;
@@ -20,25 +19,23 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
 
         function storeUserCredentials(token, profile) {
             window.localStorage.setItem(LOCAL_TOKEN_KEY, token);
-            console.log(profile);
-            window.localStorage.setItem(LOCAL_USERPROFILE_KEY, JSON.stringify(profile));
+            window.localStorage.setItem(LOCAL_USERPROFILE_KEY, JSON.stringify(profile.data));
             useCredentials(token, profile);
         }
 
         function useCredentials(token, profile) {
-            username = token.split('.')[0];
             isAuthenticated = true;
             authToken = token;
 
-            if (username == 'admin') {
+            /*if (username == 'admin') {
                 role = USER_ROLES.admin
-            }
-            if (username == 'user') {
+            }else if (username == 'user') {
                 role = USER_ROLES.public
-            }
-            if (username == 'customer') {
+            }else if (username == 'customer') {
                 role = USER_ROLES.customer
-            }
+            }else{*/
+                role = USER_ROLES.customer
+            /*}*/
 
             // Set the token as header for your requests!
             $http.defaults.headers.common['X-Auth-Token'] = token;
@@ -46,16 +43,34 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
 
         function destroyUserCredentials() {
             authToken = undefined;
-            username = '';
             isAuthenticated = false;
-            userProfile = {};
             $http.defaults.headers.common['X-Auth-Token'] = undefined;
             window.localStorage.removeItem(LOCAL_TOKEN_KEY);
             window.localStorage.removeItem(LOCAL_USERPROFILE_KEY);
+            $auth.logout();
         }
 
-        var login = function(name, pw) {
+        var login = function(credentials) {
             return $q(function(resolve, reject) {
+                $auth.login(credentials).then(function(response){
+                    if(response.status == 200){
+                        var req = {
+                            method: 'GET',
+                            url: 'http://localhost:8000/v1/api/profile?token='+response.data.token
+                        }
+                        $http(req).then(function(dataProfile){
+                            // success handler
+                            storeUserCredentials(response.data.token, dataProfile.data);
+                            resolve('Login success.');
+                        }, function(){
+                            reject('Login Failed.');
+                        });
+                    }else{
+                        reject('Login Failed.');
+                    }
+                });
+            });
+            /*return $q(function(resolve, reject) {
                 if ((name == 'admin' && pw == '1') || (name == 'user' && pw == '1') || (name == 'customer' && pw == '1')) {
                     // Make a request and receive your auth token from your server
                     storeUserCredentials(name + '.yourServerToken', {"username": name});
@@ -63,7 +78,7 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
                 } else {
                     reject('Login Failed.');
                 }
-            });
+            });*/
         };
 
         var logout = function() {
@@ -87,10 +102,10 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
             login: login,
             logout: logout,
             isAuthorized: isAuthorized,
+            authToken: authToken,
             isAuthenticated: function() {return isAuthenticated;},
-            username: function() {return username;},
-            role: function() {return role;},
-            loadUserProfile: loadUserProfile
+            userProfile: function() {return loadUserProfile();},
+            role: function() {return role;}
         };
     })
     .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
@@ -109,7 +124,7 @@ services.service('AuthService', function($q, $http, USER_ROLES) {
     }]);
 
 /*************** Profile Service/Model ******************/
-services.service('ProfileService', function($q, $http, USER_ROLES) {
+services.service('ProfileService', function($q, $http, $auth, USER_ROLES) {
     var confirmResetPassword = function(username) {
         return $q(function(resolve, reject) {
             if (username == 'admin' || username == 'customer') {
@@ -121,11 +136,9 @@ services.service('ProfileService', function($q, $http, USER_ROLES) {
     };
     var doSignUp = function(data){
         return $q(function(resolve, reject) {
-            if (data.username == 'admin') {
-                resolve('success');
-            } else {
-                reject('failed');
-            }
+            $auth.signup(data).then(function(response) {
+                console.log(response);
+            });
         });
     }
     return {
@@ -134,7 +147,7 @@ services.service('ProfileService', function($q, $http, USER_ROLES) {
     };
 });
 services.factory('Profile', ['$resource', function($resource) {
-    return $resource('/profiles/:id', {id: '@id'});
+    return $resource('v1/api/profile/:id', {id: '@id'});
 }]);
 services.factory('MultiProfileLoader', ['Profile', '$q',
     function(Store, $q) {
@@ -163,8 +176,8 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
 /*************** End Profile Model ******************/
 
 /*************** Begin Store Model ******************/
-services.factory('Store', ['$resource', function($resource) {
-    return $resource('/stores/:id', {id: '@id'});
+services.factory('Store', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
+    return $resource(API_PARAM.baseUrl + 'stores/:id', {id: '@id'});
 }]);
 services.factory('MultiStoreLoader', ['Store', '$q',
     function(Store, $q) {
@@ -192,8 +205,8 @@ services.factory('StoreLoader', ['Store', '$route', '$q',
     }]);
 /*************** End Store Model ******************/
 /*************** Receipt Model ******************/
-services.factory('Receipt', ['$resource', function($resource) {
-    return $resource('/receipts/:id', {id: '@id'});
+services.factory('Receipt', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
+    return $resource(API_PARAM.baseUrl + 'receipts/:id', {id: '@id'});
 }]);
 services.factory('MultiReceiptLoader', ['Receipt', '$q',
     function(Store, $q) {
@@ -215,6 +228,36 @@ services.factory('ReceiptLoader', ['Receipt', '$route', '$q',
                 delay.resolve(store);
             }, function() {
                 delay.reject('Unable to fetch store ' + $route.current.params.receiptId);
+            });
+            return delay.promise;
+        };
+    }]);
+/******************** Customer Note **********************/
+services.factory('CustomerNote', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:customerId/notes/:id', {customerId: '@customerId', id: '@id'}, {query: {params: {token: AuthService.authToken}}});
+    return customerNote;
+}]);
+services.factory('MultiCustomerNoteLoader', ['CustomerNote', '$q',
+    function(CustomerNote, $q) {
+        return function() {
+            var delay = $q.defer();
+            CustomerNote.query(function(customerNotes) {
+                console.log(customerNotes);
+                delay.resolve(customerNotes);
+            }, function() {
+                delay.reject('Unable to fetch receipts');
+            });
+            return delay.promise;
+        };
+    }]);
+services.factory('CustomerNoteLoader', ['CustomerNote', '$route', '$q',
+    function(CustomerNote, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            CustomerNote.get({customerId: $route.current.params.customerId, id: $route.current.params.id}, function(customerNote) {
+                delay.resolve(customerNote);
+            }, function() {
+                delay.reject('Unable to fetch CustomerNote ' + $route.current.params.id);
             });
             return delay.promise;
         };

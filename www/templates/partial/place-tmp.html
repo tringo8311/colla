@@ -1,8 +1,9 @@
 <div class="place-window">
     <div class="place-heading">
         <img src="{{ dataPopup.imgPath }}" width="80" height="80" class="pull-left"/>
-        <h4>{{ dataPopup.name }}</h4>
-        <address>{{ dataPopup.address }}, {{ dataPopup.zipcode }}</address>
+        <h4>{{ dataPopup.title }}</h4>
+        <div class="address">{{ dataPopup.address }}, {{ dataPopup.zipcode }}</div>
+        <p>about {{ dataPopup.distance }} km</p>
         <div class="clearfix"></div>
     </div>
     <div class="place-body">

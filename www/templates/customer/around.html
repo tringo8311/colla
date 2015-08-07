@@ -7,21 +7,23 @@
             <label class="item-input-wrapper">
                 <i class="icon ion-ios-search placeholder-icon"></i>
                 <input id="addressInput" type="search" placeholder="Search" ng-model="addressInput" ng-required=""/>
+                <!--select ng-model="myRadius" ng-options="radius.name for radius in radiusList track by radius.value"></select-->
             </label>
-            <button class="button button-clear" ng-click="searchLocationsNear()">Search</button>
+            <button class="button button-clear" ng-click="searchLocationsNear()"><i class="ion ion-android-search"></i></button>
+            <button class="button button-clear" style="position: absolute; z-index: 1000; right: 50px; width:100px" ng-click="openPopoverRadius($event)"><span>({{ myRadius }} miles)</span> <i class="ion ion-ios-arrow-down"></i></button>
         </ion-header-bar>
         <div id="map_canvas">
             <map center="37.7749295,-122.41941550000001" center="current-location" zoom="9" data-tap-disabled="true" style="height: {{ dimenstion.dev_height }}">
                 <marker position="{{currentPosition.coords.lat}}, {{currentPosition.coords.lng}}" on-click="getCurrentAddress()" animation="DROP" draggable="true"></marker>
                 <custom-control id="detectLocationId" position="TOP_RIGHT" index="1" on-click="detectLocationClick()">
-                    <button class="button button-positive"><i class="ion ion-compass"></i></button>
+                    <button class="button button-small button-positive" title="Current Location" style="margin-top: 5px;"><i class="ion ion-compass"></i></button>
                 </custom-control>
             </map>
         </div>
     </ion-content>
     <div class="bar bar-footer">
         <button class="button button-clear" ng-show="markerList.length" ng-click="openPopoverResult($event)">Results</button>
-        <div class="title">-</div>
+        <div class="title"><i class="icon ion-pinpoint h3" title="Get Center map" ng-click="setCenterMap($event)"></i></div>
         <button class="button button-clear" ng-click="openPopoverDirection($event)">Direction</button>
     </div>
 </ion-view>

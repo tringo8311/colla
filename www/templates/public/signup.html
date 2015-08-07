@@ -7,7 +7,7 @@
         <div class="logo-body">
             <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
         </div>
-        <form ng-submit="doSignUp(data)">
+        <form>
             <div class="list list-inset">
                 <label class="item item-input">
                     <input type="text" placeholder="Username" ng-model="data.username" required="true" maxlength="16"/>
@@ -54,7 +54,7 @@
                 </label>
             </div>
             <div class="button-bar">
-                <button class="button button-positive" ng-click="">Submit</button>
+                <button class="button button-positive" ng-click="doSignUp(data)">Submit</button>
             </div>
         </form>
     </ion-content>

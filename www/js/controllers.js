@@ -4,7 +4,10 @@
  */
 var collaApp = angular.module('collaApp');
 collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS) {
-        $scope.username = AuthService.username();
+        $scope.userProfile = null;
+        if(AuthService.userProfile()){
+            $scope.userProfile = AuthService.userProfile();
+        }
 
         $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
             var alertPopup = $ionicPopup.alert({
@@ -22,15 +25,26 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             });
         });
 
-        $scope.setCurrentUsername = function(name) {
-            $scope.username = name;
+        $scope.setCurrentProfile = function(profile) {
+            $scope.userProfile = profile;
         };
     })
-    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, UtilService, AuthService) {
+    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService) {
         $scope.data = {};
+        $scope.remember = 0;
 
-        $scope.login = function(data) {
-            AuthService.login(data.username, data.password).then(function(authenticated) {
+        $scope.login = function() {
+            var credentials = {
+                email: $scope.data.email,
+                password: $scope.data.password,
+                remember: $scope.remember
+            }
+            // Use Satellizer's $auth service to login
+            AuthService.login(credentials).then(function(data) {
+                $state.go('customer.dash', {}, {reload: true});
+                $scope.setCurrentProfile(AuthService.userProfile());
+            });
+            /*AuthService.login(data.username, data.password).then(function(authenticated) {
                 $state.go('customer.dash', {}, {reload: true});
                 $scope.setCurrentUsername(data.username);
             }, function(err) {
@@ -38,8 +52,15 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                     title: 'Login failed!',
                     template: 'Please check your credentials!'
                 });
-            });
+            });*/
         };
+        $scope.authenticate = function(type){
+            if(type=='google'||type=='facebook'||type=='twitter'){
+                $auth.authenticate(type).then(function(response) {
+                    // Signed In.
+                });
+            }
+        }
     })
     .controller('NavController', function($scope, $ionicSideMenuDelegate) {
         $scope.toggleLeft = function() {
@@ -102,8 +123,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
     })
     .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
         if(AuthService.isAuthenticated()){
-            $scope.data = AuthService.loadUserProfile();
-            console.log($scope.data);
+            $scope.data = AuthService.userProfile();
         }else{
             $scope.go("login");
         }
@@ -169,13 +189,21 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             return $scope.shownGroup === group;
         }
     }])
+    .controller('CustomerNoteCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "CustomerNote", function($scope, $state, $http, $ionicPopup, AuthService, CustomerNote) {
+        CustomerNote.get({customerId: 1}, function(notes){
+            $scope.customerNotes = notes.data;
+        }, function(errResponse) {
+            // fail
+        });
+    }])
     .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, Store, UtilService) {
         $scope.store = {};
-        Store.get({id:1}, function(store) {
-            var myStore = store;
+        Store.get({id:128}, function(store) {
+            var myStore = store.store, firstChar = myStore.title.charAt(0) ? myStore.title.charAt(0) : "0";
             angular.extend($scope.store, myStore, {
                 phone: UtilService.phoneFormat(myStore.phone),
-                website: UtilService.addHttp(myStore.website)
+                website: UtilService.addHttp(myStore.website),
+                firstChar: firstChar
             });
         });
         $scope.heomoi = [
@@ -306,6 +334,10 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 }
                 updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow);
             }
+            $scope.setCenterMap = function(ev){
+                ev.preventDefault();
+                currentMap.setCenter(currentPositionMarker.getPosition());
+            }
             $scope.detectLocationClick = function() {
                 MapService.detectCurrentLocation().then(function (answer) {
                     if (answer.status == "success") {
@@ -325,12 +357,13 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             $scope.searchLocationsNear = function(){
                 var needleLatLng = currentPositionMarker.getPosition();
                 $scope.markerList = [];
-                MapService.locationService.searchLocationsNear(needleLatLng, 50).then(function(markerNodes){
+                MapService.locationService.searchLocationsNear(needleLatLng, parseInt($scope.myRadius)).then(function(markerNodes){
                     if( 0 < markerNodes.length){
-                        var makerNode, bounds = new google.maps.LatLngBounds();
+                        var makerNode, firstChar = 'A', bounds = new google.maps.LatLngBounds();
                         for (var i = 0; i < markerNodes.length; i++) {
                             makerNode = markerNodes[i];
-                            var name = makerNode.getAttribute("name"),
+                            var title = makerNode.getAttribute("title"),
+                                firstChar = title.charAt(0) ? title.charAt(0) : "0",
                                 address = makerNode.getAttribute("address"),
                                 distance = parseFloat(makerNode.getAttribute("distance"));
                             var latlng = new google.maps.LatLng(parseFloat(makerNode.getAttribute("lat")),
@@ -341,10 +374,11 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                                 fax: makerNode.getAttribute("fax"),
                                 email: makerNode.getAttribute("email"),
                                 website: makerNode.getAttribute("website"),
-                                business_hour: makerNode.getAttribute("business_hour")
+                                business_hour: makerNode.getAttribute("business_hour"),
+                                distance: UtilService.toFixed(distance, 2), firstChar: firstChar
                             }
-                            $scope.markerList.push(angular.extend({name: name, address: address},extra));
-                            MapService.markerService.createMarker(latlng, name, address, extra);
+                            $scope.markerList.push(angular.extend({title: title, address: address}, extra));
+                            MapService.markerService.createMarker(latlng, title, address, extra);
                         }
                         bounds.extend(latlng);
                         currentMap.setZoom(14);
@@ -365,6 +399,39 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 });
             }
 
+            /**
+             *
+             * @type {null}
+             */
+            $scope.myRadius = 3;
+            $scope.radiusList = [
+                {name:'3 miles', value: '3'},
+                {name:'5 miles', value: '5'},
+                {name:'10 miles', value: '10'},
+                {name:'25 miles', value: '25'},
+                {name:'50 miles', value: '50'}
+            ];
+            $scope.popoverRadius = null;
+            $scope.selectRadius = function(ev, radius){
+                ev.preventDefault();
+                $scope.myRadius = radius.value;
+                return;
+            };
+            $scope.selectedRadius = function(radius){
+                return $scope.myRadius === radius.value;
+            };
+            $ionicPopover.fromTemplateUrl('/templates/partial/radius-tmp.html', {
+                scope: $scope
+            }).then(function(popover) {
+                $scope.popoverRadius = popover;
+            });
+            $scope.openPopoverRadius = function($event) {
+                $scope.popoverRadius.show($event);
+            };
+            $scope.closePopoverRadius = function() {
+                $scope.popoverRadius.hide();
+            };
+
             $ionicPopover.fromTemplateUrl('/templates/partial/result-tmp.html', {
                 scope: $scope
             }).then(function(popover) {
@@ -377,7 +444,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 $scope.popoverResult.hide();
             };
 
-           $ionicPopover.fromTemplateUrl('/templates/partial/direction-tmp.html', {
+            $ionicPopover.fromTemplateUrl('/templates/partial/direction-tmp.html', {
                 scope: $scope
             }).then(function(popover) {
                 $scope.popoverDirection = popover;
