@@ -27,18 +27,18 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
             isAuthenticated = true;
             authToken = token;
 
-            /*if (username == 'admin') {
+            /*if (profile.role == 'admin') {
                 role = USER_ROLES.admin
-            }else if (username == 'user') {
+            }else if (profile.role == 'user') {
                 role = USER_ROLES.public
-            }else if (username == 'customer') {
+            }else if (profile.role == 'customer') {
                 role = USER_ROLES.customer
             }else{*/
                 role = USER_ROLES.customer
             /*}*/
-
             // Set the token as header for your requests!
-            $http.defaults.headers.common['X-Auth-Token'] = token;
+            $http.defaults.headers.common['X-Auth-Token'] = authToken;
+            //$http.defaults.headers.get = {token: authToken};
         }
 
         function destroyUserCredentials() {
@@ -124,7 +124,7 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
     }]);
 
 /*************** Profile Service/Model ******************/
-services.service('ProfileService', function($q, $http, $auth, USER_ROLES) {
+services.service('ProfileService', function($q, $http, $auth, Profile) {
     var confirmResetPassword = function(username) {
         return $q(function(resolve, reject) {
             if (username == 'admin' || username == 'customer') {
@@ -137,24 +137,32 @@ services.service('ProfileService', function($q, $http, $auth, USER_ROLES) {
     var doSignUp = function(data){
         return $q(function(resolve, reject) {
             $auth.signup(data).then(function(response) {
-                console.log(response);
+                resolve(response);
+            });
+        });
+    }
+    var doUpdate = function(formData){
+        return $q(function(resolve, reject) {
+            Profile.save(formData, function(response){
+                resolve(response);
             });
         });
     }
     return {
         confirmResetPassword: confirmResetPassword,
-        doSignUp: doSignUp
+        doSignUp: doSignUp,
+        doUpdate: doUpdate
     };
 });
-services.factory('Profile', ['$resource', function($resource) {
-    return $resource('v1/api/profile/:id', {id: '@id'});
+services.factory('Profile', ['$resource' , 'API_PARAM', function($resource, API_PARAM) {
+    return $resource(API_PARAM.baseUrl + 'profile/:id', {id: '@id'});
 }]);
 services.factory('MultiProfileLoader', ['Profile', '$q',
-    function(Store, $q) {
+    function(Profile, $q) {
         return function() {
             var delay = $q.defer();
-            Store.query(function(stores) {
-                delay.resolve(stores);
+            Profile.query(function(profiles) {
+                delay.resolve(profiles);
             }, function() {
                 delay.reject('Unable to fetch stores');
             });
@@ -234,7 +242,16 @@ services.factory('ReceiptLoader', ['Receipt', '$route', '$q',
     }]);
 /******************** Customer Note **********************/
 services.factory('CustomerNote', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
-    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:customerId/notes/:id', {customerId: '@customerId', id: '@id'}, {query: {params: {token: AuthService.authToken}}});
+    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:user_id/notes/:id',
+        {   user_id: '@user_id', id: '@id'},
+        {   query: {
+                params: {token: AuthService.authToken},
+                update: {method: 'PUT'}, query: {
+                    method: 'GET',
+                    isArray: false
+                }
+            }
+        });
     return customerNote;
 }]);
 services.factory('MultiCustomerNoteLoader', ['CustomerNote', '$q',
@@ -242,7 +259,6 @@ services.factory('MultiCustomerNoteLoader', ['CustomerNote', '$q',
         return function() {
             var delay = $q.defer();
             CustomerNote.query(function(customerNotes) {
-                console.log(customerNotes);
                 delay.resolve(customerNotes);
             }, function() {
                 delay.reject('Unable to fetch receipts');
@@ -262,3 +278,43 @@ services.factory('CustomerNoteLoader', ['CustomerNote', '$route', '$q',
             return delay.promise;
         };
     }]);
+/******************** Customer Feedback **********************/
+services.factory('CustomerFeedback', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    console.log("token: " + AuthService.authToken);
+    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:user_id/feedbacks/:id',
+        {   user_id: '@user_id', id: '@id'},
+        {   query: {
+            params: {token: AuthService.authToken},
+            update: {method: 'PUT'}, query: {
+                method: 'GET',
+                isArray: false
+            }
+        }
+        });
+    return customerNote;
+}]);
+services.factory('MultiCustomerFeedbackLoader', ['CustomerFeedback', '$q',
+    function(CustomerFeedback, $q) {
+        return function() {
+            var delay = $q.defer();
+            CustomerFeedback.query(function(customerFeedbacks) {
+                delay.resolve(customerFeedbacks);
+            }, function() {
+                delay.reject('Unable to fetch receipts');
+            });
+            return delay.promise;
+        };
+    }]);
+services.factory('CustomerFeedbackLoader', ['CustomerFeedback', '$route', '$q',
+    function(CustomerFeedback, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            CustomerFeedback.get({customerId: $route.current.params.customerId, id: $route.current.params.id}, function(customerFeedback) {
+                delay.resolve(customerFeedback);
+            }, function() {
+                delay.reject('Unable to fetch CustomerFeedback ' + $route.current.params.id);
+            });
+            return delay.promise;
+        };
+    }]);
+/******************** Customer Reservation **********************/

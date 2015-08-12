@@ -9,11 +9,12 @@ angular.module('collaApp')
     notAuthenticated: 'auth-not-authenticated',
     notAuthorized: 'auth-not-authorized'
 })
-.constant('EXCLUDE_PATH', ["signup", "forgotpassword"])
+.constant('EXCLUDE_PATH', ["login", "signup", "forgotpassword"])
 .constant('USER_ROLES', {
-    admin: 'admin_role',
-    customer: 'customer_role',
-    public: 'public_role'
+    admin: 'admin',
+    agency: 'agency',
+    customer: 'customer',
+    'public': 'public'
 });
 var STORE_LIST = new Array();
 STORE_LIST.push({

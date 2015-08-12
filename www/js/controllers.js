@@ -5,24 +5,29 @@
 var collaApp = angular.module('collaApp');
 collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS) {
         $scope.userProfile = null;
+        $scope.flashMessage = {
+            visibility: false,
+            className: "",
+            message: ''
+        }
         if(AuthService.userProfile()){
             $scope.userProfile = AuthService.userProfile();
         }
 
         $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
-            var alertPopup = $ionicPopup.alert({
+            $ionicPopup.alert({
                 title: 'Unauthorized!',
                 template: 'You are not allowed to access this resource.'
             });
         });
 
         $scope.$on(AUTH_EVENTS.notAuthenticated, function(event) {
-            AuthService.logout();
-            $state.go('login');
-            var alertPopup = $ionicPopup.alert({
+            $ionicPopup.alert({
                 title: 'Session Lost!',
                 template: 'Sorry, You have to login again.'
             });
+            AuthService.logout();
+            $state.go('login');
         });
 
         $scope.setCurrentProfile = function(profile) {
@@ -117,15 +122,30 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 console.error(err);
             });
         }
-        if(AuthService.isAuthorized){
+        if(AuthService.isAuthenticated){
             $state.go('customer.dash');
         }
     })
-    .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
+    .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
         if(AuthService.isAuthenticated()){
             $scope.data = AuthService.userProfile();
         }else{
             $scope.go("login");
+        }
+        $scope.updateProfile = function(){
+            ProfileService.doUpdate($scope.data).then(function(response){
+                if(response.status=="success"){
+                    $scope.flashMessage.className = "success";
+                }else{
+                    $scope.flashMessage.className = "error";
+                }
+                $scope.flashMessage.visibility = true;
+                $scope.flashMessage.message = response.message;
+
+                $timeout(function() {
+                    $scope.flashMessage.visibility = false;
+                }, 2000);
+            });
         }
     })
     .controller('DashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
@@ -166,7 +186,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             if(document.querySelector("#qrcode")){
                 angular.element(document.querySelector("#qrcode")).empty();
                 new QRCode("qrcode", {
-                    text: "http://jindo.dev.naver.com/collie",
+                    text: $scope.userProfile.code,
                     width: 220,
                     height: 220,
                     colorDark : "#000000",
@@ -176,6 +196,50 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
         });
     })
+    .controller('ContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
+        $scope.formData = {
+            fullname: $scope.userProfile.username,
+            email: $scope.userProfile.email
+        }
+        $scope.message = {
+            submissionMessage: "",
+            submission: false
+        }
+        var param = function(data) {
+            var returnString = '';
+            for (d in data){
+                if (data.hasOwnProperty(d))
+                    returnString += d + '=' + data[d] + '&';
+            }
+            // Remove last ampersand and return
+            return returnString.slice( 0, returnString.length - 1 );
+        };
+        $scope.doSendContact = function(){
+            $http({
+                method : 'POST',
+                url : API_PARAM.baseUrl + 'profile/contact?token=' + AuthService.authToken,
+                data : param($scope.formData), // pass in data as strings
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
+            }).success(function(data) {
+                if (!data.status == "success") {
+                    // if not successful, bind errors to error variables
+                    //$scope.message.submissionMessage = data.messageError;
+                    $scope.message.submissionMessage = data.message;
+                    $scope.message.submission = true; //shows the error message
+                } else {
+                    // if successful, bind success message to message
+                    angular.forEach(data.messages, function(value, key) {
+                        $scope.message.submissionMessage += '<li>' + value + '</li>';
+                    });
+                    $scope.message.submission = true; //shows the success message
+                    $scope.formData = {
+                        fullname: $scope.userProfile.username,
+                        email: $scope.userProfile.email
+                    }
+                }
+            });
+        }
+    }])
     .controller('ReceiptCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Receipt", function($scope, $state, $http, $ionicPopup, AuthService, Receipt) {
         $scope.groups = Receipt.query();
         $scope.toggleGroup = function(group) {
@@ -189,12 +253,38 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             return $scope.shownGroup === group;
         }
     }])
-    .controller('CustomerNoteCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "CustomerNote", function($scope, $state, $http, $ionicPopup, AuthService, CustomerNote) {
-        CustomerNote.get({customerId: 1}, function(notes){
-            $scope.customerNotes = notes.data;
-        }, function(errResponse) {
-            // fail
+    .controller('CustomerNoteCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerNote", function($scope, $state, $http, $ionicModal, AuthService, CustomerNote) {
+        $scope.doRefresh = function(){
+            CustomerNote.get({user_id: 1}, function(notes){
+                $scope.customerNotes = notes.data;
+                $scope.$broadcast('scroll.refreshComplete');
+            }, function(errResponse) {
+                $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        $scope.doRefresh();
+
+        $scope.noteData = {user_id: 1};
+        $scope.saveNote = function(){
+            CustomerNote.save($scope.noteData, function(responseData){
+                $scope.customerNotes.push(responseData);
+                $scope.noteData= {user_id: 1};
+                $scope.closeModal();
+            });
+        }
+
+        $ionicModal.fromTemplateUrl('templates/partial/note-tmp.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modal = modal;
         });
+        $scope.openModal = function() {
+            $scope.modal.show();
+        };
+        $scope.closeModal = function() {
+            $scope.modal.hide();
+        };
     }])
     .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, Store, UtilService) {
         $scope.store = {};
@@ -217,6 +307,41 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 src:'/img/bg3.jpg'
             }
         ]
+    }])
+    .controller('CustomerFeedbackCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerFeedback", function($scope, $state, $http, $ionicModal, AuthService, CustomerFeedback) {
+        // Feedback
+        $scope.customerFeedbacks = [];
+        $scope.doRefresh = function(){
+            CustomerFeedback.get({user_id: 1}, function(feedbacks){
+                $scope.customerFeedbacks = feedbacks.data;
+                $scope.$broadcast('scroll.refreshComplete');
+            }, function(errResponse) {
+                $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        $scope.doRefresh();
+
+        $scope.feedbackData = { user_id: 1, rate: 1, service: "", employee: "", content: ""};
+        $scope.saveFeedback = function(){
+            CustomerFeedback.save($scope.feedbackData, function(responseData){
+                $scope.customerFeedbacks.push(responseData);
+                $scope.feedbackData={ user_id: 1, rate: 1, service: "", employee: "", content: ""};;
+                $scope.closeModal();
+            });
+        }
+
+        $ionicModal.fromTemplateUrl('templates/partial/feedback-tmp.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modal = modal;
+        });
+        $scope.openModal = function() {
+            $scope.modal.show();
+        };
+        $scope.closeModal = function() {
+            $scope.modal.hide();
+        };
     }])
     .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "_",
         function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, _) {
@@ -403,7 +528,6 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
              *
              * @type {null}
              */
-            $scope.myRadius = 3;
             $scope.radiusList = [
                 {name:'3 miles', value: '3'},
                 {name:'5 miles', value: '5'},
@@ -411,6 +535,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 {name:'25 miles', value: '25'},
                 {name:'50 miles', value: '50'}
             ];
+            $scope.myRadius = '3';
             $scope.popoverRadius = null;
             $scope.selectRadius = function(ev, radius){
                 ev.preventDefault();
@@ -463,5 +588,3 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             google.maps.event.trigger(map, "resize");
         });*/
     }]);
-
-;

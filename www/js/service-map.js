@@ -156,6 +156,7 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
                             });
                         }
                     }
+                    return directionsDisplay;
                 });
                 google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
                     directionsDisplay.setPanel(document.getElementById("directionsPanel"));
@@ -168,7 +169,6 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
                         });
                     }
                 });
-
             },
             computeTotalDistance : function(result) {
                 var total = 0;
@@ -237,7 +237,8 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
                     map: this.seflMap,
                     position: latlng,
                     storeObj: storeObj,
-                    animation: google.maps.Animation.DROP
+                    animation: google.maps.Animation.DROP,
+                    title: title + " - " + storeObj.phone + ", distance (" + storeObj.distance +"mi)"
                 });
                 google.maps.event.addListener(marker, 'click', function (evt) {
                     if(d.events != undefined) {

@@ -26,6 +26,21 @@
 .popup-container .popup {
   width: 350px; }
 
+.popover {
+  height: 380px; }
+
+.flash-message {
+  padding: 12px 6px;
+  border: 1px solid #c0c0c0;
+  line-height: 24px;
+  margin: 5px 0; }
+  .flash-message.error {
+    border-color: #ef473a;
+    color: #ef473a; }
+  .flash-message.success {
+    border-color: #008800;
+    color: #008800; }
+
 /***********************************/
 .login-page {
   background: url("../img/bg3.jpg") no-repeat center center fixed;

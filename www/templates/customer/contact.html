@@ -3,19 +3,24 @@
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content has-header="true" class="padding">
+        <h3>Get in touch</h3>
+        <div class="message" ng-class="{active: message.submission}">
+            {{ message.submissionMessage }}
+        </div>
         <div class="list list-inset">
             <label class="item item-input">
-                <input type="text" placeholder="Full Name" ng-model="data.fullname">
+                <input class="required" type="text" placeholder="Full Name" ng-model="formData.fullname">
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Email" ng-model="data.email">
+                <input class="required" type="text" placeholder="Email" ng-model="formData.email">
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Subject" ng-model="data.subject">
+                <input class="required" type="text" placeholder="Subject" ng-model="formData.subject">
             </label>
             <label class="item item-input">
-                <textarea class="" type="text" placeholder="Content" rows="8" cols="40" ng-model="data.content"></textarea>
-            </label>
+                <textarea class="required" type="text" placeholder="Message" rows="8" cols="40" ng-model="formData.message"></textarea>
+            </label><br/>
+            <button class="button button-block button-positive" ng-click="doSendContact()">Send message</button>
         </div>
     </ion-content>
 </ion-view>

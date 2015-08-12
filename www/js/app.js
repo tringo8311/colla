@@ -152,6 +152,18 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                 views: {
                     'main-content': {
                         templateUrl: 'templates/customer/feedback.html',
+                        controller: 'CustomerFeedbackCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
+                }
+            })
+            .state('customer.reservation', {
+                url: 'customer/reservation',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/customer/reservation.html',
                         controller: 'PlaceCtrl'
                     }
                 },
@@ -197,7 +209,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                 url: 'customer/contact',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/contact.html'
+                        templateUrl: 'templates/customer/contact.html',
+                        controller: 'ContactCtrl'
                     }
                 },
                 data: {
@@ -210,9 +223,6 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                     'main-content': {
                         templateUrl: 'templates/customer/policy.html'
                     }
-                },
-                data: {
-                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
                 }
             });
         $urlRouterProvider.otherwise('/customer/dash');
@@ -238,8 +248,11 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
     .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {
             // page required authentication
-            if ('data' in next && 'authorizedRoles' in next.data) {
+            if(EXCLUDE_PATH.indexOf(next.name) > -1 || $state.current.name == "login") {
+                return;
+            }else if ('data' in next && 'authorizedRoles' in next.data) {
                 var authorizedRoles = next.data.authorizedRoles;
+                console.log(authorizedRoles);
                 if (!AuthService.isAuthorized(authorizedRoles)) {
                     event.preventDefault();
                     if($state.abstract){
@@ -249,9 +262,6 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ion-gallery', '
                         $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
                     }
                 }
-            }else if(EXCLUDE_PATH.indexOf(next.name) > -1){
-
-                return;
             }else if (!AuthService.isAuthenticated()) {
                 if (next.name !== 'login') {
                     event.preventDefault();

@@ -1,0 +1,28 @@
+<ion-modal-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> Create Note</div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Product code" ng-model="noteData.product_code" autofocus=""/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Barcode" ng-model="noteData.barcode"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <textarea type="text" placeholder="Content" rows="8" cols="40" ng-model="noteData.content"></textarea>
+                </label>
+            </div>
+            <div class="button-bar">
+                <button class="button" ng-click="closeModal()">Cancel</button>
+                <button class="button" ng-click="saveNote()">Save</button>
+            </div><br/>
+        </form>
+    </ion-content>
+</ion-modal-view>

@@ -1,0 +1,36 @@
+<ion-modal-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> Create Note</div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form>
+            <div class="list list-inset">
+                <div class="item range">
+                    <i class="icon ion-android-star-outline"></i>
+                    <input type="range" name="rate" ng-model="feedbackData.rate" min="1" max="5">
+                    <i class="icon ion-android-star"></i>
+                </div>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Service" ng-model="feedbackData.service" auto-focus=""/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Employee" ng-model="feedbackData.employee"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <textarea placeholder="Comments" rows="8" ng-model="feedbackData.content"></textarea>
+                </label>
+            </div>
+            <div class="button-bar">
+                <button class="button button-positive" ng-click="closeModal()">Cancel</button>
+                <button class="button button-positive" ng-click="saveFeedback()">Save</button>
+            </div>
+            <br/>
+        </form>
+    </ion-content>
+</ion-modal-view>

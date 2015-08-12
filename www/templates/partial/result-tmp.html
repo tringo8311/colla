@@ -1,12 +1,12 @@
 <ion-popover-view>
     <ion-header-bar class="icon-left">
-        <div class="title"><i class="icon ion-search"></i> Search Results</div>
+        <div class="title"><i class="icon ion-search"></i> Search  {{ markerList.length }} result(s)</div>
     </ion-header-bar>
     <ion-content>
         <ion-list ng-repeat="item in markerList" class="list odd-background">
             <ion-item ng-class-odd="'odd'" ng-class-even="'even'" class="list-item item-avatar item-text-wrap">
                 <div class="item-char">{{item.firstChar}}</div>
-                <span class="item-note">{{item.distance}} (km)</span>
+                <span class="item-note">{{item.distance}} (mi)</span>
                 <h2>{{item.title}}</h2>
                 <p>{{item.address}}</p>
             </ion-item>

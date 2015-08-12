@@ -1,6 +1,10 @@
 /* Empty. Add your own CSS if you like */
 
 @import "www/lib/ionic/scss/_variables";
+
+$success: #008800 !default;
+$error: #ef473a !default;
+
 $ion-img-path: "../img" !default;
 .strong{
   font-weight: 600;
@@ -28,6 +32,23 @@ $ion-img-path: "../img" !default;
 }
 .popup-container .popup{
   width: 350px;
+}
+.popover{
+  height: 380px;
+}
+.flash-message{
+  padding: $padding-base-horizontal $padding-base-vertical;
+  border: 1px solid #c0c0c0;
+  line-height: 24px;
+  margin: 5px 0;
+  &.error{
+    border-color: $error;
+    color: $error;
+  }
+  &.success{
+    border-color: $success;
+    color: $success;
+  }
 }
 /***********************************/
 .login-page{
