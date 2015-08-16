@@ -1,11 +1,11 @@
 <ion-modal-view>
     <ion-header-bar class="icon-left">
-        <div class="title"><i class="icon ion-search"></i> Create Note</div>
+        <div class="title"><i class="icon ion-edit"></i> Create Note</div>
     </ion-header-bar>
     <ion-content class="padding">
         <form>
             <div class="list list-inset">
-                <div class="item range">
+                <div class="item range" ng-class="ratingClass">
                     <i class="icon ion-android-star-outline"></i>
                     <input type="range" name="rate" ng-model="feedbackData.rate" min="1" max="5">
                     <i class="icon ion-android-star"></i>

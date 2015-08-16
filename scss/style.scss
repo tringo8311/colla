@@ -2,12 +2,37 @@
 
 @import "www/lib/ionic/scss/_variables";
 
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #387ef5 !default;
+$calm:                            #11c1f3 !default;
+$balanced:                        #008800 !default;
+$energized:                       #E49307 !default;
+$assertive:                       #ef473a !default;
+$royal:                           #886aea !default;
+$dark:                            #444 !default;
+
 $success: #008800 !default;
 $error: #ef473a !default;
 
 $ion-img-path: "../img" !default;
 .strong{
   font-weight: 600;
+}
+.color-positive{
+  color: $positive;
+}
+.color-calm{
+  color: $calm;
+}
+.color-balanced{
+  color: $balanced;
+}
+.color-energized{
+  color: $energized;
+}
+.color-assertive{
+  color: $assertive;
 }
 .center-block {
   display: block;
@@ -19,6 +44,12 @@ $ion-img-path: "../img" !default;
 }
 .pull-left {
   float: left !important;
+}
+.date-time{
+  font-style: italic;
+}
+.larger{
+  font-size: larger;
 }
 .clearfix::before, .clearfix::after{
   content: " ";
@@ -106,7 +137,7 @@ $ion-img-path: "../img" !default;
 .qrcode-link .qrcode {
   margin: 0;
 }
-/**************************/
+/*********** list ***************/
 .list{
   .item{
     &.item-accordion{
@@ -126,7 +157,21 @@ $ion-img-path: "../img" !default;
     &.odd {
       background-color: #f0f0f0 !important;
     }
-
+    .item-pull-left{
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      max-width: 40px;
+      max-height: 40px;
+      width: 100%;
+      height: 100%;
+      background: none;
+      color: $positive;
+      text-align: center;
+      font-size: 1.4em;
+      line-height: 2.1em;
+      vertical-align: middle;
+    }
     .item-char{
       position: absolute;
       top: 16px;
@@ -158,4 +203,10 @@ $ion-img-path: "../img" !default;
     right: 0;
     left: 0;
   }
+}
+/************* slider *************/
+.slider {
+  width: 100%;
+  height: 400px;
+  border: 5px solid #FFF;
 }

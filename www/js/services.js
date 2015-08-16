@@ -3,17 +3,18 @@
  */
 var services = angular.module('collaApp');
 
-services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
+services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES) {
         var LOCAL_TOKEN_KEY = 'LOCAL_TOKEN_KEY';
         var LOCAL_USERPROFILE_KEY = 'LOCAL_USERPROFILE_KEY';
         var isAuthenticated = false;
-        var role = '';
-        var authToken;
+        var role = USER_ROLES.public;
+        var authToken = null;
 
         function loadUserCredentials() {
             var token = window.localStorage.getItem(LOCAL_TOKEN_KEY);
-            if (token) {
-                useCredentials(token);
+            var userProfile = window.localStorage.getItem(LOCAL_USERPROFILE_KEY);
+            if (token && userProfile) {
+                useCredentials(token, JSON.parse(userProfile));
             }
         }
 
@@ -26,16 +27,19 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
         function useCredentials(token, profile) {
             isAuthenticated = true;
             authToken = token;
-
-            /*if (profile.role == 'admin') {
-                role = USER_ROLES.admin
-            }else if (profile.role == 'user') {
-                role = USER_ROLES.public
-            }else if (profile.role == 'customer') {
-                role = USER_ROLES.customer
-            }else{*/
-                role = USER_ROLES.customer
-            /*}*/
+            console.log("set role" + role);
+            if(profile && profile.role) {
+                if (profile.role == 'admin') {
+                    role = USER_ROLES.admin
+                } else if (profile.role == 'user') {
+                    role = USER_ROLES.public
+                } else if (profile.role == 'customer') {
+                    role = USER_ROLES.customer
+                } else {
+                    role = USER_ROLES.customer
+                }
+            }
+            console.log("after set role" + role);
             // Set the token as header for your requests!
             $http.defaults.headers.common['X-Auth-Token'] = authToken;
             //$http.defaults.headers.get = {token: authToken};
@@ -56,7 +60,7 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
                     if(response.status == 200){
                         var req = {
                             method: 'GET',
-                            url: 'http://localhost:8000/v1/api/profile?token='+response.data.token
+                            url: API_PARAM.baseUrl + 'profile?token='+response.data.token
                         }
                         $http(req).then(function(dataProfile){
                             // success handler
@@ -70,15 +74,6 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
                     }
                 });
             });
-            /*return $q(function(resolve, reject) {
-                if ((name == 'admin' && pw == '1') || (name == 'user' && pw == '1') || (name == 'customer' && pw == '1')) {
-                    // Make a request and receive your auth token from your server
-                    storeUserCredentials(name + '.yourServerToken', {"username": name});
-                    resolve('Login success.');
-                } else {
-                    reject('Login Failed.');
-                }
-            });*/
         };
 
         var logout = function() {
@@ -86,14 +81,19 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
         };
 
         var isAuthorized = function(authorizedRoles) {
+            console.log(role);
             if (!angular.isArray(authorizedRoles)) {
                 authorizedRoles = [authorizedRoles];
             }
             return (isAuthenticated && authorizedRoles.indexOf(role) !== -1);
         };
 
-        var loadUserProfile = function(){
+        var loadLocalUserProfile = function(){
             return JSON.parse(window.localStorage.getItem(LOCAL_USERPROFILE_KEY));
+        }
+
+        var isAuthenticateFn = function() {
+            return isAuthenticated && authToken != null;
         }
 
         loadUserCredentials();
@@ -103,8 +103,8 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
             logout: logout,
             isAuthorized: isAuthorized,
             authToken: authToken,
-            isAuthenticated: function() {return isAuthenticated;},
-            userProfile: function() {return loadUserProfile();},
+            isAuthenticated: isAuthenticateFn,
+            userProfile: function() {return loadLocalUserProfile();},
             role: function() {return role;}
         };
     })
@@ -124,7 +124,7 @@ services.service('AuthService', function($q, $http, $auth, USER_ROLES) {
     }]);
 
 /*************** Profile Service/Model ******************/
-services.service('ProfileService', function($q, $http, $auth, Profile) {
+services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
     var confirmResetPassword = function(username) {
         return $q(function(resolve, reject) {
             if (username == 'admin' || username == 'customer') {
@@ -148,14 +148,45 @@ services.service('ProfileService', function($q, $http, $auth, Profile) {
             });
         });
     }
+    var doGetPlace = function(){
+        return $q(function(resolve, reject) {
+            Profile.place({id:1}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+    var doGetOffers = function(storeId){
+        return $q(function(resolve, reject) {
+            Store.offer({id:storeId}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+    var doFavourite = function(storeId){
+        return $q(function(resolve, reject) {
+            Profile.favourite({id: 1, store_id: storeId}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+
     return {
         confirmResetPassword: confirmResetPassword,
         doSignUp: doSignUp,
-        doUpdate: doUpdate
+        doUpdate: doUpdate,
+        doGetPlace: doGetPlace,
+        doGetOffers: doGetOffers,
+        doFavourite: doFavourite
     };
 });
-services.factory('Profile', ['$resource' , 'API_PARAM', function($resource, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'profile/:id', {id: '@id'});
+services.factory('Profile', ['$resource' , 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    return $resource(API_PARAM.baseUrl + 'profile/:id/:extendController',
+        {id: '@id', extendController: '@extendController'},
+        {
+            place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},
+            favourite: {method:'POST', params:{id: '@id', extendController: 'favourite', token: AuthService.authToken}
+        }
+    });
 }]);
 services.factory('MultiProfileLoader', ['Profile', '$q',
     function(Profile, $q) {
@@ -185,7 +216,9 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
 
 /*************** Begin Store Model ******************/
 services.factory('Store', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'stores/:id', {id: '@id'});
+    return $resource(API_PARAM.baseUrl + 'store/:id/:offerController', {id: '@id', offerController: '@offerController'},
+        {offer: {method:'GET', params:{id: '@id', offerController: 'offers'}}}
+    );
 }]);
 services.factory('MultiStoreLoader', ['Store', '$q',
     function(Store, $q) {

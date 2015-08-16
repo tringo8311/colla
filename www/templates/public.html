@@ -1,19 +1,13 @@
-<ion-view view-title="Public" name="dashboard-view">
+<ion-view view-title="Public" name="public-view">
+    <ion-nav-bar class="bar-positive"></ion-nav-bar>
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button icon-left ion-log-out button-stable" ng-click="logout()">Logout</button>
+    </ion-nav-buttons>
     <ion-content class="padding">
-        This is open for everyone!
+        <h3 class="title text-center"> Welcome to Offer colla</h3>
+        <p>This page is public page</p>
     </ion-content>
-    <ion-tabs class="tabs-icon-top tabsbalanced">
-        <ion-tab title="My Place" icon="ion-home" href="#/customer/dash">
-            <ion-nav-view name="dash-tab"></ion-nav-view>
-        </ion-tab>
-        <ion-tab title="Around" icon="ion-earth" href="#/customer/public">
-            <ion-nav-view name="public-tab"></ion-nav-view>
-        </ion-tab>
-        <ion-tab title="My Offer" icon="ion-android-subway" href="#/customer/offer">
-            <ion-nav-view name="offer-tab"></ion-nav-view>
-        </ion-tab>
-    </ion-tabs>
 </ion-view>

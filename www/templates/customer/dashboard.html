@@ -28,7 +28,7 @@
                 <br><br>
                 {{response}}
                 <div class="button-bar">
-                    <button class="button button-outline icon-left ion-android-checkmark-circle button-positive" ui-sref="customer.info">My place</button>
+                    <button class="button button-outline icon-left ion-android-checkmark-circle button-positive" ng-show="userProfile.store_id" ui-sref="customer.info">My place</button>
                     <button class="button button-outline icon-left ion-android-list button-positive" ui-sref="customer.note">Note</button>
                     <!--button class="button button-outline icon-left ion-android-star-outline button-calm" ui-sref="customer.feedback">Feedback</button-->
                 </div>

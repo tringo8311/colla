@@ -33,6 +33,11 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         $scope.setCurrentProfile = function(profile) {
             $scope.userProfile = profile;
         };
+
+        $scope.logout = function() {
+            AuthService.logout();
+            $state.go('login');
+        };
     })
     .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService) {
         $scope.data = {};
@@ -122,9 +127,10 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 console.error(err);
             });
         }
-        if(AuthService.isAuthenticated){
+        // TODO: check login or yet
+        /*if(AuthService.isAuthenticated){
             $state.go('customer.dash');
-        }
+        }*/
     })
     .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
         if(AuthService.isAuthenticated()){
@@ -149,11 +155,6 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         }
     })
     .controller('DashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
-        $scope.logout = function() {
-            AuthService.logout();
-            $state.go('login');
-        };
-
         $scope.performValidRequest = function() {
             $http.get('http://localhost:8100/valid').then(
                 function(result) {
@@ -240,26 +241,35 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             });
         }
     }])
-    .controller('ReceiptCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Receipt", function($scope, $state, $http, $ionicPopup, AuthService, Receipt) {
-        $scope.groups = Receipt.query();
-        $scope.toggleGroup = function(group) {
-            if ($scope.isGroupShown(group)) {
+    .controller('OfferCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "ProfileService", function($scope, $state, $http, $ionicPopup, AuthService, ProfileService) {
+        if($scope.userProfile.store_id){
+            ProfileService.doGetOffers($scope.userProfile.store_id).then(function(responseData) {
+                $scope.offers = responseData;
+            });
+        }
+        $scope.toggleGroup = function(item) {
+            if ($scope.isGroupShown(item)) {
                 $scope.shownGroup = null;
             } else {
-                $scope.shownGroup = group;
+                $scope.shownGroup = item;
             }
         }
-        $scope.isGroupShown = function(group){
-            return $scope.shownGroup === group;
+        $scope.isGroupShown = function(item){
+            return $scope.shownGroup === item;
         }
     }])
     .controller('CustomerNoteCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerNote", function($scope, $state, $http, $ionicModal, AuthService, CustomerNote) {
         $scope.doRefresh = function(){
-            CustomerNote.get({user_id: 1}, function(notes){
+            CustomerNote.get({user_id: $scope.userProfile.id}, function(notes){
                 $scope.customerNotes = notes.data;
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {
                 $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        $scope.doRemove = function(item){
+            CustomerNote.remove({user_id: $scope.userProfile.id, id : item.id}, function(responseData){
+                $scope.customerNotes.splice( $scope.customerNotes.indexOf(item), 1 );
             });
         }
         $scope.doRefresh();
@@ -286,29 +296,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             $scope.modal.hide();
         };
     }])
-    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "Store", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, Store, UtilService) {
-        $scope.store = {};
-        Store.get({id:128}, function(store) {
-            var myStore = store.store, firstChar = myStore.title.charAt(0) ? myStore.title.charAt(0) : "0";
-            angular.extend($scope.store, myStore, {
-                phone: UtilService.phoneFormat(myStore.phone),
-                website: UtilService.addHttp(myStore.website),
-                firstChar: firstChar
-            });
-        });
-        $scope.heomoi = [
-            {
-                src:'/img/bg1.jpg',
-                sub: 'This is a <b>subtitle</b>'
-            },{
-                src:'/img/bg2.jpg',
-                sub: 'Heo moi ' /* Not showed */
-            },{
-                src:'/img/bg3.jpg'
-            }
-        ]
-    }])
-    .controller('CustomerFeedbackCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerFeedback", function($scope, $state, $http, $ionicModal, AuthService, CustomerFeedback) {
+    .controller('CustomerFeedbackCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerFeedback", "RATING", function($scope, $state, $http, $ionicModal, AuthService, CustomerFeedback, RATING) {
         // Feedback
         $scope.customerFeedbacks = [];
         $scope.doRefresh = function(){
@@ -321,11 +309,25 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         }
         $scope.doRefresh();
 
+        // set class for
+        $scope.ratingClass = "";
+        $scope.$watch('feedbackData.rate', function (oldValue, newValue) {
+            angular.forEach(RATING, function(item, key) {
+                if(parseInt($scope.feedbackData.rate) == item.value){
+                    $scope.ratingClass = item.className;
+                    return;
+                }
+            });
+        });
         $scope.feedbackData = { user_id: 1, rate: 1, service: "", employee: "", content: ""};
         $scope.saveFeedback = function(){
             CustomerFeedback.save($scope.feedbackData, function(responseData){
-                $scope.customerFeedbacks.push(responseData);
-                $scope.feedbackData={ user_id: 1, rate: 1, service: "", employee: "", content: ""};;
+                if(responseData.status=="success"){
+                    $scope.customerFeedbacks.push(responseData.data);
+                    $scope.feedbackData={ user_id: 1, rate: 1, service: "", employee: "", content: ""};
+                }else{
+
+                }
                 $scope.closeModal();
             });
         }
@@ -343,8 +345,43 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             $scope.modal.hide();
         };
     }])
-    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "_",
-        function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, _) {
+    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "ProfileService", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, ProfileService, UtilService) {
+        $scope.store = {};
+        ProfileService.doGetPlace().then(function(myStore) {
+            var firstChar = myStore.title.charAt(0) ? myStore.title.charAt(0) : "0";
+            angular.extend($scope.store, myStore, {
+                phone: UtilService.phoneFormat(myStore.phone),
+                website: UtilService.addHttp(myStore.website),
+                firstChar: firstChar
+            });
+        });
+        $scope.slides = [
+            {
+                src:'/img/bg1.jpg',
+                sub: 'This is a <b>subtitle</b>'
+            },{
+                src:'/img/bg2.jpg',
+                sub: 'Heo moi ' /* Not showed */
+            },{
+                src:'/img/bg3.jpg'
+            }
+        ]
+        $scope.currentIndex = 0;
+        $scope.setCurrentSlideIndex = function (index) {
+            $scope.currentIndex = index;
+        };
+        $scope.isCurrentSlideIndex = function (index) {
+            return $scope.currentIndex === index;
+        };
+        $scope.prevSlide = function () {
+            $scope.currentIndex = ($scope.currentIndex < $scope.slides.length - 1) ? ++$scope.currentIndex : 0;
+        };
+        $scope.nextSlide = function () {
+            $scope.currentIndex = ($scope.currentIndex > 0) ? --$scope.currentIndex : $scope.slides.length - 1;
+        };
+    }])
+    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "ProfileService", "_",
+        function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, ProfileService, _) {
             var currentMap = null, currentPositionMarker = null, currentInfoWindow = null;
             $scope.dimenstion = {
                 dev_width : $window.innerWidth,
@@ -406,9 +443,9 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                     var directionClick = function () {
                         MapService.directionService.calcRoute(currentPositionMarker.getPosition(), $scope.dataPopup.latlng);
                     }
-                    var favouriteClick = function () {
+                    /*var favouriteClick = function (storeId) {
 
-                    }
+                    };*/
                     $ionicPopup.show({
                         title: "Information",
                         cssClass: '',
@@ -426,7 +463,12 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                             text: 'Favourite',
                             type: 'button-positive button-outline',
                             onTap: function (e) {
-                                favouriteClick();
+                                var storeId = $scope.dataPopup.id;
+                                ProfileService.doFavourite(storeId).then(function(responseData) {
+                                    console.log(responseData);
+                                }, function(error){
+                                    console.log(error);
+                                });
                                 return true;
                             }
                         }, {
@@ -487,13 +529,17 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                         var makerNode, firstChar = 'A', bounds = new google.maps.LatLngBounds();
                         for (var i = 0; i < markerNodes.length; i++) {
                             makerNode = markerNodes[i];
-                            var title = makerNode.getAttribute("title"),
+                            var id = makerNode.getAttribute("id"),
+                                title = makerNode.getAttribute("title"),
                                 firstChar = title.charAt(0) ? title.charAt(0) : "0",
                                 address = makerNode.getAttribute("address"),
                                 distance = parseFloat(makerNode.getAttribute("distance"));
+
                             var latlng = new google.maps.LatLng(parseFloat(makerNode.getAttribute("lat")),
                                 parseFloat(makerNode.getAttribute("lng")));
+
                             var extra = {
+                                id: id,
                                 zipcode: makerNode.getAttribute("zipcode"),
                                 phone: makerNode.getAttribute("phone"),
                                 fax: makerNode.getAttribute("fax"),

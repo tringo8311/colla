@@ -6,9 +6,10 @@
     <ion-content class="padding">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
         <ion-list>
-            <ion-item class="item" ng-repeat="item in customerNotes">
-                <span class="item-note">{{ item.created_at | date:"MMM-yyyy" }}</span>
-                <p><span class="strong">Product code:</span> {{item.product_code}} || <span class="strong">Barcode:</span> {{item.barcode}}</p>
+            <ion-item class="list-item item-avatar item-text-wrap" ng-repeat="item in customerNotes">
+                <div class="item-pull-left"><a href="" ng-click="doRemove(item)"><i class="ion ion-ios-minus-outline larger"></i></a></div>
+                <span class="item-note date-time">{{ item.created_at | date:"MMM-yyyy" }}</span>
+                <p><span class="strong color-positive">Product code:</span> {{item.product_code}} / <span class="strong color-positive">Barcode:</span> {{item.barcode}}</p>
                 <p>{{ item.content }}</p>
             </ion-item>
         </ion-list>

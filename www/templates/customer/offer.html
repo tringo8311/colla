@@ -1,34 +1,35 @@
-<ion-view title="Offer">
+<ion-view view-title="Offer" name="customer-offer-view">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
-    <ion-content has-header="true" padding="true">
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" padding="true">
         <div class="list">
-            <a class="item item-avatar" href="#">
+            <!--a class="item item-avatar" href="#">
                 <img src="http://lh6.ggpht.com/FftLqhhGQXPTySOyXdZBtMPh81Sgu_bsKthhzMu-U_7UJ8-Zbzk3mrbsa0th-Vv28LNWvZMBt-_B5i89q_HEzhM=s230-c" />
                 <h2>Ultimate Bloody Mary</h2>
                 <p>Tomato juice, habanero, aquavit and Lea & Perrins Worcestershire Sauce</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="http://lh5.ggpht.com/QR4CdPeEJjRZWlr7QjFUmuSfbMFezyWPv5udJQoqIKrHhdDYCXzHKx2Rwn9cq-1TbpEFoSUHtn_TUnDO0KnvkA=s230-c" />
-                <h2>Bloody Scary</h2>
-                <p>Blood orange juice, campari, prosecco, vodka and simple syrup</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="http://lh5.ggpht.com/hHUPkpVrUoxEVnDlXuS1h2yOgGKuvi2Td9Gr8lrFgxWdB_ExbgLvZ8AOKKoX2luv_-GIkuH72UA9nYx9IiRHAA=s230-c" />
-                <h2>Wasabi Bloody Marys</h2>
-                <p>Ice, tomato juice, vodka, wasabi powder, soy sauce, lemon juice and more</p>
-            </a>
+            </a-->
+            <div ng-repeat="offer in offers">
+                <ion-item class="item" ng-click="toggleGroup(offer)" ng-class="{active: isGroupShown(offer)}">
+                    <i class="icon" ng-class="isGroupShown(offer)? 'ion-android-arrow-dropdown' : 'ion-android-arrow-dropright'"></i>
+                    <span class="strong color-positive"> {{ offer.subject }}</span>
+                    <div class="pull-right"> at {{offer.start_time | date:"MMM-yyyy"}} - {{offer.end_time | date:"MMM-yyyy"}} </div>
+                </ion-item>
+                <ion-item class="item-accordion" ng-show="isGroupShown(offer)">
+                    <img class="clear" ng-src="{{ offer.file_url }}" alt="Offer" width="100%"/>
+                    <div>{{offer.content}}</div>
+                </ion-item>
+            </div>
         </div>
     </ion-content>
-    <ion-tabs class="tabs-icon-top tabsbalanced">
-        <ion-tab title="My Place" icon="ion-home" href="#/customer/dash">
+    <ion-tabs class="tabs-icon-top tabs-light">
+        <ion-tab title="Home" class="assertive" icon="ion-home" href="#/customer/dash">
             <ion-nav-view name="dash-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Around" icon="ion-map" href="#/customer/around">
+        <ion-tab title="Around" class="energized" icon="ion-map" href="#/customer/around">
             <ion-nav-view name="around-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="My Offer" icon="ion-android-subway" href="#/customer/offer">
+        <ion-tab title="My Offer" class="balanced" icon="ion-pricetags" href="#/customer/offer">
             <ion-nav-view name="offer-tab"></ion-nav-view>
         </ion-tab>
     </ion-tabs>

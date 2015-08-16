@@ -15,7 +15,15 @@ angular.module('collaApp')
     agency: 'agency',
     customer: 'customer',
     'public': 'public'
-});
+})
+.constant('RATING', [
+    { value: 1, label: "Very Bad", className: "color-assertive" },
+    { value: 2, label: "Bad", className: "color-energized" },
+    { value: 3, label: "Medium", className: "color-balanced" },
+    { value: 4, label: "Good", className: "color-calm" },
+    { value: 5, label: "Very Good", className: "color-positive" }
+]);
+/*
 var STORE_LIST = new Array();
 STORE_LIST.push({
     "name": "Hand Job Nails",
@@ -64,4 +72,4 @@ RECEIPT_LIST[1].items = [
     { "id" : 4, title: "a", price: "23", "content" : "0.9819907734464064", "date" : "1288326625006" },
     { "id" : 5, title: "s", price: "56", "content" : "0.9819907734464064", "date" : "1288326625006" },
     { "id" : 6, title: "c", price: "76", "content" : "0.9819907734464064", "date" : "12883236625006" }
-]
+]*/

@@ -7,8 +7,9 @@
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
         <div class="list">
             <ion-item class="item" ng-repeat="item in customerFeedbacks">
-                <p><span class="strong">Rate:</span> {{ item.rate }} </p>
-                <p><span class="strong">Service:</span> {{ item.service }} | <span class="strong">Employee:</span> {{ item.employee }}</p>
+                <span class="item-note date-time">{{ item.created_at | date:"MMM-yyyy" }}</span>
+                <p><span class="strong color-positive">Rate:</span> {{ item.rate }} </p>
+                <p><span class="strong color-positive">Service:</span> {{ item.service }} / <span class="strong color-positive">Employee:</span> {{ item.employee }}</p>
                 <p>{{ item.content }}</p>
             </ion-item>
         </div>

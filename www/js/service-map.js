@@ -5,8 +5,8 @@ if(env == "dev"){
     angular.module('collaApp').constant('ENV_PARAM', {
         baseUrl : baseUrl,
         basePath : "/",
-        searchUrl : baseUrl + "stores/near",
-        favouriteUrl : baseUrl + "stores/favourite",
+        searchUrl : baseUrl + "store/near",
+        favouriteUrl : baseUrl + "store/favourite",
         imgNotFound : "http://localhost:8100/images/place_item.jpg"
     });
 }else if(env == "staging"){
@@ -28,7 +28,7 @@ if(env == "dev"){
         imgNotFound : baseUrl + "gmap/images/place_item.jpg"
     });
 }
-angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup, UtilService, ENV_PARAM) {
+angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup, UtilService, AuthService, ENV_PARAM) {
     var detectCurrentLocation = function(){
         return $q(function(resolve, reject) {
             // Try HTML5 geolocation
@@ -69,9 +69,10 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
              */
             searchLocationsNear: function(bCenter, radiusVal) {
                 var d = this;
-                var searchUrl = ENV_PARAM.searchUrl + '?lat=' + bCenter.lat() + '&lng=' + bCenter.lng() + '&radius=' + radiusVal;
+                var searchUrl = ENV_PARAM.searchUrl;
+                var params = {token: AuthService.authToken, lat: bCenter.lat(), lng: bCenter.lng(), radius: radiusVal};
                 return $q(function(resolve, reject) {
-                    d.downloadUrl(searchUrl).then(function(answerXML){
+                    d.downloadUrl(searchUrl, params).then(function(answerXML){
                         var xml = d.parseXml(answerXML);
                         var markerNodes = xml.documentElement.getElementsByTagName("marker");
                         resolve(markerNodes);
@@ -83,7 +84,7 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
              * @param url
              * @param callback
              */
-            downloadUrl: function (url) {
+            downloadUrl: function (url, params) {
                 var deferred = $q.defer();
                 var request = window.ActiveXObject ? new ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest;
                 request.onreadystatechange = function () {
@@ -94,7 +95,9 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
 
                     }
                 };
-                request.open('GET', url, true);
+                params = UtilService.serializeData(params);
+                //request.setRequestHeader("Content-length", params.length);
+                request.open('GET', url + "?" + params, true);
                 request.send(null);
                 /*$http.get(url).success(function(data){
                         deferred.resolve(data);
@@ -215,6 +218,7 @@ angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup
             createMarker : function (latlng, title, address, extra) {
                 var d= this, imgPath = typeof extra.imgPath == "undefined" || extra.imgPath == "" ? "/img/icon.jpg" : extra.imgPath;
                 var storeObj = {
+                    id: extra.id,
                     latlng: latlng,
                     imgPath: imgPath,
                     title: title,
