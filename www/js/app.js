@@ -75,6 +75,10 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 templateUrl: 'templates/public/signup.html',
                 controller: 'SignUpCtrl'
             })
+            .state('logout', {
+                url: '/logout',
+                controller: 'LogoutCtrl'
+            })
             .state('public', {
                 url: '/public',
                 templateUrl: 'templates/public.html'

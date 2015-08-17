@@ -20,7 +20,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
 
         function storeUserCredentials(token, profile) {
             window.localStorage.setItem(LOCAL_TOKEN_KEY, token);
-            window.localStorage.setItem(LOCAL_USERPROFILE_KEY, JSON.stringify(profile.data));
+            window.localStorage.setItem(LOCAL_USERPROFILE_KEY, JSON.stringify(profile));
             useCredentials(token, profile);
         }
 
@@ -64,7 +64,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
                         }
                         $http(req).then(function(dataProfile){
                             // success handler
-                            storeUserCredentials(response.data.token, dataProfile.data);
+                            storeUserCredentials(response.data.token, dataProfile.data.data);
                             resolve('Login success.');
                         }, function(){
                             reject('Login Failed.');
@@ -92,6 +92,22 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             return JSON.parse(window.localStorage.getItem(LOCAL_USERPROFILE_KEY));
         }
 
+        var reloadUserProfile = function(){
+            return $q(function(resolve, reject) {
+                var req = {
+                    method: 'GET',
+                    url: API_PARAM.baseUrl + 'profile?token='+authToken
+                }
+                $http(req).then(function(dataProfile){
+                    // success handler
+                    storeUserCredentials(authToken, dataProfile.data.data);
+                    resolve({status: 'success', data: dataProfile.data.data});
+                }, function(){
+                    reject({status:'fail'});
+                });
+            });
+        }
+
         var isAuthenticateFn = function() {
             return isAuthenticated && authToken != null;
         }
@@ -105,6 +121,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             authToken: authToken,
             isAuthenticated: isAuthenticateFn,
             userProfile: function() {return loadLocalUserProfile();},
+            reloadUserProfile: reloadUserProfile,
             role: function() {return role;}
         };
     })

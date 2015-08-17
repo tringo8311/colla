@@ -30,6 +30,13 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             $state.go('login');
         });
 
+        $scope.doReloadCurrentProfile = function(){
+            AuthService.reloadUserProfile().then(function(responseData){
+                $scope.userProfile = responseData.data;
+            });
+            $scope.$broadcast('scroll.refreshComplete');
+        }
+
         $scope.setCurrentProfile = function(profile) {
             $scope.userProfile = profile;
         };
@@ -38,6 +45,10 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             AuthService.logout();
             $state.go('login');
         };
+    })
+    .controller('LogoutCtrl', function($location, AuthService){
+        AuthService.logout();
+        $location.path('/login');
     })
     .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService) {
         $scope.data = {};
@@ -78,11 +89,9 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         };
     })
     .controller('ForgotPasswordCtrl', function($scope, $ionicPopup, $ionicSideMenuDelegate, ProfileService) {
-        $scope.data = { username: "", code: ""};
-        $scope.securityCode = false;
+        $scope.data = { username: "", code: "", haveCode: false};
         $scope.resetPassword = function(data){
             ProfileService.confirmResetPassword(data.username).then(function(answer) {
-                //var alertPopup = null;
                 if("success"==answer){
                     $scope.securityCode = true;
                     $ionicPopup.alert({
@@ -98,9 +107,6 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }, function(err) {
 
             });
-        }
-        $scope.isSecurityCodeShown = function(){
-            return $scope.securityCode;
         }
     })
     .controller('SignUpCtrl', function($scope, $state, $ionicSideMenuDelegate, $ionicPopup, ProfileService, AuthService) {
