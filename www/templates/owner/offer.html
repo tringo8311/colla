@@ -1,0 +1,33 @@
+<ion-view view-title="Offer" name="owner-customer-view">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+	<ion-nav-buttons side="right">
+        <button class="button button-stable" ng-click="openModal()"><i class="ion ion-plus"></i></button>
+    </ion-nav-buttons>
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+        <div class="container">
+            <div class="list card">
+                <ion-slide-box on-slide-changed="slideHasChanged($index)">
+                    <ion-slide ng-repeat="offer in offers">
+                        <span class="strong color-positive"> {{ offer.subject }}</span>
+                        <div class="pull-right"> at {{offer.start_time | date:"MMM-yyyy"}} - {{offer.end_time | date:"MMM-yyyy"}} </div>
+                        <img class="clear" ng-src="http://localhost:8000/{{ offer.file_url }}" alt="Offer" width="100%"/>
+                        <div>{{offer.content}}</div>
+                    </ion-slide>
+                </ion-slide-box>
+            </div>
+        </div>
+    </ion-content>
+    <ion-tabs class="tabs-icon-top tabs-light">
+        <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
+            <ion-nav-view name="dash-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
+            <ion-nav-view name="customer-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
+            <ion-nav-view name="offer-tab"></ion-nav-view>
+        </ion-tab>
+    </ion-tabs>
+</ion-view>

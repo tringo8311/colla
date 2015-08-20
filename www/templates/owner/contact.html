@@ -1,0 +1,32 @@
+<ion-view view-title="Contact" name="owner-customer-view">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+        <h3>Get in touch</h3>
+        <div class="message" ng-class="{active: message.submission}">
+            {{ message.submissionMessage }}
+        </div>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <input class="required" type="text" placeholder="Full Name" ng-model="formData.fullname">
+            </label>
+        </div>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <input class="required" type="text" placeholder="Email" ng-model="formData.email">
+            </label>
+        </div>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <input class="required" type="text" placeholder="Subject" ng-model="formData.subject">
+            </label>
+        </div>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <textarea class="required" type="text" placeholder="Message" rows="8" cols="40" ng-model="formData.message"></textarea>
+            </label><br/>
+        </div>
+        <button class="button button-block button-positive" ng-click="doSendContact()">Send message</button>
+    </ion-content>
+</ion-view>

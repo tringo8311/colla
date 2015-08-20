@@ -3,7 +3,7 @@
  * @type {*|module}
  */
 var collaApp = angular.module('collaApp');
-collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS) {
+    collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS) {
         $scope.userProfile = null;
         $scope.flashMessage = {
             visibility: false,
@@ -50,7 +50,7 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
         AuthService.logout();
         $location.path('/login');
     })
-    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService) {
+    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService, USER_ROLES) {
         $scope.data = {};
         $scope.remember = 0;
 
@@ -62,7 +62,14 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             }
             // Use Satellizer's $auth service to login
             AuthService.login(credentials).then(function(data) {
-                $state.go('customer.dash', {}, {reload: true});
+                if(AuthService.loadRole()==USER_ROLES.owner){
+                    $state.go('owner.dash', {}, {reload: true});
+                }else if(AuthService.loadRole()==USER_ROLES.customer){
+                    $state.go('customer.dash', {}, {reload: true});
+                }else{
+
+                }
+                //$state.go('customer.dash', {}, {reload: true});
                 $scope.setCurrentProfile(AuthService.userProfile());
             });
             /*AuthService.login(data.username, data.password).then(function(authenticated) {
@@ -507,8 +514,8 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 }
                 updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow);
             }
-            $scope.setCenterMap = function(ev){
-                ev.preventDefault();
+            $scope.setCenterMap = function(evt){
+                evt.preventDefault();
                 currentMap.setCenter(currentPositionMarker.getPosition());
             }
             $scope.detectLocationClick = function() {
@@ -563,7 +570,6 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                 });
             }
             /**
-             *
              * @param infoWindow
              * @param addresInput
              */
@@ -575,7 +581,6 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
                     });
                 });
             }
-
             /**
              *
              * @type {null}
@@ -639,4 +644,104 @@ collaApp.controller('AppCtrl', function($scope, $state, $ionicPopup, AuthService
             var map = iScope.map;
             google.maps.event.trigger(map, "resize");
         });*/
+    }])
+    .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
+
+    })
+    .controller('OwnerCustomerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
+		$scope.formData = {keyword:""};
+        if($scope.userProfile.store_id){
+            $scope.doRefresh = function(){
+                StoreService.doGetCustomers($scope.userProfile.store_id, $scope.formData.keyword).then(function(responseData) {
+                    $scope.customers = responseData;
+                    $scope.$broadcast('scroll.refreshComplete');
+                }, function(errResponse) {
+                    $scope.$broadcast('scroll.refreshComplete');
+                });
+            }
+            $scope.doRemove = function(item){
+            }
+            $scope.doRefresh();
+        }
+		$scope.searchCustomer = function(){
+			$scope.doRefresh();
+		}
+    })
+    .controller('OwnerOfferCtrl', function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
+        if($scope.userProfile.store_id){
+            ProfileService.doGetOffers($scope.userProfile.store_id).then(function(responseData) {
+                $scope.offers = responseData;
+                setTimeout(function(){$ionicSlideBoxDelegate.update();}, 500);
+            });
+        }
+        $scope.currentIndex = 0;
+        $scope.setCurrentSlideIndex = function (index) {
+            $scope.currentIndex = index;
+        };
+        $scope.isCurrentSlideIndex = function (index) {
+            return $scope.currentIndex === index;
+        };
+        $scope.prevSlide = function () {
+            $scope.currentIndex = ($scope.currentIndex < $scope.slides.length - 1) ? ++$scope.currentIndex : 0;
+        };
+        $scope.nextSlide = function () {
+            $scope.currentIndex = ($scope.currentIndex > 0) ? --$scope.currentIndex : $scope.slides.length - 1;
+        };
+        /* assuming the slides are static cache this to save DOM lookups
+        $scope.$on('$ionicView.enter', function(){
+            // this is not polling anymore
+            var firstSlide = document.querySelectorAll('.container .slider-slide')[0];
+            if(firstSlide != undefined){
+                var width = firstSlide.clientWidth;
+                // only update when the width is wrong
+                if(width === 0) {
+                    $ionicSlideBoxDelegate.update();
+                }
+            }
+        });*/
+    })
+    .controller('OwnerContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
+        $scope.formData = {
+            fullname: $scope.userProfile.username,
+            email: $scope.userProfile.email
+        }
+        $scope.message = {
+            submissionMessage: "",
+            submission: false
+        }
+        var param = function(data) {
+            var returnString = '';
+            for (d in data){
+                if (data.hasOwnProperty(d))
+                    returnString += d + '=' + data[d] + '&';
+            }
+            // Remove last ampersand and return
+            return returnString.slice( 0, returnString.length - 1 );
+        };
+        $scope.doSendContact = function(){
+            $http({
+                method : 'POST',
+                url : API_PARAM.baseUrl + 'profile/contact?token=' + AuthService.authToken,
+                data : param($scope.formData), // pass in data as strings
+                headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
+            }).success(function(data) {
+                if (!data.status == "success") {
+                    // if not successful, bind errors to error variables
+                    //$scope.message.submissionMessage = data.messageError;
+                    $scope.message.submissionMessage = data.message;
+                    $scope.message.submission = true; //shows the error message
+                } else {
+                    // if successful, bind success message to message
+                    angular.forEach(data.messages, function(value, key) {
+                        $scope.message.submissionMessage += '<li>' + value + '</li>';
+                    });
+                    $scope.message.submission = true; //shows the success message
+                    $scope.formData = {
+                        fullname: $scope.userProfile.username,
+                        email: $scope.userProfile.email
+                    }
+                }
+            });
+        }
     }]);
+

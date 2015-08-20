@@ -31,12 +31,12 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             if(profile && profile.role) {
                 if (profile.role == 'admin') {
                     role = USER_ROLES.admin
-                } else if (profile.role == 'user') {
-                    role = USER_ROLES.public
+                } else if (profile.role == 'owner') {
+                    role = USER_ROLES.owner
                 } else if (profile.role == 'customer') {
                     role = USER_ROLES.customer
                 } else {
-                    role = USER_ROLES.customer
+                    role = USER_ROLES.public
                 }
             }
             console.log("after set role" + role);
@@ -112,6 +112,10 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             return isAuthenticated && authToken != null;
         }
 
+        var loadRole = function(){
+            return role;
+        }
+
         loadUserCredentials();
 
         return {
@@ -120,9 +124,9 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             isAuthorized: isAuthorized,
             authToken: authToken,
             isAuthenticated: isAuthenticateFn,
-            userProfile: function() {return loadLocalUserProfile();},
+            userProfile: loadLocalUserProfile,
             reloadUserProfile: reloadUserProfile,
-            role: function() {return role;}
+            loadRole: loadRole
         };
     })
     .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
@@ -231,11 +235,26 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
     }]);
 /*************** End Profile Model ******************/
 
+services.service('StoreService', function($q, $http, $auth, Profile, Store) {
+    var doGetCustomers = function(storeId, keyword){
+		console.log(keyword);
+        return $q(function(resolve, reject) {
+            Store.customer({id:storeId, keyword:keyword}, function(responseData) {
+                resolve(responseData.data);
+            });
+        });
+    }
+
+    return {
+        doGetCustomers: doGetCustomers
+    };
+});
 /*************** Begin Store Model ******************/
 services.factory('Store', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'store/:id/:offerController', {id: '@id', offerController: '@offerController'},
-        {offer: {method:'GET', params:{id: '@id', offerController: 'offers'}}}
-    );
+    return $resource(API_PARAM.baseUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
+        offer: {method:'GET', params:{id: '@id', extraController: 'offers'}},
+        customer: {method:'GET', params:{id: '@id', extraController: 'customers'}}
+    });
 }]);
 services.factory('MultiStoreLoader', ['Store', '$q',
     function(Store, $q) {

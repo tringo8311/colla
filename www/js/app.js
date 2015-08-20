@@ -233,8 +233,87 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                         templateUrl: 'templates/customer/policy.html'
                     }
                 }
+            })
+            .state('owner', {
+                url: '/',
+                abstract: true,
+                templateUrl: 'templates/owner/main-abstract.html'
+            })
+            .state('owner.contact', {
+                url: 'owner/contact',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/contact.html',
+                        controller: 'OwnerContactCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
+            .state('owner.help', {
+                url: 'owner/help',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/help.html'
+                    }
+                }
+            })
+            .state('owner.business', {
+                url: 'owner/business',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/business.html'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
+            .state('owner.dash', {
+                url: 'owner/dash',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/dash.html'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
+            .state('owner.customer', {
+                url: 'owner/customer',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/customer.html',
+                        controller: 'OwnerCustomerCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
+			.state('owner.policy', {
+                url: 'owner/policy',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/policy.html'
+                    }
+                }
+            })
+            .state('owner.offer', {
+                url: 'owner/offer',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/offer.html',
+                        controller: 'OwnerOfferCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
             });
-        $urlRouterProvider.otherwise('public');
+            $urlRouterProvider.otherwise('public');
     })
     .run(function($httpBackend){
         $httpBackend.whenGET('http://localhost:8100/valid')
@@ -319,4 +398,16 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 });
             }
         };
-    });
+    }).directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+});

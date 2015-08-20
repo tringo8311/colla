@@ -12,7 +12,7 @@ angular.module('collaApp')
 .constant('EXCLUDE_PATH', ["login", "signup", "forgotpassword"])
 .constant('USER_ROLES', {
     admin: 'admin',
-    agency: 'agency',
+    owner: 'owner',
     customer: 'customer',
     'public': 'public'
 })

@@ -1,0 +1,35 @@
+<ion-view view-title="Customer" name="owner-customer-view">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
+        <ion-header-bar class="bar bar-header item-input-inset">
+            <label class="item-input-wrapper">
+                <i class="icon ion-ios-search placeholder-icon"></i>
+                <input type="search" placeholder="Search" ng-model="formData.keyword" ng-enter="searchCustomer()"/>
+            </label>
+            <button class="button button-clear" ng-click="searchCustomer()"><i class="ion ion-android-search"></i></button>
+        </ion-header-bar>
+        <div class="list">
+            <ion-item  class="list-item item-avatar item-text-wrap" ng-repeat="item in customers">
+                <div class="item-char">{{item.first_name | first_char}}</div>
+                <span class="item-note date-time">{{ item.created_at | date:"MMM-yyyy" }}</span>
+                <p><span class="strong color-positive">{{ item.first_name }} {{ item.last_name }}</span></p>
+                <p>{{ item.address }}, {{ item.zip_code }}</p>
+                <p>{{ item.mobile | tel }}</p>
+            </ion-item>
+        </div>
+    </ion-content>
+    <ion-tabs class="tabs-icon-top tabs-light">
+        <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
+            <ion-nav-view name="dash-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
+            <ion-nav-view name="customer-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
+            <ion-nav-view name="offer-tab"></ion-nav-view>
+        </ion-tab>
+    </ion-tabs>
+</ion-view>

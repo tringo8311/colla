@@ -1,0 +1,56 @@
+<ion-view name="dashboard-view" view-title="Home">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doReloadCurrentProfile()"></ion-refresher>
+        <div class="row">
+            <div class="col text-center">
+                <h3 class="title">Welcome {{userProfile.username}}!</h3>
+                    This could be your Dashboard.
+                <br><br><br>
+                <div class="row">
+                    <div class="col-50">
+						<div class="card">
+							<h2>Customer</h2>
+							<p>10000</p>
+						</div>
+                    </div>
+					<div class="col-50">
+						<div class="card">
+							<h2>Rate</h2>
+							<p>3.6</p>
+						</div>
+                    </div>
+				</div>
+				<div class="row">
+                    <div class="col-50">
+						<div class="card">
+							<h2>Offer</h2>
+							<p>10000</p>
+						</div>
+                    </div>
+					<div class="col-50">
+						<div class="card">
+							<h2>Report</h2>
+							<p>10000</p>
+						</div>
+                    </div>
+                </div>
+                <br><br>
+            </div>
+        </div>
+    </ion-content>
+    <ion-tabs class="tabs-icon-top tabs-light">
+        <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
+            <ion-nav-view name="dash-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
+            <ion-nav-view name="customer-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
+            <ion-nav-view name="offer-tab"></ion-nav-view>
+        </ion-tab>
+    </ion-tabs>
+</ion-view>
