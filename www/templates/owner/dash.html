@@ -4,43 +4,62 @@
     </ion-nav-buttons>
     <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
-        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doReloadCurrentProfile()"></ion-refresher>
-        <div class="row">
-            <div class="col text-center">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
+        <div class="row  text-center">
+            <div class="col">
                 <h3 class="title">Welcome {{userProfile.username}}!</h3>
                     This could be your Dashboard.
                 <br><br><br>
-                <div class="row">
-                    <div class="col-50">
-						<div class="card">
-							<h2>Customer</h2>
-							<p>10000</p>
-						</div>
-                    </div>
-					<div class="col-50">
-						<div class="card">
-							<h2>Rate</h2>
-							<p>3.6</p>
-						</div>
-                    </div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="card">
+					<div class="item item-avatar">
+						<h2>Customer</h2>
+						<p>Total</p>
+					</div>
+					<div class="item text-center">
+						<div class="x-large">{{data.customerSize}}</div>
+					</div>
 				</div>
-				<div class="row">
-                    <div class="col-50">
-						<div class="card">
-							<h2>Offer</h2>
-							<p>10000</p>
-						</div>
-                    </div>
-					<div class="col-50">
-						<div class="card">
-							<h2>Report</h2>
-							<p>10000</p>
-						</div>
-                    </div>
-                </div>
-                <br><br>
-            </div>
-        </div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="item item-avatar">
+						<h2>Rate</h2>
+						<p>Average</p>
+					</div>
+					<div class="item text-center">
+						<div class="x-large">{{data.rateAverage}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<div class="card">
+					<div class="item item-avatar">
+						<h2>Offer</h2>
+						<p>Total offer</p>
+					</div>
+					<div class="item text-center">
+						<div class="x-large">{{data.offerSize}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="item item-avatar">
+						<h2>Report</h2>
+						<p>Total offer</p>
+					</div>
+					<div class="item text-center">
+						<div class="x-large">0</div>
+					</div>
+				</div>
+			</div>
+		</div>
     </ion-content>
     <ion-tabs class="tabs-icon-top tabs-light">
         <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">

@@ -10,15 +10,24 @@ if(env == "dev"){
         imgNotFound : "http://localhost:8100/images/place_item.jpg"
     });
 }else if(env == "staging"){
-    var baseUrl = "http://gmap.capri14.com/";
+    var baseUrl = "http://dev.myspa247.com/v1/api/";
     angular.module('collaApp').constant('ENV_PARAM', {
         baseUrl : baseUrl,
-        basePath : "/sximo/themes/gmap/",
-        searchUrl : baseUrl + "place/search",
-        favouriteUrl : baseUrl + "place/favourite",
-        imgNotFound : baseUrl + "images/place_item.jpg"
+        basePath : "/",
+        searchUrl : baseUrl + "store/near",
+        favouriteUrl : baseUrl + "store/favourite",
+        imgNotFound : "http://dev.myspa247.com/images/place_item.jpg"
     });
 }else if(env == "product"){
+    var baseUrl = "http://api.myspa247.com/v1/api/";
+    angular.module('collaApp').constant('ENV_PARAM', {
+        baseUrl : baseUrl,
+        basePath :  "/",
+        searchUrl : baseUrl + "store/near",
+        favouriteUrl : baseUrl + "store/favourite",
+        imgNotFound : "http://api.myspa247.com/images/place_item.jpg"
+    });
+}/*else if(env == "product"){
     var baseUrl = "http://www.nails-finder.com/";
     angular.module('collaApp').constant('ENV_PARAM', {
         baseUrl : baseUrl,
@@ -27,7 +36,7 @@ if(env == "dev"){
         favouriteUrl : "/gmap/place/favourite.php",
         imgNotFound : baseUrl + "gmap/images/place_item.jpg"
     });
-}
+}*/
 angular.module('collaApp').factory('MapService', function($q, $http, $ionicPopup, UtilService, AuthService, ENV_PARAM) {
     var detectCurrentLocation = function(){
         return $q(function(resolve, reject) {

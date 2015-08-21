@@ -60,7 +60,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
                     if(response.status == 200){
                         var req = {
                             method: 'GET',
-                            url: API_PARAM.baseUrl + 'profile?token='+response.data.token
+                            url: API_PARAM.apiUrl + 'profile?token='+response.data.token
                         }
                         $http(req).then(function(dataProfile){
                             // success handler
@@ -96,7 +96,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             return $q(function(resolve, reject) {
                 var req = {
                     method: 'GET',
-                    url: API_PARAM.baseUrl + 'profile?token='+authToken
+                    url: API_PARAM.apiUrl + 'profile?token='+authToken
                 }
                 $http(req).then(function(dataProfile){
                     // success handler
@@ -201,7 +201,7 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
     };
 });
 services.factory('Profile', ['$resource' , 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'profile/:id/:extendController',
+    return $resource(API_PARAM.apiUrl + 'profile/:id/:extendController',
         {id: '@id', extendController: '@extendController'},
         {
             place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},
@@ -251,7 +251,7 @@ services.service('StoreService', function($q, $http, $auth, Profile, Store) {
 });
 /*************** Begin Store Model ******************/
 services.factory('Store', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
+    return $resource(API_PARAM.apiUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
         offer: {method:'GET', params:{id: '@id', extraController: 'offers'}},
         customer: {method:'GET', params:{id: '@id', extraController: 'customers'}}
     });
@@ -283,7 +283,7 @@ services.factory('StoreLoader', ['Store', '$route', '$q',
 /*************** End Store Model ******************/
 /*************** Receipt Model ******************/
 services.factory('Receipt', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
-    return $resource(API_PARAM.baseUrl + 'receipts/:id', {id: '@id'});
+    return $resource(API_PARAM.apiUrl + 'receipts/:id', {id: '@id'});
 }]);
 services.factory('MultiReceiptLoader', ['Receipt', '$q',
     function(Store, $q) {
@@ -311,7 +311,7 @@ services.factory('ReceiptLoader', ['Receipt', '$route', '$q',
     }]);
 /******************** Customer Note **********************/
 services.factory('CustomerNote', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
-    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:user_id/notes/:id',
+    var customerNote = $resource(API_PARAM.apiUrl + 'profile/:user_id/notes/:id',
         {   user_id: '@user_id', id: '@id'},
         {   query: {
                 params: {token: AuthService.authToken},
@@ -350,7 +350,7 @@ services.factory('CustomerNoteLoader', ['CustomerNote', '$route', '$q',
 /******************** Customer Feedback **********************/
 services.factory('CustomerFeedback', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     console.log("token: " + AuthService.authToken);
-    var customerNote = $resource(API_PARAM.baseUrl + 'profile/:user_id/feedbacks/:id',
+    var customerNote = $resource(API_PARAM.apiUrl + 'profile/:user_id/feedbacks/:id',
         {   user_id: '@user_id', id: '@id'},
         {   query: {
             params: {token: AuthService.authToken},
@@ -387,3 +387,51 @@ services.factory('CustomerFeedbackLoader', ['CustomerFeedback', '$route', '$q',
         };
     }]);
 /******************** Customer Reservation **********************/
+/******************** Owner service **********************/
+services.service('OwnerService', function($q, $http, $auth, Owner) {
+    var doGetCount = function(store_id){
+        return $q(function(resolve, reject) {
+            Owner.query({store_id: store_id}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+    return {
+        doGetCount: doGetCount
+    };
+});
+services.factory('Owner', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    var owner = $resource(API_PARAM.apiUrl + 'owner/:id',
+        {id: '@id'},
+        {query: {
+            params: {token: AuthService.authToken},
+            update: {method: 'PUT'}, query: {method: 'GET',isArray: false}
+        }
+        });
+    return owner;
+}]);
+services.factory('MultiOwnerLoader', ['Owner', '$q',
+    function(Owner, $q) {
+        return function() {
+            var delay = $q.defer();
+            Owner.query(function(owners) {
+                delay.resolve(owners);
+            }, function() {
+                delay.reject('Unable to fetch receipts');
+            });
+            return delay.promise;
+        };
+    }]);
+services.factory('OwnerLoader', ['Owner', '$route', '$q',
+    function(Owner, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            Owner.get({id: $route.current.params.id}, function(owner) {
+                delay.resolve(owner);
+            }, function() {
+                delay.reject('Unable to fetch CustomerFeedback ' + $route.current.params.id);
+            });
+            return delay.promise;
+        };
+    }]);
+/******************** End Owner service **********************/

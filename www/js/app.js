@@ -19,8 +19,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
             }
         });
     })
-    .config(function ($stateProvider, $urlRouterProvider, $authProvider, USER_ROLES) {
-        $authProvider.baseUrl = 'http://localhost:8000';
+    .config(function ($stateProvider, $urlRouterProvider, $authProvider, USER_ROLES, API_PARAM) {
+        $authProvider.baseUrl = API_PARAM.baseUrl;
         $authProvider.loginUrl = 'v1/api/authenticate';
         $authProvider.signupUrl = 'v1/user/signup';
         $authProvider.facebook({
@@ -274,7 +274,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 url: 'owner/dash',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/owner/dash.html'
+                        templateUrl: 'templates/owner/dash.html',
+						controller: 'OwnerDashCtrl'
                     }
                 },
                 data: {
@@ -316,23 +317,21 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
             $urlRouterProvider.otherwise('public');
     })
     .run(function($httpBackend){
-        $httpBackend.whenGET('http://localhost:8100/valid')
+        /*$httpBackend.whenGET('http://localhost:8100/valid')
             .respond({message: 'This is my valid response!'});
         $httpBackend.whenGET('http://localhost:8100/notauthenticated')
             .respond(401, {message: "Not Authenticated"});
         $httpBackend.whenGET('http://localhost:8100/notauthorized')
             .respond(403, {message: "Not Authorized"});
-        /*$httpBackend.whenGET('/stores/1')
-            .respond(STORE_LIST[0]);*/
-        /*$httpBackend.whenGET('/receipts')
-            .respond(RECEIPT_LIST);*/
-        //$httpBackend.whenGET('http://devgmap.capri14.com/place/search?lat=37.7749295&lng=-122.41941550000001&radius=50').respond('<?xml version="1.0" encoding="UTF-8"?><markers><marker name="Hand Job Nails" address="565 Castro Street" city="San Francisco" state="CA" zipcode="94114" phone="4128632243" fax="" email="" website="handjobspa.com" store_link="" lat="37.764049" lng="-122.431297" distance="0.99317265541378"/></markers>');
 
-        $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
-        $httpBackend.whenPOST(/localhost:8000\/.*/).passThrough();
-        $httpBackend.whenGET(/localhost:8000\/.*/).passThrough();
-        $httpBackend.whenDELETE(/localhost:8000\/.*/).passThrough();
-        //$httpBackend.whenPOST('http://localhost:8000/api/authenticate').passThrough();
+        $httpBackend.whenGET(/templates\/\w+.*//*).passThrough();
+        $httpBackend.whenPOST(/localhost:8000\/.*//*).passThrough();
+        $httpBackend.whenGET(/localhost:8000\/.*//*).passThrough();
+        $httpBackend.whenDELETE(/localhost:8000\/.*//*).passThrough();*/
+        $httpBackend.whenGET(/templates\/\w+.*//*).passThrough();
+        $httpBackend.whenGET(/^\w+.*/).passThrough();
+        $httpBackend.whenPOST(/^\w+.*/).passThrough();
+        $httpBackend.whenDELETE(/^\w+.*/).passThrough();
     })
     .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {

@@ -10,10 +10,13 @@
             <div class="list card">
                 <ion-slide-box on-slide-changed="slideHasChanged($index)">
                     <ion-slide ng-repeat="offer in offers">
-                        <span class="strong color-positive"> {{ offer.subject }}</span>
-                        <div class="pull-right"> at {{offer.start_time | date:"MMM-yyyy"}} - {{offer.end_time | date:"MMM-yyyy"}} </div>
+						<div class="desc">
+							<h2 class=""> {{ offer.subject }}</h2>
+							<div class="pull-right"> at {{offer.start_time | asDate | date:"MMM-dd-yyyy"}} - {{offer.end_time | asDate | date:"MMM-dd-yyyy"}} </div>
+							<div class="off">{{offer.off}} {{offer.off_type}}</div>
+							<div>{{offer.content}}</div>
+						</div>
                         <img class="clear" ng-src="http://localhost:8000/{{ offer.file_url }}" alt="Offer" width="100%"/>
-                        <div>{{offer.content}}</div>
                     </ion-slide>
                 </ion-slide-box>
             </div>

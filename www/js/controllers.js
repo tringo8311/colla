@@ -231,7 +231,7 @@ var collaApp = angular.module('collaApp');
         $scope.doSendContact = function(){
             $http({
                 method : 'POST',
-                url : API_PARAM.baseUrl + 'profile/contact?token=' + AuthService.authToken,
+                url : API_PARAM.appUrl + 'profile/contact?token=' + AuthService.authToken,
                 data : param($scope.formData), // pass in data as strings
                 headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
             }).success(function(data) {
@@ -393,8 +393,7 @@ var collaApp = angular.module('collaApp');
             $scope.currentIndex = ($scope.currentIndex > 0) ? --$scope.currentIndex : $scope.slides.length - 1;
         };
     }])
-    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "ProfileService", "_",
-        function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, ProfileService, _) {
+    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "ProfileService", "_",function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, ProfileService, _) {
             var currentMap = null, currentPositionMarker = null, currentInfoWindow = null;
             $scope.dimenstion = {
                 dev_width : $window.innerWidth,
@@ -645,8 +644,20 @@ var collaApp = angular.module('collaApp');
             google.maps.event.trigger(map, "resize");
         });*/
     }])
-    .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
-
+    .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService, OwnerService) {
+		$scope.data = {'customerSize': '0', 'rateAverage' : '0','offerSize' : '0'};
+		var store_id = $scope.userProfile.store_id;
+        if(store_id){
+            $scope.doRefresh = function(){
+                OwnerService.doGetCount(store_id).then(function(responseData) {
+                    $scope.data = responseData;
+                    $scope.$broadcast('scroll.refreshComplete');
+                }, function(errResponse) {
+                    $scope.$broadcast('scroll.refreshComplete');
+                });
+            }
+            $scope.doRefresh();
+        }
     })
     .controller('OwnerCustomerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
 		$scope.formData = {keyword:""};
@@ -721,7 +732,7 @@ var collaApp = angular.module('collaApp');
         $scope.doSendContact = function(){
             $http({
                 method : 'POST',
-                url : API_PARAM.baseUrl + 'profile/contact?token=' + AuthService.authToken,
+                url : API_PARAM.appUrl + 'profile/contact?token=' + AuthService.authToken,
                 data : param($scope.formData), // pass in data as strings
                 headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
             }).success(function(data) {

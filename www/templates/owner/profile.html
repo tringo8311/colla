@@ -1,0 +1,37 @@
+<ion-view view-title="My Business" name="owner-my-business-view">
+    <ion-nav-buttons side="left">
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
+            {{ flashMessage.message }}
+        </div>
+        <form>
+            <label class="item item-input">
+                <input type="text" placeholder="Username" ng-model="data.username" readonly="readonly"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="First Name" ng-model="data.first_name"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Last Name" ng-model="data.last_name"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Email" ng-model="data.email" readonly="readonly"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Mobile Phone" ng-model="data.mobile"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Address" ng-model="data.address"/>
+            </label>
+            <label class="item item-input">
+                <input type="text" placeholder="Zipcode" ng-model="data.zipcode"/>
+            </label>
+            <br/>
+            <div class="button-bar">
+                <button class="button button-positive" ng-click="updateMyBusiness($event)">Update</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

@@ -50,4 +50,8 @@ angular.module('collaApp').filter('first_char', function(){
 
         return (country + " (" + city + ") " + number).trim();
     };
+}).filter("asDate", function () {
+    return function (input) {
+        return new Date(input);
+    }
 });

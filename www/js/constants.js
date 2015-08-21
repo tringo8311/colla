@@ -3,7 +3,8 @@
  */
 angular.module('collaApp')
 .constant('API_PARAM', {
-    baseUrl : 'http://localhost:8000/v1/api/'
+    baseUrl : 'http://localhost:8000/',
+	apiUrl : 'http://localhost:8000/v1/api/'
 })
 .constant('AUTH_EVENTS', {
     notAuthenticated: 'auth-not-authenticated',
