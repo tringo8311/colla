@@ -3,24 +3,23 @@
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" padding="true">
-        <div class="list">
-            <!--a class="item item-avatar" href="#">
-                <img src="http://lh6.ggpht.com/FftLqhhGQXPTySOyXdZBtMPh81Sgu_bsKthhzMu-U_7UJ8-Zbzk3mrbsa0th-Vv28LNWvZMBt-_B5i89q_HEzhM=s230-c" />
-                <h2>Ultimate Bloody Mary</h2>
-                <p>Tomato juice, habanero, aquavit and Lea & Perrins Worcestershire Sauce</p>
-            </a-->
-            <div ng-repeat="offer in offers">
-                <ion-item class="item" ng-click="toggleGroup(offer)" ng-class="{active: isGroupShown(offer)}">
-                    <i class="icon" ng-class="isGroupShown(offer)? 'ion-android-arrow-dropdown' : 'ion-android-arrow-dropright'"></i>
-                    <span class="strong color-positive"> {{ offer.subject }}</span>
-                    <div class="pull-right"> at {{offer.start_time | date:"MMM-yyyy"}} - {{offer.end_time | date:"MMM-yyyy"}} </div>
-                </ion-item>
-                <ion-item class="item-accordion" ng-show="isGroupShown(offer)">
-                    <img class="clear" ng-src="{{ offer.file_url }}" alt="Offer" width="100%"/>
-                    <div>{{offer.content}}</div>
-                </ion-item>
-            </div>
-        </div>
+        <ion-slide-box on-slide-changed="slideHasChanged($index)">
+            <ion-slide ng-repeat="offer in offers">
+                <div class="list">
+                    <div class="item">
+                        <h2 class="positive">{{ offer.subject }}</h2>
+                        <p class="">{{offer.start_time | asDate | date:"MMM-dd-yyyy"}} - {{offer.end_time | asDate | date:"MMM-dd-yyyy"}}</p>
+                        <div class="off">{{offer.off}}{{offer.off_type}}</div>
+                    </div>
+                    <div class="item" style="padding:0">
+                        <img class="clear" ng-src="http://localhost:8000/{{ offer.file_url }}" alt="Offer" width="100%"/>
+                    </div>
+                    <div class="item">
+                        <p>{{offer.content}}</p>
+                    </div>
+                </div>
+            </ion-slide>
+        </ion-slide-box>
     </ion-content>
     <ion-tabs class="tabs-icon-top tabs-light">
         <ion-tab title="Home" class="assertive" icon="ion-home" href="#/customer/dash">

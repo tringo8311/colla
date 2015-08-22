@@ -19,10 +19,11 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
             }
         });
     })
-    .config(function ($stateProvider, $urlRouterProvider, $authProvider, USER_ROLES, API_PARAM) {
+    .config(function ($stateProvider, $ionicConfigProvider, $urlRouterProvider, $authProvider, USER_ROLES, API_PARAM) {
         $authProvider.baseUrl = API_PARAM.baseUrl;
         $authProvider.loginUrl = 'v1/api/authenticate';
-        $authProvider.signupUrl = 'v1/user/signup';
+        $authProvider.signupUrl = 'v1/api/user/signup';
+        $authProvider.loginOnSignup = false;
         $authProvider.facebook({
             clientId: '624059410963642'
         });
@@ -30,27 +31,21 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
         $authProvider.google({
             clientId: '631036554609-v5hm2amv4pvico3asfi97f54sc51ji4o.apps.googleusercontent.com'
         });
-
         $authProvider.github({
             clientId: '0ba2600b1dbdb756688b'
         });
-
         $authProvider.linkedin({
             clientId: '77cw786yignpzj'
         });
-
         $authProvider.yahoo({
             clientId: 'dj0yJmk9dkNGM0RTOHpOM0ZsJmQ9WVdrOVlVTm9hVk0wTkRRbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0wMA--'
         });
-
         $authProvider.live({
             clientId: '000000004C12E68D'
         });
-
         $authProvider.twitter({
             url: '/auth/twitter'
         });
-
         $authProvider.oauth2({
             name: 'foursquare',
             url: '/auth/foursquare',
@@ -59,8 +54,10 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
             authorizationEndpoint: 'https://foursquare.com/oauth2/authenticate'
         });
 
-        $stateProvider
-            .state('login', {
+        $ionicConfigProvider.tabs.position('bottom');
+        $ionicConfigProvider.navBar.alignTitle('center');
+
+        $stateProvider.state('login', {
                 url: '/login',
                 templateUrl: 'templates/login.html',
                 controller: 'LoginCtrl'
@@ -328,7 +325,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
         $httpBackend.whenPOST(/localhost:8000\/.*//*).passThrough();
         $httpBackend.whenGET(/localhost:8000\/.*//*).passThrough();
         $httpBackend.whenDELETE(/localhost:8000\/.*//*).passThrough();*/
-        $httpBackend.whenGET(/templates\/\w+.*//*).passThrough();
+        $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
         $httpBackend.whenGET(/^\w+.*/).passThrough();
         $httpBackend.whenPOST(/^\w+.*/).passThrough();
         $httpBackend.whenDELETE(/^\w+.*/).passThrough();
@@ -398,15 +395,91 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
             }
         };
     }).directive('ngEnter', function () {
-    return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
-            if(event.which === 13) {
-                scope.$apply(function (){
-                    scope.$eval(attrs.ngEnter);
-                });
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                    scope.$apply(function (){
+                        scope.$eval(attrs.ngEnter);
+                    });
 
-                event.preventDefault();
+                    event.preventDefault();
+                }
+            });
+        };
+    }).directive('starRating', function() {
+        return {
+            restrict: 'EA',
+            template:
+            '<ul class="star-rating" ng-class="{readonly:1}">' +
+            '  <li ng-repeat="star in stars" class="star" ng-click="toggle($index)">' +
+            '    <i class="" ng-class="star.filled ? \'ion-android-star\': \'ion-android-star-outline\'"></i>' + // or &#9733
+            '  </li>' +
+            '</ul>',
+            scope: {
+                ratingValue: '=ngModel',
+                max: '=?', // optional (default is 5)
+                onRatingSelect: '&?',
+                readonly: '=?'
+            },
+            link: function(scope, element, attributes) {
+                if (scope.max == undefined) {
+                    scope.max = 5;
+                }
+                function updateStars() {
+                    scope.stars = [];
+                    for (var i = 0; i < scope.max; i++) {
+                        scope.stars.push({
+                            filled: i < scope.ratingValue
+                        });
+                    }
+                };
+                scope.toggle = function(index) {
+                    if (scope.readonly == undefined || scope.readonly === false){
+                        scope.ratingValue = index + 1;
+                        scope.onRatingSelect({
+                            rating: index + 1
+                        });
+                    }
+                };
+                scope.$watch('ratingValue', function(oldValue, newValue) {
+                    if (newValue) {
+                        updateStars();
+                    }
+                });
             }
-        });
-    };
-});
+        };
+        /*return {
+            restrict: 'A',
+            template: '<ul class="rating"><li ng-repeat="star in stars" ng-class="star" ng-click="toggle($index)"><i class="fa fa-star-o"></i></li></ul>',
+            scope: {
+                ratingValue: '=',
+                max: '=',
+                onRatingSelected: '&'
+            },
+            link: function (scope, elem, attrs) {
+                var updateStars = function () {
+                    scope.stars = [];
+                    for (var i = 0; i < scope.max; i++) {
+                        scope.stars.push({
+                            filled: i < scope.ratingValue
+                        });
+                    }
+                };
+
+                scope.toggle = function (index) {
+                    scope.ratingValue = index + 1;
+                    scope.onRatingSelected({
+                        rating: index + 1
+                    });
+                };
+
+                scope.$watch('ratingValue',
+                    function (oldVal, newVal) {
+                        if (newVal) {
+                            updateStars();
+                        }
+                    }
+                );
+            }
+        };*/
+    });

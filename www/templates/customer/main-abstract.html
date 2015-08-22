@@ -1,13 +1,4 @@
 <ion-side-menus>
-    <ion-side-menu-content ng-controller="DashCtrl">
-      <ion-nav-bar class="bar-positive nav-title-slide-ios7">
-        <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
-		<ion-nav-buttons side="right">
-			<button class="button icon-left ion-log-out button-stable" ng-click="logout()">Logout</button>
-		</ion-nav-buttons>
-      </ion-nav-bar>
-      <ion-nav-view name="main-content" animation="slide-left-right"></ion-nav-view>
-    </ion-side-menu-content>
     <ion-side-menu side="left" ng-controller="NavController">
       <ion-header-bar class="bar bar-header bar-calm">
         <h1 class="title">Menu</h1>
@@ -25,4 +16,13 @@
         <a class="button button-fullwidth" ui-sref="customer.policy" ng-click="toggleLeft()">Privacy Policy</a>
       </ion-footer-bar>
     </ion-side-menu>
+    <ion-side-menu-content ng-controller="DashCtrl">
+      <ion-nav-bar class="bar-positive nav-title-slide-ios7">
+        <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
+		<ion-nav-buttons side="right">
+			<button class="button icon-left ion-log-out button-stable" ng-click="logout()">Logout</button>
+		</ion-nav-buttons>
+      </ion-nav-bar>
+      <ion-nav-view name="main-content" animation="slide-left-right"></ion-nav-view>
+    </ion-side-menu-content>
 </ion-side-menus>

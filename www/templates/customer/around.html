@@ -2,15 +2,15 @@
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
-    <ion-content class="tabbed-content-within-sidemenu-app" has-header="true" padding="true">
+    <ion-content class="tabbed-content-within-sidemenu-app around-pane" has-header="true" padding="true">
         <ion-header-bar class="bar bar-header item-input-inset">
             <label class="item-input-wrapper">
                 <i class="icon ion-ios-search placeholder-icon"></i>
-                <input id="addressInput" type="search" placeholder="Search" ng-model="addressInput" ng-required=""/>
+                <input id="addressInput" type="search" placeholder="Zipcode, Name, Address" class="form-address" ng-model="addressInput" ng-required=""/>
                 <!--select ng-model="myRadius" ng-options="radius.name for radius in radiusList track by radius.value"></select-->
             </label>
             <button class="button button-clear" ng-click="searchLocationsNear()"><i class="ion ion-android-search"></i></button>
-            <button class="button button-clear" style="position: absolute; z-index: 1000; right: 50px; width:100px" ng-click="openPopoverRadius($event)"><span>({{ myRadius }} miles)</span> <i class="ion ion-ios-arrow-down"></i></button>
+            <button class="button button-clear form-radius" ng-click="openPopoverRadius($event)"><span>{{myRadius}} mi</span> <i class="ion ion-ios-arrow-down"></i></button>
         </ion-header-bar>
         <div id="map_canvas">
             <map center="37.7749295,-122.41941550000001" center="current-location" zoom="9" data-tap-disabled="true" style="height: {{ dimenstion.dev_height }}">

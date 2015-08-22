@@ -1,61 +1,66 @@
 <ion-view view-title="Sign Up" name="sign-up-view" class="login-page">
     <ion-nav-bar class="bar-balanced"></ion-nav-bar>
     <ion-nav-buttons side="left">
-        <a href="/#/login" class="button icon-left ion-home"></a>
+        <a href="/#/" class="button icon-left ion-home"></a>
     </ion-nav-buttons>
-    <ion-content class="padding">
+    <ion-content class="padding" has-header="true">
         <div class="logo-body">
             <img src="/img/logo_512.png" width="200" height="200" alt="Logo"/>
+        </div>
+        <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
+            <p class="" ng-repeat="item in flashMessage.message">
+                {{ angular.isArray(item) ? item[0] : item[0]; }}
+            </p>
         </div>
         <form>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Username" ng-model="data.username" required="true" maxlength="16"/>
+                    <input type="text" placeholder="Username" ng-model="formData.username" required="true" maxlength="16"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="First Name" ng-model="data.firstname" required="true" maxlength="32"/>
+                    <input type="text" placeholder="First Name" ng-model="formData.first_name" required="true" maxlength="32"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Last Name" ng-model="data.lastname" required="true" maxlength="32"/>
+                    <input type="text" placeholder="Last Name" ng-model="formData.last_name" required="true" maxlength="32"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="email" placeholder="Email" ng-model="data.email" required="true" maxlength="32"/>
+                    <input type="email" placeholder="Email" ng-model="formData.email" required="true" maxlength="32"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Mobile Phone" ng-model="data.mobile_phone" maxlength="32"/>
+                    <input type="text" placeholder="Mobile Phone" ng-model="formData.mobile" maxlength="32"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Address" ng-model="data.address" maxlength="128"/>
+                    <input type="text" placeholder="Address" ng-model="formData.address" maxlength="128"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="text" placeholder="Zipcode" ng-model="data.zipcode" maxlength="10"/>
+                    <input type="text" placeholder="Zipcode" ng-model="formData.zipcode" maxlength="10"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="password" placeholder="Password" ng-model="data.password" required="true" maxlength="32"/>
+                    <input type="password" placeholder="Password" ng-model="formData.password" required="true" maxlength="32"/>
                 </label>
             </div>
             <div class="list list-inset">
                 <label class="item item-input">
-                    <input type="password" placeholder="Confirm Password" ng-model="data.confirm_password" required="true" maxlength="32"/>
+                    <input type="password" placeholder="Confirm Password" ng-model="formData.password_confirmation" required="true" maxlength="32"/>
                 </label>
             </div>
             <div class="button-bar">
-                <button class="button button-positive" ng-click="doSignUp(data)">Submit</button>
-            </div>
+                <button class="button button-positive" ng-click="doSignUp(formData)">Submit</button>
+            </div><br/><br/>
         </form>
     </ion-content>
 </ion-view>

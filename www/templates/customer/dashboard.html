@@ -1,34 +1,23 @@
-<ion-view name="dashboard-view" view-title="Home">
+<ion-view cache-view="true" name="dashboard-view" view-title="Home">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
-    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" has-footer="true">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doReloadCurrentProfile()"></ion-refresher>
         <div class="row">
             <div class="col text-center">
                 <h3 class="title">Welcome {{userProfile.username}}!</h3>
-                    This could be your Dashboard.
-                <br><br><br>
+                <p>This could be your Dashboard.</p>
                 <div class="card-circle text-center">
                     <div id="qrcode"></div>
-                    <h4 class="strong">{{userProfile.code}}</h4>
                 </div>
-                <!--<button class="button button-fullxdc button-positive" ng-click="performValidRequest()">
-                    Make Valid Request
-                </button>
-                <button class="button button-full button-energized" ng-click="performUnauthorizedRequest()">
-                    Make Request for unauthorized resource
-                </button>
-                <button class="button button-full button-assertive" ng-click="performInvalidRequest()">
-                    Make Request without valid token
-                </button-->
-                <br><br>
-                {{response}}
-                <div class="button-bar">
-                    <button class="button button-outline icon-left ion-android-checkmark-circle button-positive" ng-show="userProfile.store_id" ui-sref="customer.info">My place</button>
-                    <button class="button button-outline icon-left ion-android-list button-positive" ui-sref="customer.note">Note</button>
-                    <!--button class="button button-outline icon-left ion-android-star-outline button-calm" ui-sref="customer.feedback">Feedback</button-->
-                </div>
+                <h4 class="strong">{{userProfile.code}}</h4>
+                <button class="button button-block button-outline icon-left ion-android-list button-positive" ui-sref="customer.note">Note</button>
+                <button class="button button-block button-outline icon-left ion-android-checkmark-circle button-positive" ng-show="userProfile.store_id" ui-sref="customer.info">Place : </button>
+                <p ng-hide="userProfile.store_id">
+                    You don't have any favourite place, click <span class="energized">Around tab</span> to choose your favourite spa.
+                </p>
+                <br/><br/><br/>
             </div>
         </div>
     </ion-content>

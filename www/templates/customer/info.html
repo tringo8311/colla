@@ -1,6 +1,7 @@
-<ion-view view-title="Information" name="customer-info-view">
+<ion-view cache-view="true" view-title="Information" name="customer-info-view">
+    <ion-nav-buttons side="left"></ion-nav-buttons>
     <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
-    <ion-content class="padding">
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
         <div class="list card">
             <div class="item item-avatar">
                 <div class="item-char">{{store.firstChar}}</div>
@@ -13,11 +14,7 @@
                         <img ng-src="{{slide.src}}">
                     </ion-slide>
                 </ion-slide-box>
-                <p>
-                    This is a "Facebook" styled Card. The header is created from a Thumbnail List item,
-                    the content is from a card-body consisting of an image and paragraph text. The footer
-                    consists of tabs, icons aligned left, within the card-footer.
-                </p>
+                <p>Your slogan</p>
             </div>
             <div class="item item-icon-left energized">
                 <i class="icon ion-clock"></i>
@@ -37,6 +34,6 @@
 			<button class="button button-outline icon-left ion-android-list button-positive" ui-sref="customer.reservation">Reservation</button>
 			<button class="button button-outline icon-left ion-android-star-outline button-positive" ui-sref="customer.feedback">Feedback</button>
 		</div>
-		<br/>
+        <br/><br/><br/>
     </ion-content>
 </ion-view>

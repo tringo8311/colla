@@ -6,6 +6,15 @@ angular.module('collaApp')
     baseUrl : 'http://localhost:8000/',
 	apiUrl : 'http://localhost:8000/v1/api/'
 })
+.constant('APP_CONFIG', {
+    FORMAT: {
+        'DATE' : "MMM dd, yyyy",
+        'DATETIME' : "MMM dd, yyyy HH:mm",
+        "DATEFULL" : "MMM dd, yyyy HH:mm:ss",
+        "TIME" : "HH:mm",
+        "TIMEFULL" : "HH:mm:ss"
+    }
+})
 .constant('AUTH_EVENTS', {
     notAuthenticated: 'auth-not-authenticated',
     notAuthorized: 'auth-not-authorized'
@@ -16,6 +25,9 @@ angular.module('collaApp')
     owner: 'owner',
     customer: 'customer',
     'public': 'public'
+})
+.constant('$ionicLoadingConfig', {
+    template: 'Please wait processing'
 })
 .constant('RATING', [
     { value: 1, label: "Very Bad", className: "color-assertive" },

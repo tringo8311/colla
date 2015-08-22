@@ -1,16 +1,29 @@
 <ion-view view-title="Note" name="customer-note-view">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete"></button>
+    </ion-nav-buttons>
     <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
     <ion-nav-buttons side="right">
         <button class="button button-stable" ng-click="openModal()"><i class="ion ion-plus"></i></button>
     </ion-nav-buttons>
-    <ion-content class="padding">
+    <ion-content class="tabbed-content-within-sidemenu-app padding">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
-        <ion-list>
-            <ion-item class="list-item item-avatar item-text-wrap" ng-repeat="item in customerNotes">
-                <div class="item-pull-left"><a href="" ng-click="doRemove(item)"><i class="ion ion-ios-minus-outline larger"></i></a></div>
-                <span class="item-note date-time">{{ item.created_at | date:"MMM-yyyy" }}</span>
+        <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
+            {{ flashMessage.message }}
+        </div>
+        <ion-header-bar class="bar bar-header item-input-inset" ng-show="customerNotes.length > 0">
+            <label class="item-input-wrapper">
+                <i class="icon ion-ios-search placeholder-icon"></i>
+                <input type="search" placeholder="Search" ng-model="formData.keyword" ng-enter="searchCustomer()"/>
+            </label>
+            <button class="button button-clear" ng-click="doRefresh()"><i class="ion ion-android-search"></i></button>
+        </ion-header-bar>
+        <ion-list show-delete="data.showDelete">
+            <ion-item class="list-item" ng-repeat="item in customerNotes">
+                <ion-delete-button class="ion-minus-circled" ng-click="doRemove(item)"></ion-delete-button>
+                <span class="item-note date-time">{{ item.created_at | asDate | date: "MMM-dd-yyyy" }}</span>
                 <p><span class="strong color-positive">Product code:</span> {{item.product_code}} / <span class="strong color-positive">Barcode:</span> {{item.barcode}}</p>
-                <p>{{ item.content }}</p>
+                <p>{{ item.content }} {{ shouldShowDelete}}</p>
             </ion-item>
         </ion-list>
     </ion-content>

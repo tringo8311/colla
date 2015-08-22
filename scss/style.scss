@@ -12,6 +12,7 @@ $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
 $dark:                            #444 !default;
 
+$rate: #fd0;
 $success: #008800 !default;
 $error: #ef473a !default;
 
@@ -122,7 +123,7 @@ $ion-img-path: "../img" !default;
 /************ QR Code****************/
 .card-circle{
   border: 10px solid #ff3b30;
-  padding: 10px;
+  padding: 20px;
   border-radius: 999em;
   #qrcode{
     display: inline-block;
@@ -194,33 +195,62 @@ $ion-img-path: "../img" !default;
     }
   }
 }
-#map_canvas {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  position: relative;
-  .angular-google-map-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+.around-pane {
+  #map_canvas {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    position: relative;
+    .angular-google-map-container {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+    }
+  }
+  .form-address{
+    padding-right: 36px !important;
+  }
+  .form-radius {
+    z-index: 1000;
+    right: 40px !important;
+    width: 80px
   }
 }
 /************* slider *************/
 .slider {
   width: 100%;
-  height: 400px;
+  min-height: 300px;
   border: 5px solid #FFF;
   .slider-slide {
-    .desc{
-      background: rgba(0, 0, 0, 0.5);
+    img{
+      max-height: 500px;
+    }
+    .off{
+      background: rgba(255, 0, 0, .9);
       position: absolute;
-      width: 100%;
-      padding: 10px;
-      bottom: 0;
-      height: 80px;
+      font-size: 2em;
+      width: auto;
+      padding: 20px;
+      top: 0;
+      right: 0;
       color: #fff;
     }
+  }
+}
+/************** Star rating ***************/
+.star-rating {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  .star {
+    padding: 1px;
+    color: $rate;
+    font-size: 20px;
+    text-shadow: .05em .05em #aaa;
+    list-style-type: none;
+    display: inline-block;
+    cursor: pointer;
   }
 }

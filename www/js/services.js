@@ -157,8 +157,10 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
     };
     var doSignUp = function(data){
         return $q(function(resolve, reject) {
-            $auth.signup(data).then(function(response) {
-                resolve(response);
+            $auth.signup(data).then(function(responseData) {
+                resolve(responseData.data);
+            }, function(responseData) {
+                resolve(responseData.data);
             });
         });
     }
@@ -237,7 +239,6 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
 
 services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     var doGetCustomers = function(storeId, keyword){
-		console.log(keyword);
         return $q(function(resolve, reject) {
             Store.customer({id:storeId, keyword:keyword}, function(responseData) {
                 resolve(responseData.data);
@@ -250,10 +251,10 @@ services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     };
 });
 /*************** Begin Store Model ******************/
-services.factory('Store', ['$resource', 'API_PARAM', function($resource, API_PARAM) {
+services.factory('Store', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     return $resource(API_PARAM.apiUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
-        offer: {method:'GET', params:{id: '@id', extraController: 'offers'}},
-        customer: {method:'GET', params:{id: '@id', extraController: 'customers'}}
+        offer: {method:'GET', params:{id: '@id', extraController: 'offers', token: AuthService.authToken}},
+        customer: {method:'GET', params:{id: '@id', extraController: 'customers', token: AuthService.authToken}}
     });
 }]);
 services.factory('MultiStoreLoader', ['Store', '$q',
@@ -351,15 +352,14 @@ services.factory('CustomerNoteLoader', ['CustomerNote', '$route', '$q',
 services.factory('CustomerFeedback', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     console.log("token: " + AuthService.authToken);
     var customerNote = $resource(API_PARAM.apiUrl + 'profile/:user_id/feedbacks/:id',
-        {   user_id: '@user_id', id: '@id'},
-        {   query: {
+        {user_id: '@user_id', id: '@id'},
+        {query: {
             params: {token: AuthService.authToken},
             update: {method: 'PUT'}, query: {
                 method: 'GET',
                 isArray: false
             }
-        }
-        });
+        }});
     return customerNote;
 }]);
 services.factory('MultiCustomerFeedbackLoader', ['CustomerFeedback', '$q',
