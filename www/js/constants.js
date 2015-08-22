@@ -19,7 +19,7 @@ angular.module('collaApp')
     notAuthenticated: 'auth-not-authenticated',
     notAuthorized: 'auth-not-authorized'
 })
-.constant('EXCLUDE_PATH', ["login", "signup", "forgotpassword"])
+.constant('EXCLUDE_PATH', ["landing", "login", "signup", "forgotpassword"])
 .constant('USER_ROLES', {
     admin: 'admin',
     owner: 'owner',

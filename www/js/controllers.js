@@ -5,6 +5,13 @@
 var collaApp = angular.module('collaApp');
     collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup, $ionicLoading, AuthService, AUTH_EVENTS, APP_CONFIG) {
         $rootScope.APP_CONFIG = APP_CONFIG;
+        $rootScope.showLoading = function() {
+            $ionicLoading.show(); //options default to values in $ionicLoadingConfig
+        };
+        $rootScope.hideLoading = function() {
+            $ionicLoading.hide();
+        }
+
         $scope.userProfile = null;
         $scope.flashMessage = {
             visibility: false,
@@ -39,12 +46,6 @@ var collaApp = angular.module('collaApp');
             });
             return confirmPopup;
         };
-        $scope.showLoading = function() {
-            $ionicLoading.show(); //options default to values in $ionicLoadingConfig
-        };
-        $scope.hideLoading = function() {
-            $ionicLoading.hide();
-        }
         $scope.doReloadCurrentProfile = function(){
             AuthService.reloadUserProfile().then(function(responseData){
                 $scope.userProfile = responseData.data;
@@ -65,11 +66,12 @@ var collaApp = angular.module('collaApp');
         AuthService.logout();
         $location.path('/login');
     })
-    .controller('LoginCtrl', function($scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService, USER_ROLES) {
+    .controller('LoginCtrl', function($rootScope, $scope, $state, $ionicPopup, $interval, $auth, UtilService, AuthService, USER_ROLES) {
         $scope.data = {};
         $scope.remember = 0;
 
         $scope.login = function() {
+            $rootScope.showLoading();
             var credentials = {
                 email: $scope.data.email,
                 password: $scope.data.password,
@@ -77,6 +79,7 @@ var collaApp = angular.module('collaApp');
             }
             // Use Satellizer's $auth service to login
             AuthService.login(credentials).then(function(data) {
+                $rootScope.hideLoading();
                 if(AuthService.loadRole()==USER_ROLES.owner){
                     $state.go('owner.dash', {}, {reload: true});
                 }else if(AuthService.loadRole()==USER_ROLES.customer){
@@ -86,6 +89,8 @@ var collaApp = angular.module('collaApp');
                 }
                 //$state.go('customer.dash', {}, {reload: true});
                 $scope.setCurrentProfile(AuthService.userProfile());
+            }, function(err){
+                $rootScope.hideLoading();
             });
             /*AuthService.login(data.username, data.password).then(function(authenticated) {
                 $state.go('customer.dash', {}, {reload: true});
@@ -139,6 +144,7 @@ var collaApp = angular.module('collaApp');
          */
         $scope.doSignUp = function(formData) {
             // Go to login page
+            $rootScope.showLoading();
             ProfileService.doSignUp(formData).then(function(responseData){
                 if(responseData.status=="success"){
                     $scope.flashMessage.className = "success";
@@ -150,6 +156,7 @@ var collaApp = angular.module('collaApp');
                     $scope.flashMessage.message = responseData.message;
                     $scope.flashMessage.visibility = true;
                 }
+                $rootScope.hideLoading();
             });
         }
         // TODO: check login or yet
@@ -331,8 +338,9 @@ var collaApp = angular.module('collaApp');
             });
         }
         $scope.saveNote = function(){
-            $scope.showLoading();
+            $rootScope.showLoading();
             CustomerNote.save($scope.noteData, function(responseData){
+                $rootScope.hideLoading();
                 if(responseData.status == "success"){
                     $scope.customerNotes.push(responseData.data);
                     $scope.noteData= {user_id: $scope.userProfile.id};
@@ -340,7 +348,6 @@ var collaApp = angular.module('collaApp');
                     console.log("failure");
                 }
                 $scope.closeModal();
-                $scope.hideLoading();
             });
         }
         $scope.doRefresh();
@@ -502,11 +509,9 @@ var collaApp = angular.module('collaApp');
             var showPopup = function (marker) {
                 $scope.dataPopup = marker.storeObj;
                 var directionClick = function () {
+                    //$scope.openPopoverDirection();
                     MapService.directionService.calcRoute(currentPositionMarker.getPosition(), $scope.dataPopup.latlng);
                 }
-                /*var favouriteClick = function (storeId) {
-
-                };*/
                 $ionicPopup.show({
                     title: "Information",
                     cssClass: '',

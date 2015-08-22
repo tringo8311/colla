@@ -132,6 +132,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
     .factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
         return {
             responseError: function (response) {
+                $rootScope.hideLoading();
                 $rootScope.$broadcast({
                     401: AUTH_EVENTS.notAuthenticated,
                     403: AUTH_EVENTS.notAuthorized

@@ -14,7 +14,7 @@
         <div class="list">
             <ion-item  class="list-item item-avatar item-text-wrap" ng-repeat="item in customers">
                 <div class="item-char">{{item.first_name | first_char}}</div>
-                <span class="item-note date-time">{{ item.created_at | date:"MMM-yyyy" }}</span>
+                <span class="item-note date-time">{{ item.created_at | asDate | date: APP_CONFIG.FORMAT.DATE }}</span>
                 <p><span class="strong color-positive">{{ item.first_name }} {{ item.last_name }}</span></p>
                 <p>{{ item.address }}, {{ item.zip_code }}</p>
                 <p>{{ item.mobile | tel }}</p>

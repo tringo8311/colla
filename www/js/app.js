@@ -57,7 +57,12 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
         $ionicConfigProvider.tabs.position('bottom');
         $ionicConfigProvider.navBar.alignTitle('center');
 
-        $stateProvider.state('login', {
+        $stateProvider.
+            state('landing', {
+                url: '/landing',
+                templateUrl: 'templates/landing.html'
+            })
+            .state('login', {
                 url: '/login',
                 templateUrl: 'templates/login.html',
                 controller: 'LoginCtrl'
@@ -256,6 +261,17 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                     }
                 }
             })
+            .state('owner.profile', {
+                url: 'owner/profile',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/profile.html'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
             .state('owner.business', {
                 url: 'owner/business',
                 views: {
@@ -346,7 +362,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 if (!AuthService.isAuthorized(authorizedRoles)) {
                     event.preventDefault();
                     if($state.abstract || $state.current.abstract){
-                        $state.go('login');
+                        $state.go('landing');
                     }else{
                         $state.go($state.current, {}, {reload: true});
                         $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
