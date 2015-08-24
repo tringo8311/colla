@@ -1,36 +1,76 @@
-<ion-view view-title="My Business" name="owner-my-business-view">
+<ion-view view-title="Business" name="owner-my-business-view">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content class="padding">
-        <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
+        <div class="flash-message" ng-class="flashMessage.className" ng-if="flashMessage.visibility">
             {{ flashMessage.message }}
         </div>
         <form>
-            <label class="item item-input">
-                <input type="text" placeholder="Username" ng-model="data.username" readonly="readonly"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Store name</span>
+                <input type="text" placeholder="Store name" ng-model="formData.title"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="First Name" ng-model="data.first_name"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Company Name</span>
+                <input type="text" placeholder="Company Name" ng-model="formData.company_name"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Last Name" ng-model="data.last_name"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Address</span>
+                <input type="text" placeholder="Address" ng-model="formData.address"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Email" ng-model="data.email" readonly="readonly"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">City</span>
+                <input type="text" placeholder="City" ng-model="formData.city"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Mobile Phone" ng-model="data.mobile"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">State</span>
+                <input type="text" placeholder="State" ng-model="formData.state"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Address" ng-model="data.address"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Zipcode</span>
+                <input type="text" placeholder="Zipcode" ng-model="formData.zipcode"/>
             </label>
-            <label class="item item-input">
-                <input type="text" placeholder="Zipcode" ng-model="data.zipcode"/>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Phone</span>
+                <input type="tel" placeholder="Phone" ng-model="formData.phone"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Fax</span>
+                <input type="tel" placeholder="Fax" ng-model="formData.fax"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Website</span>
+                <input type="text" placeholder="Website" ng-model="formData.website"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Email</span>
+                <input type="email" placeholder="Email" ng-model="formData.email"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Latitude</span>
+                <input type="text" placeholder="Latitude" ng-model="formData.latitude"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Longtitude</span>
+                <input type="text" placeholder="Longtitude" ng-model="formData.longtitude"/>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Business hour</span>
+                <textarea placeholder="Type here your business hour" rows="8" cols="40" ng-model="formData.business_hour"></textarea>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Overview</span>
+                <textarea placeholder="Type here your overview" rows="8" cols="40" ng-model="formData.overview"></textarea>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Content</span>
+                <textarea placeholder="Type here your content" rows="8" cols="40" ng-model="formData.content"></textarea>
             </label>
             <br/>
             <div class="button-bar">
-                <button class="button button-positive" ng-click="updateMyBusiness($event)">Update</button>
+                <button class="button button-outline" ng-click="doReset($event)">Reset</button>
+                <button class="button button-outline" ng-click="updateBusiness($event)">Update</button>
             </div>
         </form>
     </ion-content>

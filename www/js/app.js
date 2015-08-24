@@ -265,7 +265,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 url: 'owner/profile',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/owner/profile.html'
+                        templateUrl: 'templates/owner/profile.html',
+                        controller: 'OwnerProfileCtrl'
                     }
                 },
                 data: {
@@ -276,7 +277,8 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 url: 'owner/business',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/owner/business.html'
+                        templateUrl: 'templates/owner/business.html',
+                        controller: 'OwnerBusinessCtrl'
                     }
                 },
                 data: {
@@ -295,12 +297,12 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                     authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
                 }
             })
-            .state('owner.customer', {
-                url: 'owner/customer',
+            .state('owner.follower', {
+                url: 'owner/follower',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/owner/customer.html',
-                        controller: 'OwnerCustomerCtrl'
+                        templateUrl: 'templates/owner/follower.html',
+                        controller: 'OwnerFollowerCtrl'
                     }
                 },
                 data: {
@@ -464,38 +466,18 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                 });
             }
         };
-        /*return {
-            restrict: 'A',
-            template: '<ul class="rating"><li ng-repeat="star in stars" ng-class="star" ng-click="toggle($index)"><i class="fa fa-star-o"></i></li></ul>',
-            scope: {
-                ratingValue: '=',
-                max: '=',
-                onRatingSelected: '&'
-            },
-            link: function (scope, elem, attrs) {
-                var updateStars = function () {
-                    scope.stars = [];
-                    for (var i = 0; i < scope.max; i++) {
-                        scope.stars.push({
-                            filled: i < scope.ratingValue
-                        });
+    }).directive('fileUpload', function () {
+        return {
+            scope: true,        //create a new scope
+            link: function (scope, el, attrs) {
+                el.bind('change', function (event) {
+                    var files = event.target.files;
+                    //iterate files since 'multiple' may be specified on the element
+                    for (var i = 0;i<files.length;i++) {
+                        //emit event upward
+                        scope.$emit("fileSelected", { file: files[i] });
                     }
-                };
-
-                scope.toggle = function (index) {
-                    scope.ratingValue = index + 1;
-                    scope.onRatingSelected({
-                        rating: index + 1
-                    });
-                };
-
-                scope.$watch('ratingValue',
-                    function (oldVal, newVal) {
-                        if (newVal) {
-                            updateStars();
-                        }
-                    }
-                );
+                });
             }
-        };*/
+        };
     });

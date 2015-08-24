@@ -1,4 +1,4 @@
-<ion-view view-title="Customer" name="owner-customer-view">
+<ion-view view-title="Follower" name="owner-follower-view">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -13,7 +13,7 @@
         </ion-header-bar>
         <div class="list">
             <ion-item  class="list-item item-avatar item-text-wrap" ng-repeat="item in customers">
-                <div class="item-char">{{item.first_name | first_char}}</div>
+                <div class="item-char">{{$index+1}}</div>
                 <span class="item-note date-time">{{ item.created_at | asDate | date: APP_CONFIG.FORMAT.DATE }}</span>
                 <p><span class="strong color-positive">{{ item.first_name }} {{ item.last_name }}</span></p>
                 <p>{{ item.address }}, {{ item.zip_code }}</p>
@@ -25,8 +25,8 @@
         <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
             <ion-nav-view name="dash-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
-            <ion-nav-view name="customer-tab"></ion-nav-view>
+        <ion-tab title="Follower" class="energized" icon="ion-person" href="#/owner/follower">
+            <ion-nav-view name="follower-tab"></ion-nav-view>
         </ion-tab>
         <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
             <ion-nav-view name="offer-tab"></ion-nav-view>

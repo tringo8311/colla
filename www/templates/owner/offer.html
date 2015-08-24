@@ -1,13 +1,24 @@
 <ion-view view-title="Offer" name="owner-customer-view">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+        <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete"></button>
     </ion-nav-buttons>
 	<ion-nav-buttons side="right">
         <button class="button button-stable" ng-click="openModal()"><i class="ion ion-plus"></i></button>
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
-        <div class="list">
-            <div ng-repeat="offer in offers">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
+        <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
+            {{ flashMessage.message }}
+        </div>
+        <ion-list show-delete="data.showDelete" class="list">
+            <ion-item class=""  ng-repeat="offer in storeOffers">
+                <ion-delete-button class="ion-minus-circled" ng-click="doRemove(offer)"></ion-delete-button>
+                <span class="strong color-positive"> {{ offer.subject }} ({{ offer.off }}{{ offer.off_type}})</span>
+                <div class="pull-right text-right">{{offer.start_time | asDate | date: APP_CONFIG.FORMAT.DATE}}<br/>{{offer.end_time | asDate | date:APP_CONFIG.FORMAT.DATE}} </div>
+                <div>{{offer.content}}</div>
+            </ion-item>
+            <!--div ng-repeat="offer in offers">
                 <ion-item class="item" ng-click="toggleGroup(offer)" ng-class="{active: isGroupShown(offer)}">
                     <i class="icon" ng-class="isGroupShown(offer)? 'ion-android-arrow-dropdown' : 'ion-android-arrow-dropright'"></i>
                     <span class="strong color-positive"> {{ offer.subject }}</span>
@@ -17,16 +28,16 @@
                     <img class="clear" ng-src="{{ offer.file_url }}" alt="Offer" width="100%"/>
                     <div>{{offer.content}}</div>
                 </ion-item>
-            </div>
-        </div>
+            </div-->
+        </ion-list>
     </ion-content>
     <ion-footer-bar>
         <ion-tabs class="tabs-icon-top tabs-light">
             <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
                 <ion-nav-view name="dash-tab"></ion-nav-view>
             </ion-tab>
-            <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
-                <ion-nav-view name="customer-tab"></ion-nav-view>
+            <ion-tab title="Follower" class="energized" icon="ion-person" href="#/owner/follower">
+                <ion-nav-view name="follower-tab"></ion-nav-view>
             </ion-tab>
             <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
                 <ion-nav-view name="offer-tab"></ion-nav-view>

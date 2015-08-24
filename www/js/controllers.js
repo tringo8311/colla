@@ -187,30 +187,6 @@ var collaApp = angular.module('collaApp');
         }
     })
     .controller('DashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
-        $scope.performValidRequest = function() {
-            $http.get('http://localhost:8100/valid').then(
-                function(result) {
-                    $scope.response = result;
-                });
-        };
-
-        $scope.performUnauthorizedRequest = function() {
-            $http.get('http://localhost:8100/notauthorized').then(
-                function(result) {
-                    // No result here..
-                }, function(err) {
-                    $scope.response = err;
-                });
-        };
-
-        $scope.performInvalidRequest = function() {
-            $http.get('http://localhost:8100/notauthenticated').then(
-                function(result) {
-                    // No result here..
-                }, function(err) {
-                    $scope.response = err;
-                });
-        };
         /*$scope.$on('$ionicView.beforeEnter', function (event, viewData) {
             viewData.enableBack = true;
         });*/
@@ -699,6 +675,62 @@ var collaApp = angular.module('collaApp');
             google.maps.event.trigger(map, "resize");
         });*/
     }])
+    .controller('OwnerProfileCtrl', function($scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
+        if(AuthService.isAuthenticated()){
+            $scope.formData = AuthService.userProfile();
+        }else{
+            $scope.go("login");
+        }
+        $scope.updateProfile = function(){
+            ProfileService.doUpdate($scope.data).then(function(response){
+                if(response.status=="success"){
+                    $scope.flashMessage.className = "success";
+                }else{
+                    $scope.flashMessage.className = "error";
+                }
+                $scope.flashMessage.visibility = true;
+                $scope.flashMessage.message = response.message;
+
+                $timeout(function() {
+                    $scope.flashMessage.visibility = false;
+                }, 2000);
+            });
+        }
+    })
+    .controller('OwnerBusinessCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $timeout, AuthService, StoreService) {
+        var doRefresh = function(){
+            StoreService.getStore($scope.userProfile.store_id).then(function(responseData){
+                $scope.formData = responseData;
+                $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        if(AuthService.isAuthenticated()){
+            doRefresh();
+        }else{
+            $scope.go("login");
+        }
+        $scope.doReset = function(){
+            doRefresh();
+        }
+        $scope.updateBusiness = function(){
+            $rootScope.showLoading();
+            StoreService.doUpdate($scope.data, $scope.userProfile.store_id).then(function(response){
+                $rootScope.hideLoading();
+                if(response.status=="success"){
+                    $scope.flashMessage.className = "success";
+                }else{
+                    $scope.flashMessage.className = "error";
+                }
+                $scope.flashMessage.visibility = true;
+                $scope.flashMessage.message = response.message;
+
+                $timeout(function() {
+                    $scope.flashMessage.visibility = false;
+                }, 3000);
+
+            });
+        }
+    })
     .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService, OwnerService) {
 		$scope.data = {'customerSize': '0', 'rateAverage' : '0','offerSize' : '0'};
 		var store_id = $scope.userProfile.store_id;
@@ -714,18 +746,16 @@ var collaApp = angular.module('collaApp');
             $scope.doRefresh();
         }
     })
-    .controller('OwnerCustomerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
+    .controller('OwnerFollowerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
 		$scope.formData = {keyword:""};
         if($scope.userProfile.store_id){
             $scope.doRefresh = function(){
-                StoreService.doGetCustomers($scope.userProfile.store_id, $scope.formData.keyword).then(function(responseData) {
+                StoreService.getFollower($scope.userProfile.store_id, $scope.formData.keyword).then(function(responseData) {
                     $scope.customers = responseData;
                     $scope.$broadcast('scroll.refreshComplete');
                 }, function(errResponse) {
                     $scope.$broadcast('scroll.refreshComplete');
                 });
-            }
-            $scope.doRemove = function(item){
             }
             $scope.doRefresh();
         }
@@ -733,13 +763,114 @@ var collaApp = angular.module('collaApp');
 			$scope.doRefresh();
 		}
     })
-    .controller('OwnerOfferCtrl', function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
-        if($scope.userProfile.store_id){
-            ProfileService.doGetOffers($scope.userProfile.store_id).then(function(responseData) {
-                $scope.offers = responseData;
+    .controller('OwnerOfferCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, $ionicSlideBoxDelegate, AuthService, ProfileService, StoreOffer, API_PARAM) {
+        $scope.data = {showDelete : false};
+        $scope.formData = {keyword:""};
+        $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+        $scope.doRefresh = function(){
+            ProfileService.doGetOffers({store_id: $scope.userProfile.store_id, keyword: $scope.formData.keyword}).then(function(responseData){
+                $scope.storeOffers = responseData;
+                $scope.$broadcast('scroll.refreshComplete');
+            }, function(errResponse) {
+                $scope.$broadcast('scroll.refreshComplete');
             });
         }
-        $scope.toggleGroup = function(item) {
+        $scope.doRemove = function(item){
+            $scope.doShowConfirm("Delete?", "Are you sure want to remove this item?").then(function(answer){
+                if(answer){
+                    StoreOffer.remove({id: item.id, store_id: $scope.offerData.store_id}, function(responseData){
+                        if(responseData.status=="success"){
+                            $scope.flashMessage.className = "success";
+                        }else{
+                            $scope.flashMessage.className = "error";
+                        }
+                        $scope.flashMessage.visibility = true;
+                        $scope.flashMessage.message = responseData.message;
+
+                        $timeout(function(){$scope.flashMessage.visibility = false;}, 2000);
+                        $scope.storeOffers.splice( $scope.storeOffers.indexOf(item), 1 );
+                    });
+                }
+            });
+        }
+
+        //an array of files selected
+        $scope.files = [];
+
+        //listen for the file selected event
+        $scope.$on("fileSelected", function (event, args) {
+            $scope.$apply(function () {
+                //add the file object to the scope's files collection
+                $scope.files.push(args.file);
+            });
+        });
+        //the save method
+        /*$scope.saveOffer = function() {
+            $http({
+                method: 'POST',
+                url: API_PARAM.apiUrl + "store_offer?token=" + AuthService.authToken,
+                //IMPORTANT!!! You might think this should be set to 'multipart/form-data'
+                // but this is not true because when we are sending up files the request
+                // needs to include a 'boundary' parameter which identifies the boundary
+                // name between parts in this multi-part request and setting the Content-type
+                // manually will not set this boundary parameter. For whatever reason,
+                // setting the Content-type to 'false' will force the request to automatically
+                // populate the headers properly including the boundary parameter.
+                headers: { 'Content-Type': false },
+                //This method will allow us to change how the data is sent up to the server
+                // for which we'll need to encapsulate the model data in 'FormData'
+                transformRequest: function (data) {
+                    var formData = new FormData();
+                    //need to convert our json object to a string version of json otherwise
+                    // the browser will do a 'toString()' on the object which will result
+                    // in the value '[Object object]' on the server.
+                    formData.append("model", angular.toJson(data.model));
+                    //now add all of the assigned files
+                    for (var i = 0; i < data.files; i++) {
+                        //add each file to the form data and iteratively name them
+                        formData.append("file" + i, data.files[i]);
+                    }
+                    return formData;
+                },
+                //Create an object that contains the model and files which will be transformed
+                // in the above transformRequest method
+                data: { model: $scope.offerData, files: $scope.files }
+            }).
+            success(function (data, status, headers, config) {
+                alert("success!");
+            }).
+            error(function (data, status, headers, config) {
+                alert("failed!");
+            });
+        };*/
+        $scope.saveOffer = function(){
+            $rootScope.showLoading();
+            StoreOffer.save($scope.offerData, function(responseData){
+                $rootScope.hideLoading();
+                if(responseData.status == "success"){
+                    $scope.storeOffers.unshift(responseData.data);
+                    $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+                }else{
+                    console.log("fail");
+                }
+                $scope.closeModal();
+            });
+        }
+        $scope.doRefresh();
+
+        $ionicModal.fromTemplateUrl('templates/partial/offer-tmp.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modal = modal;
+        });
+        $scope.openModal = function() {
+            $scope.modal.show();
+        };
+        $scope.closeModal = function() {
+            $scope.modal.hide();
+        };
+        /*$scope.toggleGroup = function(item) {
             if ($scope.isGroupShown(item)) {
                 $scope.shownGroup = null;
             } else {
@@ -748,7 +879,7 @@ var collaApp = angular.module('collaApp');
         }
         $scope.isGroupShown = function(item){
             return $scope.shownGroup === item;
-        }
+        }*/
     })
     .controller('OwnerContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
         $scope.formData = {

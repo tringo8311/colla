@@ -9,16 +9,16 @@
             <div class="col">
                 <h3 class="title">Welcome {{userProfile.username}}!</h3>
                     This could be your Dashboard.
-                <br><br><br>
+                <br><br>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col">
 				<div class="card">
 					<div class="item item-avatar">
-						<div class="item-pull-left"><span class="ion-person"></span></div>
-						<h2>Customer</h2>
-						<p>Total</p>
+						<div class="item-pull-left"><span class="ionicons ion-person"></span></div>
+						<h2>Follower</h2>
+						<p>All follower who like your business</p>
 					</div>
 					<div class="item text-center">
 						<div class="x-large">{{data.customerSize}}</div>
@@ -28,12 +28,12 @@
 			<div class="col">
 				<div class="card">
 					<div class="item item-avatar">
-						<div class="item-pull-left"><span class="ion-star"></span></div>
-						<h2>Rate</h2>
-						<p>Average</p>
+						<div class="item-pull-left"><span class="ionicons ion-pricetags"></span></div>
+						<h2>Offer</h2>
+						<p>Total offer that created by you</p>
 					</div>
 					<div class="item text-center">
-						<div class="x-large">{{data.rateAverage}}</div>
+						<div class="x-large">{{data.offerSize}}</div>
 					</div>
 				</div>
 			</div>
@@ -42,21 +42,21 @@
 			<div class="col">
 				<div class="card">
 					<div class="item item-avatar">
-						<div class="item-pull-left"><span class="ion-pricetags"></span></div>
-						<h2>Offer</h2>
-						<p>Total offer</p>
+						<div class="item-pull-left"><span class="ionicons ion-star"></span></div>
+						<h2>Rate</h2>
+						<p>Average rate score per 5</p>
 					</div>
 					<div class="item text-center">
-						<div class="x-large">{{data.offerSize}}</div>
+						<div class="x-large">{{data.rateAverage}}</div>
 					</div>
 				</div>
 			</div>
 			<div class="col">
 				<div class="card">
 					<div class="item item-avatar">
-						<div class="item-pull-left"><span class="ion-arrow-graph-up-right"></span></div>
-						<h2>Report</h2>
-						<p>Total offer</p>
+						<div class="item-pull-left"><span class="ionicons ion-arrow-graph-up-right"></span></div>
+						<h2>Reservation</h2>
+						<p>Comming soon</p>
 					</div>
 					<div class="item text-center">
 						<div class="x-large">0</div>
@@ -69,8 +69,8 @@
         <ion-tab title="Home" class="assertive" icon="ion-home" href="#/owner/dash">
             <ion-nav-view name="dash-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Customer" class="energized" icon="ion-person" href="#/owner/customer">
-            <ion-nav-view name="customer-tab"></ion-nav-view>
+        <ion-tab title="Follower" class="energized" icon="ion-person" href="#/owner/follower">
+            <ion-nav-view name="follower-tab"></ion-nav-view>
         </ion-tab>
         <ion-tab title="Offer" class="balanced" icon="ion-pricetags" href="#/owner/offer">
             <ion-nav-view name="offer-tab"></ion-nav-view>

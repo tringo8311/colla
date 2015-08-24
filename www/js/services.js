@@ -109,7 +109,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
         }
 
         var isAuthenticateFn = function() {
-            return isAuthenticated && authToken != null;
+            return isAuthenticated && authToken != null && authToken != "";
         }
 
         var loadRole = function(){
@@ -179,9 +179,9 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
             })
         });
     }
-    var doGetOffers = function(storeId){
+    var doGetOffers = function(formData){
         return $q(function(resolve, reject) {
-            Store.offer({id:storeId}, function(responseData) {
+            Store.offer({id:formData.store_id}, function(responseData) {
                 resolve(responseData.data);
             })
         });
@@ -193,7 +193,6 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
             })
         });
     }
-
     return {
         confirmResetPassword: confirmResetPassword,
         doSignUp: doSignUp,
@@ -239,21 +238,42 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
 /*************** End Profile Model ******************/
 
 services.service('StoreService', function($q, $http, $auth, Profile, Store) {
-    var doGetCustomers = function(storeId, keyword){
+    var getFollower = function(storeId, keyword){
         return $q(function(resolve, reject) {
             Store.customer({id:storeId, keyword:keyword}, function(responseData) {
                 resolve(responseData.data);
             });
         });
     }
+    var getStore = function(storeId){
+        return $q(function(resolve, reject) {
+            Store.get({id:storeId}, function(responseData) {
+                resolve(responseData.data);
+            });
+        });
+    }
+    var doUpdate = function(formData, $storeId){
+        return $q(function(resolve, reject) {
+            Store.save(angular.extend({id:$storeId}, formData), function(response){
+                resolve(response);
+            });
+        });
+    }
 
     return {
-        doGetCustomers: doGetCustomers
+        getFollower: getFollower,
+        getStore: getStore,
+        doUpdate: doUpdate
     };
 });
 /*************** Begin Store Model ******************/
 services.factory('Store', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     return $resource(API_PARAM.apiUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
+        query: {
+            params: {token: AuthService.authToken},
+            update: {method: 'POST'},
+            get: {method:'GET'}
+        },
         offer: {method:'GET', params:{id: '@id', extraController: 'offers', token: AuthService.authToken}},
         customer: {method:'GET', params:{id: '@id', extraController: 'customers', token: AuthService.authToken}}
     });
@@ -436,3 +456,39 @@ services.factory('OwnerLoader', ['Owner', '$route', '$q',
         };
     }]);
 /******************** End Owner service **********************/
+/******************** Store Offer service **********************/
+services.factory('StoreOffer', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    var storeOffer = $resource(API_PARAM.apiUrl + 'store_offer/:id',
+        { id: '@id'},
+        { query: {
+            params: {token: AuthService.authToken},
+            update: {method: 'PUT'}, query: {method: 'GET',isArray: false}
+          }
+        });
+    return storeOffer;
+}]);
+services.factory('MultiStoreOfferLoader', ['StoreOffer', '$q',
+    function(StoreOffer, $q) {
+        return function() {
+            var delay = $q.defer();
+            StoreOffer.query(function(responseData) {
+                delay.resolve(responseData);
+            }, function() {
+                delay.reject('Unable to fetch receipts');
+            });
+            return delay.promise;
+        };
+    }]);
+services.factory('StoreOfferLoader', ['StoreOffer', '$route', '$q',
+    function(StoreOffer, $route, $q) {
+        return function() {
+            var delay = $q.defer();
+            StoreOffer.get({id: $route.current.params.id}, function(responseData) {
+                delay.resolve(responseData);
+            }, function() {
+                delay.reject('Unable to fetch CustomerNote ' + $route.current.params.id);
+            });
+            return delay.promise;
+        };
+    }]);
+/******************** End Offer service **********************/

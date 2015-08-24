@@ -55,6 +55,15 @@ $ion-img-path: "../img" !default;
 .x-large{
 	font-size: 2em;
 }
+select.form-control{
+  width: 98%;
+  height: 40px;
+  line-height: 120%;
+  border: none;
+  option{
+    padding: 5px;
+  }
+}
 .clearfix::before, .clearfix::after{
   content: " ";
   display: table;
@@ -210,6 +219,9 @@ $ion-img-path: "../img" !default;
     font-size: 1.4em;
     line-height: 2.1em;
     vertical-align: middle;
+    .ionicons{
+      font-size: 2em;
+    }
   }
 }
 .around-pane {

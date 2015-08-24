@@ -37,6 +37,14 @@
 .x-large {
   font-size: 2em; }
 
+select.form-control {
+  width: 98%;
+  height: 40px;
+  line-height: 120%;
+  border: none; }
+  select.form-control option {
+    padding: 5px; }
+
 .clearfix::before, .clearfix::after {
   content: " ";
   display: table; }
@@ -176,6 +184,8 @@
   font-size: 1.4em;
   line-height: 2.1em;
   vertical-align: middle; }
+  .card .item-pull-left .ionicons {
+    font-size: 2em; }
 
 .around-pane #map_canvas {
   width: 100%;

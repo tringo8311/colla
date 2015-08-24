@@ -1,0 +1,59 @@
+<ion-modal-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> Create Offer</div>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <form>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="text" placeholder="Type subject here" ng-model="offerData.subject" autofocus=""/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="date" placeholder="Start date" ng-model="offerData.start_time"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="date" placeholder="End date" ng-model="offerData.end_time"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="number" placeholder="Type here value off" ng-model="offerData.off"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="number" placeholder="Type here max value" ng-model="offerData.off_max"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <select class="form-control" ng-model="offerData.off_type">
+                        <option value="%">%</option>
+                        <option value="$">$</option>
+                    </select>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <textarea type="text" placeholder="Type here your content" rows="8" cols="40" ng-model="offerData.content"></textarea>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input">
+                    <input type="file" name="filename" value="" file-upload/>
+                </label>
+                <ul>
+                    <li ng-repeat="file in files">{{file.name}}</li>
+                </ul>
+            </div>
+            <div class="button-bar">
+                <button class="button" ng-click="closeModal()">Cancel</button>
+                <button class="button" ng-click="saveOffer()">Save</button>
+            </div><br/>
+        </form>
+    </ion-content>
+</ion-modal-view>

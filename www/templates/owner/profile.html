@@ -1,4 +1,4 @@
-<ion-view view-title="My Business" name="owner-my-business-view">
+<ion-view view-title="Profile" name="owner-my-business-view">
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
@@ -8,29 +8,29 @@
         </div>
         <form>
             <label class="item item-input">
-                <input type="text" placeholder="Username" ng-model="data.username" readonly="readonly"/>
+                <input type="text" placeholder="Username" ng-model="formData.username" readonly="readonly"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="First Name" ng-model="data.first_name"/>
+                <input type="text" placeholder="First Name" ng-model="formformData.first_name"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Last Name" ng-model="data.last_name"/>
+                <input type="text" placeholder="Last Name" ng-model="formData.last_name"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Email" ng-model="data.email" readonly="readonly"/>
+                <input type="email" placeholder="Email" ng-model="formData.email" readonly="readonly"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Mobile Phone" ng-model="data.mobile"/>
+                <input type="tel" placeholder="Mobile Phone" ng-model="formData.mobile"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Address" ng-model="data.address"/>
+                <input type="text" placeholder="Address" ng-model="formData.address"/>
             </label>
             <label class="item item-input">
-                <input type="text" placeholder="Zipcode" ng-model="data.zipcode"/>
+                <input type="text" placeholder="Zipcode" ng-model="formData.zipcode"/>
             </label>
             <br/>
             <div class="button-bar">
-                <button class="button button-positive" ng-click="updateMyBusiness($event)">Update</button>
+                <button class="button button-positive" ng-click="updateProfile($event)">Update</button>
             </div>
         </form>
     </ion-content>
