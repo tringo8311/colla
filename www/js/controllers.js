@@ -251,7 +251,7 @@ var collaApp = angular.module('collaApp');
     }])
     .controller('OfferCtrl', ['$scope', "$state", "$http", "$ionicPopup", "$ionicSlideBoxDelegate", "AuthService", "ProfileService", function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
         if($scope.userProfile.store_id){
-            ProfileService.doGetOffers($scope.userProfile.store_id).then(function(responseData) {
+            ProfileService.doGetOffers({store_id: $scope.userProfile.store_id}).then(function(responseData) {
                 $scope.offers = responseData;
                 setTimeout(function(){$ionicSlideBoxDelegate.update();}, 500);
             });

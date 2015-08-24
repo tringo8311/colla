@@ -23,7 +23,7 @@
                 <ion-delete-button class="ion-minus-circled" ng-click="doRemove(item)"></ion-delete-button>
                 <span class="item-note date-time">{{ item.created_at | asDate | date: "MMM-dd-yyyy" }}</span>
                 <p><span class="strong color-positive">Product code:</span> {{item.product_code}} / <span class="strong color-positive">Barcode:</span> {{item.barcode}}</p>
-                <p>{{ item.content }} {{ shouldShowDelete}}</p>
+                <p>{{ item.content }}</p>
             </ion-item>
         </ion-list>
     </ion-content>

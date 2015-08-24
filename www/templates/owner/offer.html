@@ -4,7 +4,7 @@
         <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete"></button>
     </ion-nav-buttons>
 	<ion-nav-buttons side="right">
-        <button class="button button-stable" ng-click="openModal()"><i class="ion ion-plus"></i></button>
+        <button class="button button-stable" ng-click="openModal()" ng-hide="storeOffers.length > 4"><i class="ion ion-plus"></i></button>
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>

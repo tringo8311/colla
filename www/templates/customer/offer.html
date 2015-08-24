@@ -7,12 +7,13 @@
             <ion-slide ng-repeat="offer in offers">
                 <div class="list">
                     <div class="item">
-                        <h2 class="positive">{{ offer.subject }}</h2>
-                        <p class="">{{offer.start_time | asDate | date:"MMM-dd-yyyy"}} - {{offer.end_time | asDate | date:"MMM-dd-yyyy"}}</p>
+                        <h2 class="positive">{{offer.subject}}</h2>
+                        <p class="">{{offer.start_time | asDate | date:"MMM-dd-yyyy"}} - {{offer.end_time | asDate | date:APP_CONFIG.FORMAT.DATE}}</p>
                         <div class="off">{{offer.off}}{{offer.off_type}}</div>
                     </div>
-                    <div class="item" style="padding:0">
-                        <img class="clear" ng-src="http://localhost:8000/{{ offer.file_url }}" alt="Offer" width="100%"/>
+                    <div class="item" style="padding:0" ng-switch on="offer">
+                        <img class="clear" ng-src="{{ offer.file_url }}" alt="Offer" width="100%" ng-switch-when="offer.file_url!=''"/>
+                        <img class="clear" ng-src="{{APP_CONFIG.IMAGE_DEFAULT.DISCOUNT}}" alt="Offer" width="100%" ng-switch-default/>
                     </div>
                     <div class="item">
                         <p>{{offer.content}}</p>

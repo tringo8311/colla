@@ -13,6 +13,10 @@ angular.module('collaApp')
         "DATEFULL" : "MMM dd, yyyy HH:mm:ss",
         "TIME" : "HH:mm",
         "TIMEFULL" : "HH:mm:ss"
+    },
+    IMAGE_DEFAULT: {
+        'DISCOUNT' : '/img/discounts.jpg',
+        'EXAMPLE' : '/img/example.jpg'
     }
 })
 .constant('AUTH_EVENTS', {
