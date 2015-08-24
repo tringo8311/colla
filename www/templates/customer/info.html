@@ -6,7 +6,7 @@
             <div class="item item-avatar">
                 <div class="item-char">{{store.firstChar}}</div>
                 <h2 class="strong">{{ store.title }}</h2>
-                <p class="address">{{ store.address }}, {{ store.zipcode }}</p>
+                <p class="address">{{ store.address }}, {{ store.city}}, {{store.state}}, {{ store.zipcode }}</p>
             </div>
             <div class="item item-body">
                 <ion-slide-box on-slide-changed="slideHasChanged($index)">
@@ -14,7 +14,7 @@
                         <img ng-src="{{slide.src}}">
                     </ion-slide>
                 </ion-slide-box>
-                <p>Your slogan</p>
+                <p>{{ store.slogan }}</p>
             </div>
             <div class="item item-icon-left energized">
                 <i class="icon ion-clock"></i>

@@ -2,7 +2,7 @@
     <ion-nav-buttons side="left">
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
-    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" padding="true">
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" has-footer="true">
         <ion-slide-box on-slide-changed="slideHasChanged($index)">
             <ion-slide ng-repeat="offer in offers">
                 <div class="list">
@@ -20,7 +20,7 @@
                     </div>
                 </div>
             </ion-slide>
-        </ion-slide-box>
+        </ion-slide-box><br/><br/><br/>
     </ion-content>
     <ion-tabs class="tabs-icon-top tabs-light">
         <ion-tab title="Home" class="assertive" icon="ion-home" href="#/customer/dash">

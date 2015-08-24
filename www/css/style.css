@@ -210,17 +210,19 @@ select.form-control {
   width: 100%;
   min-height: 300px;
   border: 5px solid #FFF; }
-  .slider .slider-slide img {
-    max-height: 500px; }
-  .slider .slider-slide .off {
-    background: rgba(255, 0, 0, 0.9);
-    position: absolute;
-    font-size: 2em;
-    width: auto;
-    padding: 20px;
-    top: 0;
-    right: 0;
-    color: #fff; }
+  .slider .slider-slide {
+    min-width: 400px; }
+    .slider .slider-slide img {
+      max-height: 500px; }
+    .slider .slider-slide .off {
+      background: rgba(255, 0, 0, 0.9);
+      position: absolute;
+      font-size: 2em;
+      width: auto;
+      padding: 20px;
+      top: 0;
+      right: 0;
+      color: #fff; }
 
 /************** Star rating ***************/
 .star-rating {

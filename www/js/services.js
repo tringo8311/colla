@@ -27,7 +27,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
         function useCredentials(token, profile) {
             isAuthenticated = true;
             authToken = token;
-            console.log("set role" + role);
+            //console.log("set role" + role);
             if(profile && profile.role) {
                 if (profile.role == 'admin') {
                     role = USER_ROLES.admin
@@ -39,7 +39,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
                     role = USER_ROLES.public
                 }
             }
-            console.log("after set role" + role);
+            //console.log("after set role" + role);
             // Set the token as header for your requests!
             $http.defaults.headers.common['X-Auth-Token'] = authToken;
             //$http.defaults.headers.get = {token: authToken};
@@ -271,9 +271,9 @@ services.factory('Store', ['$resource', 'AuthService', 'API_PARAM', function($re
     return $resource(API_PARAM.apiUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
         query: {
             params: {token: AuthService.authToken},
-            update: {method: 'POST'},
-            get: {method:'GET'}
+            update: {method: 'POST'}
         },
+        get: {method:'GET', params:{id: '@id', token: AuthService.authToken}},
         offer: {method:'GET', params:{id: '@id', extraController: 'offers', token: AuthService.authToken}},
         customer: {method:'GET', params:{id: '@id', extraController: 'customers', token: AuthService.authToken}}
     });
@@ -426,9 +426,9 @@ services.factory('Owner', ['$resource', 'AuthService', 'API_PARAM', function($re
         {id: '@id'},
         {query: {
             params: {token: AuthService.authToken},
-            update: {method: 'PUT'}, query: {method: 'GET',isArray: false}
+            update: {method: 'PUT'}
         }
-        });
+    });
     return owner;
 }]);
 services.factory('MultiOwnerLoader', ['Owner', '$q',
@@ -462,7 +462,7 @@ services.factory('StoreOffer', ['$resource', 'AuthService', 'API_PARAM', functio
         { id: '@id'},
         { query: {
             params: {token: AuthService.authToken},
-            update: {method: 'PUT'}, query: {method: 'GET',isArray: false}
+            update: {method: 'PUT'}
           }
         });
     return storeOffer;

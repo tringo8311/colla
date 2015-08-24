@@ -3,6 +3,8 @@
  */
 angular.module('collaApp')
 .constant('API_PARAM', {
+    /*baseUrl : 'http://api.myspa247.com/',
+	apiUrl : 'http://api.myspa247.com/v1/api/'*/
     baseUrl : 'http://localhost:8000/',
 	apiUrl : 'http://localhost:8000/v1/api/'
 })
@@ -15,8 +17,8 @@ angular.module('collaApp')
         "TIMEFULL" : "HH:mm:ss"
     },
     IMAGE_DEFAULT: {
-        'DISCOUNT' : '/img/discounts.jpg',
-        'EXAMPLE' : '/img/example.jpg'
+        'DISCOUNT' : '/img/sample/discounts.jpg',
+        'EXAMPLE' : '/img/sample/example.jpg'
     }
 })
 .constant('AUTH_EVENTS', {

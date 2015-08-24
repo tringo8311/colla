@@ -1,6 +1,6 @@
 <ion-modal-view>
     <ion-header-bar class="icon-left">
-        <div class="title"><i class="icon ion-search"></i> Create Offer</div>
+        <div class="title"><i class="icon ion-search"></i> {{ modalTitle}}</div>
     </ion-header-bar>
     <ion-content class="padding">
         <form>
@@ -36,7 +36,7 @@
             </div>
             <div class="list list-inset">
                 <label class="item item-input item-stacked-label">
-                    <span class="input-label">Type</span>
+                    <span class="input-label">Type</span><br/>
                     <select class="form-control" ng-model="offerData.off_type">
                         <option value="%">%</option>
                         <option value="$">$</option>

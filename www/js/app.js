@@ -329,7 +329,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
                     authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
                 }
             });
-            $urlRouterProvider.otherwise('public');
+            $urlRouterProvider.otherwise('landing');
     })
     .run(function($httpBackend){
         /*$httpBackend.whenGET('http://localhost:8100/valid')

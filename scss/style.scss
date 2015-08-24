@@ -7,7 +7,7 @@ $stable:                          #f8f8f8 !default;
 $positive:                        #387ef5 !default;
 $calm:                            #11c1f3 !default;
 $balanced:                        #008800 !default;
-$energized:                       rbg(232,119,93) !default;
+$energized:                       #f1831e !default;
 $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
 $dark:                            #444 !default;
@@ -253,6 +253,7 @@ select.form-control{
   min-height: 300px;
   border: 5px solid #FFF;
   .slider-slide {
+    min-width: 400px;
     img{
       max-height: 500px;
     }

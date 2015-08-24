@@ -4,7 +4,7 @@
         <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete"></button>
     </ion-nav-buttons>
 	<ion-nav-buttons side="right">
-        <button class="button button-stable" ng-click="openModal()" ng-hide="storeOffers.length > 4"><i class="ion ion-plus"></i></button>
+        <button class="button button-stable" ng-click="createOffer()" ng-hide="storeOffers.length > 4"><i class="ion ion-plus"></i></button>
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
@@ -12,8 +12,8 @@
             {{ flashMessage.message }}
         </div>
         <ion-list show-delete="data.showDelete" class="list">
-            <ion-item class=""  ng-repeat="offer in storeOffers">
-                <ion-delete-button class="ion-minus-circled" ng-click="doRemove(offer)"></ion-delete-button>
+            <ion-item ng-repeat="offer in storeOffers" ng-click="detailOffer(offer)">
+                <ion-delete-button class="ion-minus-circled" ng-click="doRemove($event, offer)"></ion-delete-button>
                 <span class="strong color-positive"> {{ offer.subject }} ({{ offer.off }}{{ offer.off_type}})</span>
                 <div class="pull-right text-right">{{offer.start_time | asDate | date: APP_CONFIG.FORMAT.DATE}}<br/>{{offer.end_time | asDate | date:APP_CONFIG.FORMAT.DATE}} </div>
                 <div>{{offer.content}}</div>

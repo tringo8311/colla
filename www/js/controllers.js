@@ -166,12 +166,15 @@ var collaApp = angular.module('collaApp');
     })
     .controller('ProfileCtrl', function($scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
         if(AuthService.isAuthenticated()){
-            $scope.data = AuthService.userProfile();
+            $scope.formData = AuthService.userProfile();
         }else{
             $scope.go("login");
         }
+        $scope.doReset = function(){
+            $scope.formData = AuthService.userProfile();
+        }
         $scope.updateProfile = function(){
-            ProfileService.doUpdate($scope.data).then(function(response){
+            ProfileService.doUpdate($scope.formData).then(function(response){
                 if(response.status=="success"){
                     $scope.flashMessage.className = "success";
                 }else{
@@ -402,13 +405,13 @@ var collaApp = angular.module('collaApp');
         });
         $scope.slides = [
             {
-                src:'/img/bg1.jpg',
+                src:'/img/sample/sample1.jpg',
                 sub: 'This is a <b>subtitle</b>'
             },{
-                src:'/img/bg2.jpg',
+                src:'/img/sample/sample2.jpg',
                 sub: 'Heo moi ' /* Not showed */
             },{
-                src:'/img/bg3.jpg'
+                src:'/img/sample/sample3.jpg'
             }
         ]
         $scope.currentIndex = 0;
@@ -763,7 +766,7 @@ var collaApp = angular.module('collaApp');
 			$scope.doRefresh();
 		}
     })
-    .controller('OwnerOfferCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, $ionicSlideBoxDelegate, AuthService, ProfileService, StoreOffer, API_PARAM) {
+    .controller('OwnerOfferCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, $ionicSlideBoxDelegate, $filter, AuthService, ProfileService, StoreOffer, API_PARAM) {
         $scope.data = {showDelete : false};
         $scope.formData = {keyword:""};
         $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
@@ -775,7 +778,8 @@ var collaApp = angular.module('collaApp');
                 $scope.$broadcast('scroll.refreshComplete');
             });
         }
-        $scope.doRemove = function(item){
+        $scope.doRemove = function(evt, item){
+            evt.preventDefault();
             $scope.doShowConfirm("Delete?", "Are you sure want to remove this item?").then(function(answer){
                 if(answer){
                     StoreOffer.remove({id: item.id, store_id: $scope.offerData.store_id}, function(responseData){
@@ -858,6 +862,7 @@ var collaApp = angular.module('collaApp');
         }
         $scope.doRefresh();
 
+        $scope.modalTitle = "Create offer";
         $ionicModal.fromTemplateUrl('templates/partial/offer-tmp.html', {
             scope: $scope,
             animation: 'slide-in-up'
@@ -870,6 +875,23 @@ var collaApp = angular.module('collaApp');
         $scope.closeModal = function() {
             $scope.modal.hide();
         };
+
+        $scope.createOffer = function(){
+            $scope.modalTitle = "Create offer";
+            $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+            $scope.openModal();
+        }
+        $scope.detailOffer = function(item){
+            $scope.modalTitle = "Update offer";
+            if(item.start_time){
+                item.start_time = new Date(item.start_time);
+            }
+            if(item.end_time){
+                item.end_time = new Date(item.end_time);
+            }
+            $scope.offerData = item;
+            $scope.openModal();
+        }
         /*$scope.toggleGroup = function(item) {
             if ($scope.isGroupShown(item)) {
                 $scope.shownGroup = null;
