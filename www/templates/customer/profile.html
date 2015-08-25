@@ -6,7 +6,7 @@
         <div class="flash-message {{ flashMessage.className }}" ng-class="" ng-if="flashMessage.visibility">
             {{ flashMessage.message }}
         </div>
-        <form>
+        <form ng-submit="updateProfile($event)">
             <label class=" item item-input item-stacked-label">
                 <span class="input-label"></span>
                 <input type="text" placeholder="Username" ng-model="formData.username" readonly="readonly"/>
@@ -38,7 +38,7 @@
             <br/>
             <div class="button-bar">
                 <button class="button button-outline" ng-click="doReset($event)">Reset</button>
-                <button class="button button-outline" ng-click="updateProfile($event)">Update</button>
+                <button class="button button-outline" type="submit">Update</button>
             </div>
         </form>
     </ion-content>

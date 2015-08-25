@@ -17,6 +17,9 @@
 .color-assertive {
   color: #ef473a; }
 
+.input-label {
+  color: #387ef5; }
+
 .center-block {
   display: block;
   margin-left: auto;
@@ -61,6 +64,14 @@ select.form-control {
 .popover {
   height: 380px; }
 
+.vm-container {
+  display: table !important;
+  width: 100% !important;
+  height: 100% !important; }
+  .vm-container .vm-body {
+    display: table-cell;
+    vertical-align: middle; }
+
 .flash-message {
   padding: 12px 6px;
   border: 1px solid #c0c0c0;
@@ -72,6 +83,35 @@ select.form-control {
   .flash-message.success {
     border-color: #008800;
     color: #008800; }
+
+/*******************************/
+.error-container {
+  margin: 5px 0; }
+
+.error-container:last-child {
+  margin: 5px 0 0; }
+
+.error {
+  padding: 10px 16px;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #555;
+  vertical-align: middle; }
+
+.error i {
+  font-size: 24px;
+  color: #B83E2C;
+  vertical-align: middle; }
+
+.last-error-container > .error {
+  padding: 10px 16px 0; }
+
+.has-errors {
+  border-bottom: 3px solid #B83E2C; }
+
+.no-errors {
+  border-bottom: 3px solid green; }
 
 /***********************************/
 .login-page {

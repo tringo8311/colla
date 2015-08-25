@@ -285,7 +285,7 @@ var collaApp = angular.module('collaApp');
             }
         });*/
     }])
-    .controller('CustomerNoteCtrl', ['$scope', "$state", "$http", "$ionicModal", "$timeout", "AuthService", "CustomerNote", function($scope, $state, $http, $ionicModal, $timeout, AuthService, CustomerNote) {
+    .controller('CustomerNoteCtrl', ['$rootScope','$scope', "$state", "$http", "$ionicModal", "$timeout", "AuthService", "CustomerNote", function($rootScope, $scope, $state, $http, $ionicModal, $timeout, AuthService, CustomerNote) {
         $scope.data = {showDelete : false};
         $scope.formData = {keyword:""};
         $scope.noteData = {user_id: $scope.userProfile.id};
@@ -298,7 +298,8 @@ var collaApp = angular.module('collaApp');
                 $scope.$broadcast('scroll.refreshComplete');
             });
         }
-        $scope.doRemove = function(item){
+        $scope.doRemove = function(evt, item){
+			evt.preventDefault();
             $scope.doShowConfirm("Delete?", "Are you sure want to remove this item?").then(function(answer){
                 if(answer){
                     CustomerNote.remove({user_id: $scope.userProfile.id, id : item.id}, function(responseData){
@@ -318,18 +319,43 @@ var collaApp = angular.module('collaApp');
         }
         $scope.saveNote = function(){
             $rootScope.showLoading();
-            CustomerNote.save($scope.noteData, function(responseData){
-                $rootScope.hideLoading();
-                if(responseData.status == "success"){
-                    $scope.customerNotes.push(responseData.data);
-                    $scope.noteData= {user_id: $scope.userProfile.id};
-                }else{
-                    console.log("failure");
-                }
-                $scope.closeModal();
-            });
+			if($scope.noteData.id){
+				$scope.noteData.token = AuthService.authToken;
+				CustomerNote.update({id:$scope.noteData.id}, $scope.noteData).$promise.then(function(responseData){
+					$rootScope.hideLoading();
+					if(responseData.status == "success"){
+						$scope.noteData = {user_id: $scope.userProfile.id};
+					}else{
+						console.log("failure");
+					}
+					$scope.closeModal();
+				});
+			}else{
+				CustomerNote.save($scope.noteData).$promise.then(function(responseData){
+					$rootScope.hideLoading();
+					if(responseData.status == "success"){
+						$scope.customerNotes.push(responseData.data);
+						$scope.noteData = {user_id: $scope.userProfile.id};
+					}else{
+						console.log("failure");
+					}
+					$scope.closeModal();
+				});
+			}
         }
         $scope.doRefresh();
+		
+		$scope.modalTitle = "Create Note";
+        $scope.createNote = function(){
+            $scope.modalTitle = "Create Note";
+            $scope.offerData = {user_id: $scope.userProfile.id};
+            $scope.openModal();
+        }
+        $scope.detailNote = function(item){
+            $scope.modalTitle = "Update Note";
+            $scope.noteData = item;
+            $scope.openModal();
+        }
 
         $ionicModal.fromTemplateUrl('templates/partial/note-tmp.html', {
             scope: $scope,
@@ -685,7 +711,7 @@ var collaApp = angular.module('collaApp');
             $scope.go("login");
         }
         $scope.updateProfile = function(){
-            ProfileService.doUpdate($scope.data).then(function(response){
+            ProfileService.doUpdate($scope.formData).then(function(response){
                 if(response.status=="success"){
                     $scope.flashMessage.className = "success";
                 }else{
@@ -698,6 +724,9 @@ var collaApp = angular.module('collaApp');
                     $scope.flashMessage.visibility = false;
                 }, 2000);
             });
+        }
+        $scope.resetProfile = function(){
+            $scope.formData = AuthService.userProfile();
         }
     })
     .controller('OwnerBusinessCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $timeout, AuthService, StoreService) {
@@ -849,16 +878,29 @@ var collaApp = angular.module('collaApp');
         };*/
         $scope.saveOffer = function(){
             $rootScope.showLoading();
-            StoreOffer.save($scope.offerData, function(responseData){
-                $rootScope.hideLoading();
-                if(responseData.status == "success"){
-                    $scope.storeOffers.unshift(responseData.data);
-                    $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
-                }else{
-                    console.log("fail");
-                }
-                $scope.closeModal();
-            });
+            if($scope.offerData.id){
+                $scope.offerData.token = AuthService.authToken;
+                StoreOffer.update({id:$scope.offerData.id}, $scope.offerData).$promise.then(function(responseData){
+                    $rootScope.hideLoading();
+                    if(responseData.status == "success"){
+                        $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+                    }else{
+                        console.log("failure");
+                    }
+                    $scope.closeModal();
+                });
+            }else {
+                StoreOffer.save($scope.offerData, function (responseData) {
+                    $rootScope.hideLoading();
+                    if (responseData.status == "success") {
+                        $scope.storeOffers.unshift(responseData.data);
+                        $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+                    } else {
+                        console.log("fail");
+                    }
+                    $scope.closeModal();
+                });
+            }
         }
         $scope.doRefresh();
 

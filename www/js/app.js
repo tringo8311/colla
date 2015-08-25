@@ -345,6 +345,7 @@ angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ng
         $httpBackend.whenDELETE(/localhost:8000\/.*//*).passThrough();*/
         $httpBackend.whenGET(/templates\/\w+.*/).passThrough();
         $httpBackend.whenGET(/^\w+.*/).passThrough();
+        $httpBackend.whenPUT(/^\w+.*/).passThrough();
         $httpBackend.whenPOST(/^\w+.*/).passThrough();
         $httpBackend.whenDELETE(/^\w+.*/).passThrough();
     })

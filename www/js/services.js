@@ -27,7 +27,6 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
         function useCredentials(token, profile) {
             isAuthenticated = true;
             authToken = token;
-            //console.log("set role" + role);
             if(profile && profile.role) {
                 if (profile.role == 'admin') {
                     role = USER_ROLES.admin
@@ -39,7 +38,6 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
                     role = USER_ROLES.public
                 }
             }
-            //console.log("after set role" + role);
             // Set the token as header for your requests!
             $http.defaults.headers.common['X-Auth-Token'] = authToken;
             //$http.defaults.headers.get = {token: authToken};
@@ -81,7 +79,6 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
         };
 
         var isAuthorized = function(authorizedRoles) {
-            console.log(role);
             if (!angular.isArray(authorizedRoles)) {
                 authorizedRoles = [authorizedRoles];
             }
@@ -166,6 +163,7 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
         });
     }
     var doUpdate = function(formData){
+        console.log(formData);
         return $q(function(resolve, reject) {
             Profile.save(formData, function(response){
                 resolve(response);
@@ -204,8 +202,10 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
 });
 services.factory('Profile', ['$resource' , 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     return $resource(API_PARAM.apiUrl + 'profile/:id/:extendController',
-        {id: '@id', extendController: '@extendController'},
-        {
+        {id: '@id', extendController: '@extendController'},{
+            query: {
+                update: {method: "PUT"}
+            },
             place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},
             favourite: {method:'POST', params:{id: '@id', extendController: 'favourite', token: AuthService.authToken}
         }
@@ -236,7 +236,6 @@ services.factory('ProfileLoader', ['Profile', '$route', '$q',
         };
     }]);
 /*************** End Profile Model ******************/
-
 services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     var getFollower = function(storeId, keyword){
         return $q(function(resolve, reject) {
@@ -271,7 +270,7 @@ services.factory('Store', ['$resource', 'AuthService', 'API_PARAM', function($re
     return $resource(API_PARAM.apiUrl + 'store/:id/:extraController', {id: '@id', extraController: '@extraController'},{
         query: {
             params: {token: AuthService.authToken},
-            update: {method: 'POST'}
+            update: {method: 'PUT'}
         },
         get: {method:'GET', params:{id: '@id', token: AuthService.authToken}},
         offer: {method:'GET', params:{id: '@id', extraController: 'offers', token: AuthService.authToken}},
@@ -334,14 +333,9 @@ services.factory('ReceiptLoader', ['Receipt', '$route', '$q',
 /******************** Customer Note **********************/
 services.factory('CustomerNote', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     var customerNote = $resource(API_PARAM.apiUrl + 'profile/:user_id/notes/:id',
-        {   user_id: '@user_id', id: '@id'},
-        {   query: {
-                params: {token: AuthService.authToken},
-                update: {method: 'PUT'}, query: {
-                    method: 'GET',
-                    isArray: false
-                }
-            }
+        {user_id: '@user_id', id: '@id'},
+        {query:{params: {token: AuthService.authToken}},
+		 update:{method:'PUT'}
         });
     return customerNote;
 }]);
@@ -424,10 +418,8 @@ services.service('OwnerService', function($q, $http, $auth, Owner) {
 services.factory('Owner', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     var owner = $resource(API_PARAM.apiUrl + 'owner/:id',
         {id: '@id'},
-        {query: {
-            params: {token: AuthService.authToken},
-            update: {method: 'PUT'}
-        }
+        {query: {params: {token: AuthService.authToken}},
+         update: {method: 'PUT'}
     });
     return owner;
 }]);
@@ -460,10 +452,8 @@ services.factory('OwnerLoader', ['Owner', '$route', '$q',
 services.factory('StoreOffer', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     var storeOffer = $resource(API_PARAM.apiUrl + 'store_offer/:id',
         { id: '@id'},
-        { query: {
-            params: {token: AuthService.authToken},
-            update: {method: 'PUT'}
-          }
+        { query: {params: {token: AuthService.authToken}},
+          update: {method: 'PUT'}
         });
     return storeOffer;
 }]);

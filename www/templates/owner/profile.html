@@ -13,7 +13,7 @@
             </label>
             <label class=" item item-input item-stacked-label">
                 <span class="input-label">First Name</span>
-                <input type="text" placeholder="First Name" ng-model="formformData.first_name"/>
+                <input type="text" placeholder="First Name" ng-model="formData.first_name"/>
             </label>
             <label class=" item item-input item-stacked-label">
                 <span class="input-label">Last Name</span>
@@ -37,7 +37,8 @@
             </label>
             <br/>
             <div class="button-bar">
-                <button class="button button-positive" ng-click="updateProfile($event)">Update</button>
+                <button class="button button-default" ng-click="resetProfile($event)">Reset</button>
+                <button class="button button-default" ng-click="updateProfile($event)">Update</button>
             </div>
         </form>
     </ion-content>
