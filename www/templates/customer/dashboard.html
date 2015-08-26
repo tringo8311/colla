@@ -13,10 +13,21 @@
                 </div>
                 <h4 class="strong">{{userProfile.code}}</h4>
                 <button class="button button-block button-outline icon-left ion-android-list button-positive" ui-sref="customer.note">Note</button>
-                <button class="button button-block button-outline icon-left ion-android-checkmark-circle button-positive" ng-show="userProfile.store_id" ui-sref="customer.info">Place</button>
-                <p ng-hide="userProfile.store_id">
-                    You don't have any favourite place, click <span class="energized">Around tab</span> to choose your favourite spa.
-                </p>
+                <ion-list>
+                    <ion-item class="list-item item-avatar item-button-right" ng-repeat="store in userProfile.stores">
+                        <div class="item-char" ui-sref="customer.info({id:store.id})">{{store.title | firstChar }}</div>
+                        <div class="detail" ng-hide="store.showBusinessHour">
+                            <h2>{{store.title}}</h2>
+                            <p class="address">{{ store.address }}, {{ store.city}}, {{store.state}}, {{ store.zipcode }}</p>
+                            <p>{{store.phone}}</p>
+                        </div>
+                        <div class="business-hour" ng-show="store.showBusinessHour">{{store.business_hour}}</div>
+                        <button class="button" ng-click="toggleBusinessHour(store)" ng-class="store.showBusinessHour ? 'button-positive' : 'button-default'">
+                            <i class="icon ion-clock"></i>
+                        </button>
+                    </ion-item>
+                </ion-list>
+                <button class="button button-block button-outline icon-left ion-android-checkmark-circle button-positive" ui-sref="customer.around" ng-show="userProfile.stores.length < 5">Add store</button>
                 <br/><br/><br/>
             </div>
         </div>

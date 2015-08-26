@@ -18,8 +18,17 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             className: "",
             message: ''
         }
+
+        $scope.setCurrentProfile = function(profile) {
+            $scope.userProfile = profile;
+            if($scope.userProfile && $scope.userProfile.stores){
+                angular.forEach($scope.userProfile.stores, function(value, key) {
+                    $scope.userProfile.stores[key].showBusinessHour = false;
+                });
+            }
+        };
         if(AuthService.userProfile()){
-            $scope.userProfile = AuthService.userProfile();
+            $scope.setCurrentProfile(AuthService.userProfile());
         }
 
         $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
@@ -48,14 +57,10 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         };
         $scope.doReloadCurrentProfile = function(){
             AuthService.reloadUserProfile().then(function(responseData){
-                $scope.userProfile = responseData.data;
+                $scope.setCurrentProfile(responseData.data);
             });
             $scope.$broadcast('scroll.refreshComplete');
         }
-
-        $scope.setCurrentProfile = function(profile) {
-            $scope.userProfile = profile;
-        };
 
         $scope.logout = function() {
             AuthService.logout();
@@ -190,11 +195,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     })
     .controller('DashCtrl', function($scope, $state, $http, $ionicPopup, AuthService) {
-        /*$scope.$on('$ionicView.beforeEnter', function (event, viewData) {
-            viewData.enableBack = true;
-        });*/
         $scope.$on('$ionicView.loaded', function (viewInfo, state) {
-            //console.log('CTRL - $ionicView.loaded', viewInfo, state);
             if(document.querySelector("#qrcode")){
                 angular.element(document.querySelector("#qrcode")).empty();
                 new QRCode("qrcode", {
@@ -207,6 +208,9 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
                 });
             }
         });
+        $scope.toggleBusinessHour = function(item) {
+            item.showBusinessHour = !item.showBusinessHour;
+        }
     })
     .controller('ContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
         $scope.formData = {
@@ -253,8 +257,10 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     }])
     .controller('OfferCtrl', ['$scope', "$state", "$http", "$ionicPopup", "$ionicSlideBoxDelegate", "AuthService", "ProfileService", function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
-        if($scope.userProfile.store_id){
-            ProfileService.doGetOffers({store_id: $scope.userProfile.store_id}).then(function(responseData) {
+        $scope.formData = {storeId: 0};
+        if($scope.userProfile.stores){
+            $scope.formData.storeId = $scope.userProfile.stores[0].id;
+            ProfileService.doGetOffers({store_id: $scope.formData.storeId}).then(function(responseData) {
                 $scope.offers = responseData;
                 setTimeout(function(){$ionicSlideBoxDelegate.update();}, 500);
             });
@@ -370,11 +376,12 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             $scope.modal.hide();
         };
     }])
-    .controller('CustomerFeedbackCtrl', ['$scope', "$state", "$http", "$ionicModal", "AuthService", "CustomerFeedback", "RATING", function($scope, $state, $http, $ionicModal, AuthService, CustomerFeedback, RATING) {
+    .controller('CustomerFeedbackCtrl', ['$rootScope','$scope', "$state", "$http", "$ionicModal", "$stateParams", "AuthService", "CustomerFeedback", "RATING", function($rootScope, $scope, $state, $http, $ionicModal, $stateParams, AuthService, CustomerFeedback, RATING) {
         // Feedback
+        var storeId = $stateParams.storeId;
         $scope.customerFeedbacks = [];
         $scope.doRefresh = function(){
-            CustomerFeedback.query({user_id: 1}, function(feedbacks){
+            CustomerFeedback.query({user_id: 1, storeId: storeId}, function(feedbacks){
                 $scope.customerFeedbacks = feedbacks.data;
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {
@@ -419,9 +426,10 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             $scope.modal.hide();
         };
     }])
-    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "ProfileService", "UtilService", function($scope, $state, $http, $ionicPopup, AuthService, ProfileService, UtilService) {
+    .controller('PlaceCtrl', ['$scope', "$state", "$http", "$ionicPopup", "$stateParams", "AuthService", "StoreService", "UtilService", function($scope, $state, $http, $ionicPopup, $stateParams, AuthService, StoreService, UtilService) {
         $scope.store = {};
-        ProfileService.doGetPlace().then(function(myStore) {
+        var storeId = $stateParams.id;
+        StoreService.getStore(storeId).then(function(myStore) {
             var firstChar = myStore.title.charAt(0) ? myStore.title.charAt(0) : "0";
             angular.extend($scope.store, myStore, {
                 phone: UtilService.phoneFormat(myStore.phone),
@@ -738,8 +746,9 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     })
     .controller('OwnerBusinessCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $timeout, AuthService, StoreService) {
+        storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
         var doRefresh = function(){
-            StoreService.getStore($scope.userProfile.store_id).then(function(responseData){
+            StoreService.getStore(storeId).then(function(responseData){
                 $scope.formData = responseData;
                 $scope.$broadcast('scroll.refreshComplete');
             });
@@ -773,10 +782,10 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
     })
     .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService, OwnerService) {
 		$scope.data = {'customerSize': '0', 'rateAverage' : '0','offerSize' : '0'};
-		var store_id = $scope.userProfile.store_id;
-        if(store_id){
+        var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
+        if(storeId){
             $scope.doRefresh = function(){
-                OwnerService.doGetCount(store_id).then(function(responseData) {
+                OwnerService.doGetCount(storeId).then(function(responseData) {
                     $scope.data = responseData;
                     $scope.$broadcast('scroll.refreshComplete');
                 }, function(errResponse) {
@@ -787,10 +796,11 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     })
     .controller('OwnerFollowerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
+        var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
 		$scope.formData = {keyword:""};
-        if($scope.userProfile.store_id){
+        if(storeId){
             $scope.doRefresh = function(){
-                StoreService.getFollower($scope.userProfile.store_id, $scope.formData.keyword).then(function(responseData) {
+                StoreService.getFollower(storeId, $scope.formData.keyword).then(function(responseData) {
                     $scope.customers = responseData;
                     $scope.$broadcast('scroll.refreshComplete');
                 }, function(errResponse) {
@@ -804,11 +814,12 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
 		}
     })
     .controller('OwnerOfferCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, $ionicSlideBoxDelegate, $filter, AuthService, ProfileService, StoreOffer, API_PARAM) {
+        var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
         $scope.data = {showDelete : false};
         $scope.formData = {keyword:""};
-        $scope.offerData = {user_id: $scope.userProfile.id, store_id: $scope.userProfile.store_id};
+        $scope.offerData = {user_id: $scope.userProfile.id, store_id: storeId};
         $scope.doRefresh = function(){
-            ProfileService.doGetOffers({store_id: $scope.userProfile.store_id, keyword: $scope.formData.keyword}).then(function(responseData){
+            ProfileService.doGetOffers({store_id: storeId, keyword: $scope.formData.keyword}).then(function(responseData){
                 $scope.storeOffers = responseData;
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {

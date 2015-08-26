@@ -155,7 +155,7 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 }
             })
             .state('customer.info', {
-                url: 'customer/info',
+                url: 'customer/info/:id',
                 views: {
                     'main-content': {
                         templateUrl: 'templates/customer/info.html',
@@ -179,7 +179,7 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 }
             })
             .state('customer.feedback', {
-                url: 'customer/feedback',
+                url: 'customer/feedback/:storeId',
                 views: {
                     'main-content': {
                         templateUrl: 'templates/customer/feedback.html',
@@ -369,7 +369,7 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
         $httpBackend.whenPOST(/^\w+.*/).passThrough();
         $httpBackend.whenDELETE(/^\w+.*/).passThrough();
     })
-    .run(function ($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
+    .run(function($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {
             // page required authentication
             //console.log(AuthService.isAuthenticated());

@@ -2,7 +2,7 @@
     <ion-header-bar class="icon-left">
         <div class="title"><i class="icon ion-search"></i> {{ modalTitle}}</div>
     </ion-header-bar>
-    <ion-content class="padding">
+    <ion-content class="padding"  has-header="true" has-footer="true">
         <form>
             <div class="list list-inset">
                 <label class="item item-input item-stacked-label">
@@ -63,10 +63,13 @@
                     <li ng-repeat="file in files">{{file.name}}</li>
                 </ul>
             </div-->
-            <div class="button-bar">
-                <button class="button" ng-click="closeModal()">Cancel</button>
-                <button class="button" ng-click="saveOffer()">Save</button>
-            </div><br/>
+            <br/>
         </form>
     </ion-content>
+    <ion-footer-bar class="bar bar-footer">
+        <div class="button-bar">
+            <button class="button" ng-click="closeModal()">Cancel</button>
+            <button class="button" ng-click="saveOffer()">Save</button>
+        </div>
+    </ion-footer-bar>
 </ion-modal-view>

@@ -366,7 +366,6 @@ services.factory('CustomerNoteLoader', ['CustomerNote', '$route', '$q',
     }]);
 /******************** Customer Feedback **********************/
 services.factory('CustomerFeedback', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
-    console.log("token: " + AuthService.authToken);
     var customerNote = $resource(API_PARAM.apiUrl + 'profile/:user_id/feedbacks/:id',
         {user_id: '@user_id', id: '@id'},
         {query: {
