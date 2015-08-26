@@ -56,6 +56,7 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             return $q(function(resolve, reject) {
                 $auth.login(credentials).then(function(response){
                     if(response.status == 200){
+                        authToken = response.data.token;
                         var req = {
                             method: 'GET',
                             url: API_PARAM.apiUrl + 'profile?token='+response.data.token
@@ -163,7 +164,6 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
         });
     }
     var doUpdate = function(formData){
-        console.log(formData);
         return $q(function(resolve, reject) {
             Profile.save(formData, function(response){
                 resolve(response);
@@ -204,6 +204,7 @@ services.factory('Profile', ['$resource' , 'AuthService', 'API_PARAM', function(
     return $resource(API_PARAM.apiUrl + 'profile/:id/:extendController',
         {id: '@id', extendController: '@extendController'},{
             query: {
+                params: {token: AuthService.authToken},
                 update: {method: "PUT"}
             },
             place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},

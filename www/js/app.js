@@ -6,7 +6,27 @@
 // bower install angular-mocks --save
 // <script src="lib/angular-mocks/angular-mocks.js"></script>
 // https://docs.angularjs.org/api/ngMockE2E
-angular.module('collaApp', ['ionic', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ngMap', 'underscore', 'ui.router', 'satellizer'])
+angular.module('ionic.utils', []).factory('$localStorage', ['$window', function($window) {
+    return {
+        set: function(key, value) {
+            $window.localStorage[key] = value;
+        },
+        get: function(key, defaultValue) {
+            return $window.localStorage[key] || defaultValue;
+        },
+        setObject: function(key, value) {
+            $window.localStorage[key] = JSON.stringify(value);
+        },
+        getObject: function(key) {
+            try {
+                return JSON.parse($window.localStorage[key] || null);
+            } catch (e) {
+                return null;
+            }
+        }
+    }
+}]);
+angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', 'ngAnimate', 'ngMap', 'underscore', 'ui.router', 'satellizer'])
     .run(function($ionicPlatform) {
         $ionicPlatform.ready(function() {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard

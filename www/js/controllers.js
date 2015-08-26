@@ -3,7 +3,7 @@
  * @type {*|module}
  */
 var collaApp = angular.module('collaApp');
-    collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup, $ionicLoading, AuthService, AUTH_EVENTS, APP_CONFIG) {
+collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup, $ionicLoading, AuthService, AUTH_EVENTS, APP_CONFIG) {
         $rootScope.APP_CONFIG = APP_CONFIG;
         $rootScope.showLoading = function() {
             $ionicLoading.show(); //options default to values in $ionicLoadingConfig
@@ -136,7 +136,7 @@ var collaApp = angular.module('collaApp');
             });
         }
     })
-    .controller('SignUpCtrl', function($scope, $state, $ionicSideMenuDelegate, $ionicPopup, $timeout, ProfileService, AuthService) {
+    .controller('SignUpCtrl', function($rootScope, $scope, $state, $ionicSideMenuDelegate, $ionicPopup, $timeout, ProfileService, AuthService) {
         $scope.formData = {}
         /**
          * do validate and save data
@@ -454,21 +454,28 @@ var collaApp = angular.module('collaApp');
             $scope.currentIndex = ($scope.currentIndex > 0) ? --$scope.currentIndex : $scope.slides.length - 1;
         };
     }])
-    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "GeoCoder", "UtilService", "AuthService", "MapService", "ProfileService", "_",function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, GeoCoder, UtilService, AuthService, MapService, ProfileService, _) {
+    .controller('AroundCtrl', ['$scope', "$q", "$state", "$http", "$interval", "$ionicPopup", "$ionicModal", "$ionicPopover", "$window", "$localStorage", "GeoCoder", "UtilService", "AuthService", "MapService", "ProfileService",function($scope, $q, $state, $http, $interval, $ionicPopup, $ionicModal, $ionicPopover, $window, $localStorage, GeoCoder, UtilService, AuthService, MapService, ProfileService) {
         var currentMap = null, currentPositionMarker = null, currentInfoWindow = null;
+        var CURRENT_LOCATION_STORAGE = "CURRENT_LOCATION_STORAGE";
+        var CURRENT_LOCATION_DEFAULT = {coords:{lat:37.7749295,lng:-122.41941550000001}, heading:"",address:""};
         $scope.dimenstion = {
             dev_width : $window.innerWidth,
             dev_height : $window.innerHeight
         }
         $scope.addressInput = "";
-        $scope.currentPosition = {coords:{lat:37.7749295,lng:-122.41941550000001}, heading:"",address:""};
         $scope.markerList = [];
         $scope.mapDirection = {};
+
+        $scope.currentPosition = $localStorage.getObject(CURRENT_LOCATION_STORAGE) || CURRENT_LOCATION_DEFAULT;
+        $scope.$watch('currentPosition', function(newVal, oldVal){
+            $localStorage.setObject(CURRENT_LOCATION_STORAGE, newVal);
+        }, true);
         $scope.$on('mapInitialized', function(evt, evtMap) {
             currentMap = evtMap;
             currentPositionMarker = currentMap.markers[0];
             currentInfoWindow = new google.maps.InfoWindow();
             google.maps.event.addListener(currentPositionMarker, 'dragend', function (event) {
+                $scope.currentPosition.coords = {lat: currentPositionMarker.getPosition().G, lng: currentPositionMarker.getPosition().K};
                 updateInfoWindow(currentPositionMarker.getPosition(), currentInfoWindow).then(function(answer){
                     if(answer.status == "success"){
                         $scope.addressInput = answer.result;
@@ -516,6 +523,7 @@ var collaApp = angular.module('collaApp');
                 var directionClick = function () {
                     //$scope.openPopoverDirection();
                     MapService.directionService.calcRoute(currentPositionMarker.getPosition(), $scope.dataPopup.latlng);
+                    return true;
                 }
                 $ionicPopup.show({
                     title: "Information",
@@ -528,7 +536,7 @@ var collaApp = angular.module('collaApp');
                         text: 'Direction',
                         type: 'button-calm button-outline',
                         onTap: function (e) {
-                            directionClick();
+                            return directionClick();
                         }
                     }, {
                         text: 'Favourite',

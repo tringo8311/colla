@@ -62,7 +62,8 @@ select.form-control {
   width: 350px; }
 
 .popover {
-  height: 380px; }
+  height: 380px;
+  width: 360px; }
 
 .vm-container {
   display: table !important;
@@ -149,8 +150,7 @@ select.form-control {
 /************ QR Code****************/
 .card-circle {
   border: 10px solid #ff3b30;
-  padding: 20px;
-  border-radius: 999em; }
+  padding: 10px; }
   .card-circle #qrcode {
     display: inline-block; }
 
