@@ -17,8 +17,44 @@
 .color-assertive {
   color: #ef473a; }
 
+.clearfix::before, .clearfix::after {
+  content: " ";
+  display: table; }
+
+.clearfix::after {
+  clear: both; }
+
+.scroll {
+  height: 100%; }
+
+.button-halfwidth {
+  width: 49%; }
+
+.button-fullwidth {
+  width: 100%; }
+
+.button-outline {
+  background: rgba(255, 255, 255, 0.3) none repeat scroll 0 0 !important; }
+
+select.form-control {
+  width: 98%;
+  height: 40px;
+  line-height: 120%;
+  border: none; }
+  select.form-control option {
+    padding: 5px; }
+
 .input-label {
   color: #387ef5; }
+
+.date-time {
+  font-style: italic; }
+
+.larger {
+  font-size: 1.3em; }
+
+.x-large {
+  font-size: 2em; }
 
 .center-block {
   display: block;
@@ -30,33 +66,6 @@
 
 .pull-left {
   float: left !important; }
-
-.date-time {
-  font-style: italic; }
-
-.larger {
-  font-size: 1.3em; }
-
-.x-large {
-  font-size: 2em; }
-
-select.form-control {
-  width: 98%;
-  height: 40px;
-  line-height: 120%;
-  border: none; }
-  select.form-control option {
-    padding: 5px; }
-
-.clearfix::before, .clearfix::after {
-  content: " ";
-  display: table; }
-
-.clearfix::after {
-  clear: both; }
-
-.scroll {
-  height: 100%; }
 
 .popup-container .popup {
   width: 350px; }
@@ -126,12 +135,6 @@ select.form-control {
 .logo-body {
   text-align: center; }
 
-.button-halfwidth {
-  width: 49%; }
-
-.button-fullwidth {
-  width: 100%; }
-
 .tabbed-content-within-sidemenu-app {
   z-index: 5; }
 
@@ -177,6 +180,16 @@ select.form-control {
   line-height: 0; }
 .list .item.item-accordion.ng-hide-add, .list .item.item-accordion.ng-hide-remove {
   display: block !important; }
+.list .item.item-positive-outline {
+  border-color: #387ef5; }
+.list .item.item-balanced-outline {
+  border-color: #33cd5f; }
+.list .item.item-energized-outline {
+  border-color: #ffc900; }
+.list .item.item-assertive-outline {
+  border-color: #ef473a; }
+.list .item.item-stable-outline {
+  border-color: #f8f8f8; }
 .list .item.odd {
   background-color: #f0f0f0 !important; }
 .list .item .item-pull-left {

@@ -35,8 +35,45 @@ $ion-img-path: "../img" !default;
 .color-assertive{
   color: $assertive;
 }
+.clearfix::before, .clearfix::after{
+  content: " ";
+  display: table;
+}
+.clearfix::after{
+  clear: both;
+}
+.scroll {
+  height: 100%;
+}
+.button-halfwidth{
+  width: 49%;
+}
+.button-fullwidth{
+  width: 100%;
+}
+.button-outline{
+  background: rgba(255,255,255,.3) none repeat scroll 0 0 !important;
+}
+select.form-control{
+  width: 98%;
+  height: 40px;
+  line-height: 120%;
+  border: none;
+  option{
+    padding: 5px;
+  }
+}
 .input-label{
   color: $positive;
+}
+.date-time{
+  font-style: italic;
+}
+.larger{
+  font-size: 1.3em;
+}
+.x-large{
+	font-size: 2em;
 }
 .center-block {
   display: block;
@@ -48,34 +85,6 @@ $ion-img-path: "../img" !default;
 }
 .pull-left {
   float: left !important;
-}
-.date-time{
-  font-style: italic;
-}
-.larger{
-  font-size: 1.3em;
-}
-.x-large{
-	font-size: 2em;
-}
-select.form-control{
-  width: 98%;
-  height: 40px;
-  line-height: 120%;
-  border: none;
-  option{
-    padding: 5px;
-  }
-}
-.clearfix::before, .clearfix::after{
-  content: " ";
-  display: table;
-}
-.clearfix::after{
-  clear: both;
-}
-.scroll {
-  height: 100%;
 }
 .popup-container .popup{
   width: 350px;
@@ -152,12 +161,7 @@ select.form-control{
   transition: background-image 2s ease-in-out;
 }
 .logo-body { text-align: center; }
-.button-halfwidth{
-  width: 49%;
-}
-.button-fullwidth{
-  width: 100%;
-}
+
 .tabbed-content-within-sidemenu-app{
   z-index: 5;
 }
@@ -213,7 +217,21 @@ select.form-control{
     &.item-accordion.ng-hide-add, &.item-accordion.ng-hide-remove{
       display: block !important;
     }
-
+	&.item-positive-outline{
+		border-color: $positive;
+	}
+	&.item-balanced-outline{
+		border-color: $balanced;
+	}
+	&.item-energized-outline{
+		border-color: $energized;
+	}
+	&.item-assertive-outline{
+		border-color: $assertive;
+	}
+	&.item-stable-outline{
+		border-color: $stable;
+	}
     &.odd {
       background-color: #f0f0f0 !important;
     }

@@ -212,7 +212,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             item.showBusinessHour = !item.showBusinessHour;
         }
     })
-    .controller('ContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
+	.controller('ContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
         $scope.formData = {
             fullname: $scope.userProfile.username,
             email: $scope.userProfile.email
@@ -291,7 +291,110 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             }
         });*/
     }])
-    .controller('CustomerNoteCtrl', ['$rootScope','$scope', "$state", "$http", "$ionicModal", "$timeout", "AuthService", "CustomerNote", function($rootScope, $scope, $state, $http, $ionicModal, $timeout, AuthService, CustomerNote) {
+	.controller('CustomerReservationCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, AuthService, CustomerReservation) {
+        $scope.data = {showDelete : false};
+        $scope.formData = {keyword:""};
+        $scope.reservationData = {user_id: $scope.userProfile.id};
+		
+		$scope.doRefresh = function(){
+            CustomerReservation.query({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}, function(reservations){
+                $scope.customerReservations = reservations.data;
+                $scope.$broadcast('scroll.refreshComplete');
+            }, function(errResponse) {
+                $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        $scope.doRemove = function(evt, item){
+			evt.preventDefault();
+            $scope.doShowConfirm("Delete?", "Are you sure want to remove this item?").then(function(answer){
+                if(answer){
+                    CustomerReservation.remove({user_id: $scope.userProfile.id, id : item.id}, function(responseData){
+                        if(responseData.status=="success"){
+                            $scope.flashMessage.className = "success";
+                        }else{
+                            $scope.flashMessage.className = "error";
+                        }
+                        $scope.flashMessage.visibility = true;
+                        $scope.flashMessage.message = responseData.message;
+
+                        $timeout(function(){$scope.flashMessage.visibility = false;}, 2000);
+                        $scope.customerReservations.splice( $scope.customerReservations.indexOf(item), 1 );
+                    });
+                }
+            });
+        }
+        $scope.saveReservation = function(){
+            $rootScope.showLoading();
+			if($scope.reservationData.id){
+				$scope.reservationData.token = AuthService.authToken;
+				CustomerReservation.update({id:$scope.reservationData.id}, $scope.reservationData).$promise.then(function(responseData){
+					$rootScope.hideLoading();
+					if(responseData.status == "success"){
+						$scope.reservationData = {user_id: $scope.userProfile.id};
+					}else{
+						console.log("failure");
+					}
+					$scope.closeModal();
+				});
+			}else{
+				CustomerReservation.save($scope.reservationData).$promise.then(function(responseData){
+					$rootScope.hideLoading();
+					if(responseData.status == "success"){
+						$scope.customerReservations.push(responseData.data);
+						$scope.reservationData = {user_id: $scope.userProfile.id};
+					}else{
+						console.log("failure");
+					}
+					$scope.closeModal();
+				});
+			}
+        }
+        $scope.doRefresh();
+		
+		var statusClassArr = {
+			"pending" : "item-energized-outline",
+			"reject" : "item-assertive-outline",
+			"accept" : "item-balanced-outline",
+			"terminate" : "item-terminate-outline",
+		}
+		$scope.statusClass = function(status){
+			return {
+				'item-energized-outline' : status == 'pending',
+				'item-assertive-outline' : status == 'reject',
+				'item-balanced-outline' : status == 'accept',
+				'item-terminate-outline' : status == 'terminate'
+			}
+		}
+		
+		$scope.modalTitle = "Create Reservation";
+        $scope.createReservation = function(){
+            $scope.modalTitle = "Create Reservation";
+            $scope.offerData = {user_id: $scope.userProfile.id};
+            $scope.openModal();
+        }
+        $scope.detailReservation = function(item){
+            $scope.modalTitle = "Update Reservation";
+			if(item.datetime){
+                item.datetime = new Date(item.datetime);
+            }
+            $scope.reservationData = item;
+            $scope.openModal();
+        }
+
+        $ionicModal.fromTemplateUrl('templates/partial/reservation-tmp.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modal = modal;
+        });
+        $scope.openModal = function() {
+            $scope.modal.show();
+        };
+        $scope.closeModal = function() {
+            $scope.modal.hide();
+        };
+    })
+    .controller('CustomerNoteCtrl', ['$rootScope', '$scope', "$state", "$http", "$ionicModal", "$timeout", "AuthService", "CustomerNote", function($rootScope, $scope, $state, $http, $ionicModal, $timeout, AuthService, CustomerNote) {
         $scope.data = {showDelete : false};
         $scope.formData = {keyword:""};
         $scope.noteData = {user_id: $scope.userProfile.id};
@@ -326,7 +429,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.saveNote = function(){
             $rootScope.showLoading();
 			if($scope.noteData.id){
-				$scope.noteData.token = AuthService.authToken;
+				$scope.noteData.token 	
 				CustomerNote.update({id:$scope.noteData.id}, $scope.noteData).$promise.then(function(responseData){
 					$rootScope.hideLoading();
 					if(responseData.status == "success"){
@@ -811,6 +914,32 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
 		$scope.searchCustomer = function(){
 			$scope.doRefresh();
+		}
+    })
+	.controller('OwnerReservationCtrl', function($scope, $state, $http, $ionicPopup, AuthService, ReservationService) {
+        var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
+		$scope.formData = {keyword:""};
+        if(storeId){
+            $scope.doRefresh = function(){
+                ReservationService.ownerfetchAll($scope.userProfile.id, storeId, $scope.formData.keyword).then(function(responseData) {
+                    $scope.reservations = responseData;
+                    $scope.$broadcast('scroll.refreshComplete');
+                }, function(errResponse) {
+                    $scope.$broadcast('scroll.refreshComplete');
+                });
+            }
+            $scope.doRefresh();
+        }
+		$scope.searchReservation = function(){
+			$scope.doRefresh();
+		}
+		$scope.statusClass = function(status){
+			return {
+				'item-energized-outline' : status == 'pending',
+				'item-assertive-outline' : status == 'reject',
+				'item-balanced-outline' : status == 'accept',
+				'item-terminate-outline' : status == 'terminate'
+			}
 		}
     })
     .controller('OwnerOfferCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $ionicModal, $timeout, $ionicSlideBoxDelegate, $filter, AuthService, ProfileService, StoreOffer, API_PARAM) {

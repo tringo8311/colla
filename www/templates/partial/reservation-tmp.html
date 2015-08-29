@@ -1,0 +1,42 @@
+<ion-modal-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> {{modalTitle}}</div>
+    </ion-header-bar>
+    <ion-content class="padding" has-header="true" has-footer="true">
+        <form>
+			<div class="list list-inset">
+                <label class="item item-input item-stacked-label">
+					<span class="input-label">Store</span><br/>
+					<!--select class="form-control" ng-model="reservationData.store_id" ng-options="store.title for store in userProfile.stores track by store.id"></select-->
+					<select class="form-control" ng-model="reservationData.store_id" ng-disabled="reservationData.id">
+					<option ng-repeat="store in userProfile.stores" value="{{store.id}}">{{store.title}}</option>
+					</select>
+				</label>
+			</div>
+            <div class="list list-inset">
+                <label class="item item-input item-stacked-label">
+					<span class="input-label">Prefer</span>
+                    <input type="text" placeholder="Prefer" ng-model="reservationData.prefer" autofocus=""/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input item-stacked-label">
+					<span class="input-label">Date</span>
+                    <input type="date" placeholder="Date" ng-model="reservationData.datetime"/>
+                </label>
+            </div>
+            <div class="list list-inset">
+                <label class="item item-input item-stacked-label">
+					<span class="input-label">Content</span>
+                    <textarea type="text" placeholder="Content" rows="8" cols="40" ng-model="reservationData.content"></textarea>
+                </label>
+            </div><br/>
+        </form>
+    </ion-content>
+    <ion-footer-bar class="bar bar-footer">
+        <div class="button-bar">
+            <button class="button" ng-click="closeModal()">Cancel</button>
+            <button class="button" ng-click="saveReservation()">Save</button>
+        </div>
+    </ion-footer-bar>
+</ion-modal-view>

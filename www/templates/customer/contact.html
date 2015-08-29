@@ -8,25 +8,29 @@
             {{ message.submissionMessage }}
         </div>
         <div class="list list-inset">
-            <label class="item item-input">
+            <label class="item item-input item-stacked-label">
+				<span class="input-label">Full name</span>
                 <input class="required" type="text" placeholder="Full Name" ng-model="formData.fullname">
             </label>
         </div>
         <div class="list list-inset">
-            <label class="item item-input">
+            <label class="item item-input item-stacked-label">
+				<span class="input-label">Email</span>
                 <input class="required" type="text" placeholder="Email" ng-model="formData.email">
             </label>
         </div>
         <div class="list list-inset">
-            <label class="item item-input">
+            <label class="item item-input item-stacked-label">
+				<span class="input-label">Subject</span>
                 <input class="required" type="text" placeholder="Subject" ng-model="formData.subject">
             </label>
         </div>
         <div class="list list-inset">
-            <label class="item item-input">
+            <label class="item item-input item-stacked-label">
+				<span class="input-label">Message</span>
                 <textarea class="required" type="text" placeholder="Message" rows="8" cols="40" ng-model="formData.message"></textarea>
-            </label><br/>
-        </div>
+            </label>
+        </div><br/>
         <button class="button button-block button-positive" ng-click="doSendContact()">Send message</button>
     </ion-content>
 </ion-view>

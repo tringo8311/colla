@@ -1,0 +1,18 @@
+<ion-view view-title="Feedback" name="customer-feedback-view">
+    <ion-nav-back-button class="button-clear"><i class="icon ion-ios7-arrow-back"></i></ion-nav-back-button>
+    <ion-nav-buttons side="right">
+        <button class="button button-stable" ng-click="openModal()"><i class="ion ion-plus"></i></button>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
+        <div class="list">
+            <ion-item class="item item-avatar item-text-wrap" ng-repeat="item in customerFeedbacks">
+                <div class="item-char">{{$index+1}}</div>
+                <span class="item-note date-time text-right">{{ item.created_at | asDate | date: APP_CONFIG.FORMAT.DATE }}<br/>{{ item.created_at | asDate | date: APP_CONFIG.FORMAT.TIME }}</span>
+                <p><span class="strong color-positive">Rate:</span> <star-rating ng-model="item.rate" readonly="rating.isReadonly"></star-rating></p>
+                <p>{{ item.content }}</p>
+                <!--p><span class="strong color-positive">Service:</span> {{ item.service }} / <span class="strong color-positive">Employee:</span> {{ item.employee }}</p-->
+            </ion-item>
+        </div>
+    </ion-content>
+</ion-view>

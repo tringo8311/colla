@@ -53,7 +53,6 @@ angular.module('collaApp').filter('first_char', function(){
 }).filter("asDate", function () {
     return function (input) {
         if(input != ""){
-            console.log(input);
             return new Date(input);
         }
         return null;

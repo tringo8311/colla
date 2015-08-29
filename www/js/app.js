@@ -106,7 +106,7 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 templateUrl: 'templates/public.html'
             })
             .state('customer', {
-                url: '/',
+                url: '/customer',
                 abstract: true,
                 templateUrl: 'templates/customer/main-abstract.html'
             })
@@ -178,24 +178,24 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                     authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
                 }
             })
-            .state('customer.feedback', {
-                url: 'customer/feedback/:storeId',
+			.state('customer.reservation', {
+                url: 'customer/reservation',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/feedback.html',
-                        controller: 'CustomerFeedbackCtrl'
+                        templateUrl: 'templates/customer/reservation.html',
+                        controller: 'CustomerReservationCtrl'
                     }
                 },
                 data: {
                     authorizedRoles: [USER_ROLES.admin,USER_ROLES.customer]
                 }
             })
-            .state('customer.reservation', {
-                url: 'customer/reservation',
+            .state('customer.feedback', {
+                url: 'customer/feedback/:storeId',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/reservation.html',
-                        controller: 'PlaceCtrl'
+                        templateUrl: 'templates/customer/feedback.html',
+                        controller: 'CustomerFeedbackCtrl'
                     }
                 },
                 data: {
@@ -311,6 +311,18 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                     'main-content': {
                         templateUrl: 'templates/owner/dash.html',
 						controller: 'OwnerDashCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin,USER_ROLES.owner]
+                }
+            })
+			.state('owner.reservation', {
+                url: 'owner/reservation',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/owner/reservation.html',
+						controller: 'OwnerReservationCtrl'
                     }
                 },
                 data: {

@@ -402,6 +402,42 @@ services.factory('CustomerFeedbackLoader', ['CustomerFeedback', '$route', '$q',
         };
     }]);
 /******************** Customer Reservation **********************/
+services.service('ReservationService', function($q, $http, $auth, CustomerReservation, OwnerReservation) {
+    var customerfetchAll = function(userId, storeId, keyword){
+        return $q(function(resolve, reject) {
+            CustomerReservation.query({user_id: userId, store_id: storeId, keyword: keyword}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+	var ownerfetchAll = function(userId, storeId, keyword){
+        return $q(function(resolve, reject) {
+            OwnerReservation.query({user_id: userId, store_id: storeId, keyword: keyword}, function(responseData) {
+                resolve(responseData.data);
+            })
+        });
+    }
+    return {
+        customerfetchAll: customerfetchAll,
+        ownerfetchAll: ownerfetchAll
+    };
+});
+services.factory('CustomerReservation', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    var customerReservation = $resource(API_PARAM.apiUrl + 'profile/:user_id/reservations/:id',
+        {user_id: '@user_id', id: '@id'},
+        {query:{params: {token: AuthService.authToken}},
+		 update:{method:'PUT'}
+        });
+    return customerReservation;
+}]);
+services.factory('OwnerReservation', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
+    var ownerReservation = $resource(API_PARAM.apiUrl + 'owner/:user_id/reservations/:id',
+        {user_id: '@user_id', id: '@id'},
+        {query:{params: {token: AuthService.authToken}},
+		 update:{method:'PUT'}
+        });
+    return ownerReservation;
+}]);
 /******************** Owner service **********************/
 services.service('OwnerService', function($q, $http, $auth, Owner) {
     var doGetCount = function(store_id){

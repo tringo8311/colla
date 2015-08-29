@@ -12,7 +12,7 @@
                         <div class="off">{{offer.off}}{{offer.off_type}}</div>
                     </div>
                     <div class="item" style="padding:0" ng-switch on="offer">
-                        <img class="clear" ng-src="{{ offer.file_url }}" alt="Offer" width="100%" ng-switch-when="offer.file_url!=''"/>
+                        <img class="clear" ng-src="{{offer.file_url}}" alt="Offer" width="100%" ng-switch-when="offer.file_url!=''"/>
                         <img class="clear" ng-src="{{APP_CONFIG.IMAGE_DEFAULT.DISCOUNT}}" alt="Offer" width="100%" ng-switch-default/>
                     </div>
                     <div class="item">
