@@ -1,0 +1,17 @@
+<ion-popover-view>
+    <ion-header-bar>
+        <div class="title">Filter</div>
+    </ion-header-bar>
+    <ion-content class="padding">
+		<form>
+            <label class="item item-input" style="border-top: 1px">
+				<input type="search" placeholder="Type here your keyword" ng-model="formData.keyword" ng-enter="doRefresh()"/>
+			</label>
+			<ion-checkbox ng-model="formData.status.pending">Pending</ion-checkbox>
+			<ion-checkbox ng-model="formData.status.accept">Accept</ion-checkbox>
+			<ion-checkbox ng-model="formData.status.reject">Reject</ion-checkbox>
+			<ion-checkbox ng-model="formData.status.terminate">Terminate</ion-checkbox>
+			<button class="button button-block" ng-click="closePopoverFilter();doRefresh()">Filter</button>
+		</form>
+    </ion-content>
+</ion-popover-view>

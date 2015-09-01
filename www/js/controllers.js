@@ -39,19 +39,33 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         });
 
         $scope.$on(AUTH_EVENTS.notAuthenticated, function(event) {
-            $ionicPopup.alert({
-                title: 'Session Lost!',
-                template: 'Sorry, You have to login again.'
-            });
-            AuthService.logout();
-            $state.go('login');
+            var sessionLost = function(){
+                $ionicPopup.alert({
+                    title: 'Session Lost!',
+                    template: 'Sorry, Username and password is not right! You have to login again.'
+                });
+                AuthService.logout();
+                $state.go('login');
+            }
+            // Try to refresh token if exist
+            if(AuthService.authToken!=null){
+                AuthService.refresh().then(function(responseData){
+                    if(responseData.status == "success"){
+                        $state.go($state.current, {}, {reload: true});
+                    }else{
+                        sessionLost();
+                    }
+                });
+            }else{
+                sessionLost();
+            }
         });
 
         // A confirm dialog
-        $scope.doShowConfirm = function(yrTitle, yrTemplate) {
+        $scope.doShowConfirm = function(confirmTitle, confirmTemplate) {
             var confirmPopup = $ionicPopup.confirm({
-                title: yrTitle,
-                template: yrTemplate
+                title: confirmTitle,
+                template: confirmTemplate
             });
             return confirmPopup;
         };
@@ -142,7 +156,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     })
     .controller('SignUpCtrl', function($rootScope, $scope, $state, $ionicSideMenuDelegate, $ionicPopup, $timeout, ProfileService, AuthService) {
-        $scope.formData = {}
+        $scope.formData = {};
         /**
          * do validate and save data
          * @param data
@@ -154,7 +168,14 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
                 if(responseData.status=="success"){
                     $scope.flashMessage.className = "success";
                     $scope.flashMessage.message = null;
-                    //$timeout(function(){$state.go('login');}, 1000);
+                    $scope.formData = {};
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sign up',
+                        template: 'Your account has been created successfully you can now log in.'
+                    });
+                    alertPopup.then(function(res) {
+                        $timeout(function(){$state.go('login');}, 1000);
+                    });
                 }else{
                     $scope.flashMessage.className = "error";
                     //$timeout(function(){$scope.flashMessage.visibility = false;}, 2000);
@@ -208,7 +229,8 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
                 });
             }
         });
-        $scope.toggleBusinessHour = function(item) {
+        $scope.toggleBusinessHour = function(evt, item) {
+            evt.stopImmediatePropagation();
             item.showBusinessHour = !item.showBusinessHour;
         }
     })
@@ -233,7 +255,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.doSendContact = function(){
             $http({
                 method : 'POST',
-                url : API_PARAM.appUrl + 'profile/contact?token=' + AuthService.authToken,
+                url : API_PARAM.apiUrl + 'profile/contact?token=' + AuthService.authToken,
                 data : param($scope.formData), // pass in data as strings
                 headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
             }).success(function(data) {
@@ -258,13 +280,17 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
     }])
     .controller('OfferCtrl', ['$scope', "$state", "$http", "$ionicPopup", "$ionicSlideBoxDelegate", "AuthService", "ProfileService", function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
         $scope.formData = {storeId: 0};
-        if($scope.userProfile.stores){
-            $scope.formData.storeId = $scope.userProfile.stores[0].id;
-            ProfileService.doGetOffers({store_id: $scope.formData.storeId}).then(function(responseData) {
-                $scope.offers = responseData;
-                setTimeout(function(){$ionicSlideBoxDelegate.update();}, 500);
-            });
+        $scope.doRefresh = function(){
+            if($scope.userProfile.stores){
+                $scope.formData.storeId = $scope.userProfile.stores[0].id;
+                ProfileService.doGetOffers({store_id: $scope.formData.storeId}).then(function(responseData) {
+                    $scope.offers = responseData;
+                    $scope.$broadcast('scroll.refreshComplete');
+                    setTimeout(function(){$ionicSlideBoxDelegate.update();}, 500);
+                });
+            }
         }
+        $scope.doRefresh();
         $scope.currentIndex = 0;
         $scope.setCurrentSlideIndex = function (index) {
             $scope.currentIndex = index;
@@ -297,8 +323,8 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.reservationData = {user_id: $scope.userProfile.id};
 		
 		$scope.doRefresh = function(){
-            CustomerReservation.query({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}, function(reservations){
-                $scope.customerReservations = reservations.data;
+            CustomerReservation.query({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}, function(responseData){
+                $scope.customerReservations = responseData.data;
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {
                 $scope.$broadcast('scroll.refreshComplete');
@@ -351,12 +377,12 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
         $scope.doRefresh();
 		
-		var statusClassArr = {
+		/*var statusClassArr = {
 			"pending" : "item-energized-outline",
 			"reject" : "item-assertive-outline",
 			"accept" : "item-balanced-outline",
-			"terminate" : "item-terminate-outline",
-		}
+			"terminate" : "item-terminate-outline"
+		}*/
 		$scope.statusClass = function(status){
 			return {
 				'item-energized-outline' : status == 'pending',
@@ -823,7 +849,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             google.maps.event.trigger(map, "resize");
         });*/
     }])
-    .controller('OwnerProfileCtrl', function($scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
+    .controller('OwnerProfileCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $timeout, AuthService, ProfileService) {
         if(AuthService.isAuthenticated()){
             $scope.formData = AuthService.userProfile();
         }else{
@@ -883,7 +909,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             });
         }
     })
-    .controller('OwnerDashCtrl', function($scope, $state, $http, $ionicPopup, AuthService, OwnerService) {
+    .controller('OwnerDashCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, AuthService, OwnerService) {
 		$scope.data = {'customerSize': '0', 'rateAverage' : '0','offerSize' : '0'};
         var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
         if(storeId){
@@ -898,7 +924,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             $scope.doRefresh();
         }
     })
-    .controller('OwnerFollowerCtrl', function($scope, $state, $http, $ionicPopup, AuthService, StoreService) {
+    .controller('OwnerFollowerCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, AuthService, StoreService) {
         var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
 		$scope.formData = {keyword:""};
         if(storeId){
@@ -916,12 +942,35 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
 			$scope.doRefresh();
 		}
     })
-	.controller('OwnerReservationCtrl', function($scope, $state, $http, $ionicPopup, AuthService, ReservationService) {
+	.controller('OwnerReservationCtrl', function($rootScope, $scope, $state, $http, $ionicModal, $ionicPopup, $ionicPopover, AuthService, ReservationService) {
         var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
-		$scope.formData = {keyword:""};
+		$scope.formData = {
+			keyword: "",
+			status: {
+				pending: false,
+				accept: false,
+				reject: false,
+				terminate: false
+			}
+		};
+		$scope.formText = "";
+		$scope.$watch('formData', function (oldValue, newValue) {
+			$scope.formText = $scope.formData.keyword;
+            angular.forEach($scope.formData.status, function(value, key) {
+                if(value){
+                    $scope.formText += ", " + key;
+                }
+            });
+        }, true);
         if(storeId){
             $scope.doRefresh = function(){
-                ReservationService.ownerfetchAll($scope.userProfile.id, storeId, $scope.formData.keyword).then(function(responseData) {
+				var statusArr = [];
+				angular.forEach($scope.formData.status, function(value, key) {
+					if(value){
+						statusArr.push(key);
+					}
+				});
+                ReservationService.ownerFetchAll($scope.userProfile.id, storeId, $scope.formData.keyword, statusArr).then(function(responseData) {
                     $scope.reservations = responseData;
                     $scope.$broadcast('scroll.refreshComplete');
                 }, function(errResponse) {
@@ -939,6 +988,60 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
 				'item-assertive-outline' : status == 'reject',
 				'item-balanced-outline' : status == 'accept',
 				'item-terminate-outline' : status == 'terminate'
+			}
+		}
+		$scope.selectFilter = function($event){
+			$scope.openPopoverFilter($event);
+		}
+		$scope.popoverFilter = null;
+		$ionicPopover.fromTemplateUrl('/templates/partial/reservation-filter-tmp.html', {
+            scope: $scope
+        }).then(function(popover) {
+            $scope.popoverFilter = popover;
+        });
+        $scope.openPopoverFilter = function($event) {
+            $scope.popoverFilter.show($event);
+        };
+        $scope.closePopoverFilter = function() {
+            $scope.popoverFilter.hide();
+        };
+		
+		$scope.modalAnwser = null;
+		$scope.reservationData = null;
+		$scope.answerReservation = function(item){
+			if(item.status=="pending"){
+				$scope.modalTitle = "Answer Reservation";
+				$scope.reservationData = item;
+				$scope.openAnswerModal();
+			}
+        }
+		
+        $ionicModal.fromTemplateUrl('templates/partial/reservation-answer-tmp.html', {
+            scope: $scope,
+            animation: 'slide-in-up'
+        }).then(function(modal) {
+            $scope.modalAnwser = modal;
+        });
+        $scope.openAnswerModal = function() {
+            $scope.modalAnwser.show();
+        };
+        $scope.closeAnswerModal = function() {
+            $scope.modalAnwser.hide();
+        };
+		
+		$scope.saveAnswerReservation = function(){
+			$rootScope.showLoading();
+			if($scope.reservationData.id){
+				$scope.reservationData.token = AuthService.authToken;
+				ReservationService.ownerAnswer($scope.userProfile.id, $scope.reservationData).then(function(responseData){
+					$rootScope.hideLoading();
+					if(responseData.status == "success"){
+						$scope.reservationData = {user_id: $scope.userProfile.id};
+					}else{
+						console.log("failure");
+					}
+					$scope.closeAnswerModal();
+				});
 			}
 		}
     })

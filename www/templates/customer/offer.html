@@ -3,6 +3,7 @@
         <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" has-footer="true">
+        <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
         <ion-slide-box on-slide-changed="slideHasChanged($index)">
             <ion-slide ng-repeat="offer in offers">
                 <div class="list">
@@ -13,7 +14,7 @@
                     </div>
                     <div class="item" style="padding:0" ng-switch on="offer">
                         <img class="clear" ng-src="{{offer.file_url}}" alt="Offer" width="100%" ng-switch-when="offer.file_url!=''"/>
-                        <img class="clear" ng-src="{{APP_CONFIG.IMAGE_DEFAULT.DISCOUNT}}" alt="Offer" width="100%" ng-switch-default/>
+                        <!--img class="clear" ng-src="{{APP_CONFIG.IMAGE_DEFAULT.DISCOUNT}}" alt="Offer" width="100%" ng-switch-default/-->
                     </div>
                     <div class="item">
                         <p>{{offer.content}}</p>

@@ -3,10 +3,10 @@
  */
 angular.module('collaApp')
 .constant('API_PARAM', {
-    /*baseUrl : 'http://api.myspa247.com/',
-	apiUrl : 'http://api.myspa247.com/v1/api/'*/
-    baseUrl : 'http://localhost:8000/',
-	apiUrl : 'http://localhost:8000/v1/api/'
+    baseUrl : 'http://api.myspa247.com/',
+	apiUrl : 'http://api.myspa247.com/v1/api/'
+    /*baseUrl : 'http://localhost:8000/',
+	apiUrl : 'http://localhost:8000/v1/api/'*/
 })
 .constant('APP_CONFIG', {
     FORMAT: {

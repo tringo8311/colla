@@ -1,0 +1,42 @@
+<ion-modal-view>
+    <ion-header-bar class="icon-left">
+        <div class="title"><i class="icon ion-search"></i> {{modalTitle}}</div>
+    </ion-header-bar>
+    <ion-content class="padding" has-header="true" has-footer="true">
+		<div class="">
+			<div class="row">
+				<div class="col"><span class="label">Prefer:</span> {{ reservationData.prefer }} </div>
+				<div class="col"><span class="label">Date:</span> {{reservationData.datetime}}</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<span class="label">Content: </span>{{reservationData.content}}
+				</div>
+			</div>
+		</div>
+        <form>
+			<label class="item item-radio ">
+				<input type="radio" name="status" value="accept" ng-model="reservationData.status">
+				<div class="item-content balanced">Accept</div>
+				<i class="radio-icon ion-checkmark"></i>
+			</label>
+			<label class="item item-radio">
+				<input type="radio" name="status" value="reject" ng-model="reservationData.status">
+				<div class="item-content assertive">Reject</div>
+				<i class="radio-icon ion-checkmark"></i>
+			</label>
+            <div class="list list-inset">
+                <label class="item item-input item-stacked-label">
+					<span class="input-label">Answer</span>
+                    <textarea type="text" placeholder="Type here your answer" rows="8" cols="40" ng-model="reservationData.answer"></textarea>
+                </label>
+            </div><br/>
+        </form>
+    </ion-content>
+    <ion-footer-bar class="bar bar-footer">
+        <div class="button-bar">
+            <button class="button" ng-click="closeAnswerModal()">Cancel</button>
+            <button class="button" ng-click="saveAnswerReservation()">Save</button>
+        </div>
+    </ion-footer-bar>
+</ion-modal-view>

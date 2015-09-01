@@ -17,6 +17,18 @@ $success: #008800 !default;
 $error: #ef473a !default;
 
 $ion-img-path: "../img" !default;
+
+.animate-show {
+  opacity: 1;
+}
+.animate-show.ng-hide-add, .animate-show.ng-hide-remove {
+  transition: all linear 0.5s;
+}
+.animate-show.ng-hide {
+  line-height: 0;
+  opacity: 0;
+}
+
 .strong{
   font-weight: 600;
 }
@@ -63,8 +75,9 @@ select.form-control{
     padding: 5px;
   }
 }
-.input-label{
+.input-label, .label{
   color: $positive;
+  font-size: 1.2em;
 }
 .date-time{
   font-style: italic;
@@ -267,6 +280,10 @@ select.form-control{
       line-height: 2.1em;
       vertical-align: middle;
     }
+    .business-hour{
+      animation-name: fadeOut;
+      animation-timing-function: ease-in;
+    }
   }
 }
 .card{
@@ -318,7 +335,6 @@ select.form-control{
   min-height: 300px;
   border: 5px solid #FFF;
   .slider-slide {
-    min-width: 400px;
     img{
       max-height: 500px;
     }

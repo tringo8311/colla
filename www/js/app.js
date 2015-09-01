@@ -47,11 +47,10 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
         $authProvider.facebook({
             clientId: '624059410963642'
         });
-
         $authProvider.google({
             clientId: '631036554609-v5hm2amv4pvico3asfi97f54sc51ji4o.apps.googleusercontent.com'
         });
-        $authProvider.github({
+        /*$authProvider.github({
             clientId: '0ba2600b1dbdb756688b'
         });
         $authProvider.linkedin({
@@ -62,17 +61,17 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
         });
         $authProvider.live({
             clientId: '000000004C12E68D'
-        });
+        });*/
         $authProvider.twitter({
             url: '/auth/twitter'
         });
-        $authProvider.oauth2({
+        /*$authProvider.oauth2({
             name: 'foursquare',
             url: '/auth/foursquare',
             redirectUri: window.location.origin,
             clientId: 'MTCEJ3NGW2PNNB31WOSBFDSAD4MTHYVAZ1UKIULXZ2CVFC2K',
             authorizationEndpoint: 'https://foursquare.com/oauth2/authenticate'
-        });
+        });*/
 
         $ionicConfigProvider.tabs.position('bottom');
         $ionicConfigProvider.navBar.alignTitle('center');
@@ -106,7 +105,7 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 templateUrl: 'templates/public.html'
             })
             .state('customer', {
-                url: '/customer',
+                url: '/',
                 abstract: true,
                 templateUrl: 'templates/customer/main-abstract.html'
             })
@@ -405,7 +404,8 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 }
             }
         });
-    }).directive('focusMe', function($timeout) {
+    })
+    .directive('focusMe', function($timeout) {
         return {
             scope: { trigger: '@focusMe' },
             link: function(scope, element) {
@@ -418,7 +418,8 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 });
             }
         };
-    }).directive('backImg', function($interval, UtilService){
+    })
+    .directive('backImg', function($interval, UtilService){
         return {
             restrict: "A",
             scope:{
@@ -445,7 +446,8 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 });
             }
         };
-    }).directive('ngEnter', function () {
+    })
+    .directive('ngEnter', function () {
         return function (scope, element, attrs) {
             element.bind("keydown keypress", function (event) {
                 if(event.which === 13) {
@@ -457,7 +459,8 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                 }
             });
         };
-    }).directive('starRating', function() {
+    })
+    .directive('starRating', function() {
         return {
             restrict: 'EA',
             template:

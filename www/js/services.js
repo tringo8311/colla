@@ -114,11 +114,36 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
             return role;
         }
 
+        var refresh = function(){
+            return $q(function(resolve, reject) {
+                $http({
+                    method: 'POST',
+                    url: API_PARAM.apiUrl + 'refresh?token=' + authToken,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    transformResponse: function(data, headers){
+                        var response = {};
+                        response.data = data;
+                        response.headers = headers();
+                        return response;
+                    }
+                }).success(function(response) {
+                    var newToken = response.headers.authorization;
+                    newToken = newToken.substr(7);
+                    authToken = newToken;
+                    $auth.setToken(newToken);
+                    console.log(newToken);
+                    resolve({status:'success'});
+                }).error(function(data, status, headers, config) {
+                    resolve({status:'fail'});
+                });
+            });
+        }
         loadUserCredentials();
 
         return {
             login: login,
             logout: logout,
+            refresh: refresh,
             isAuthorized: isAuthorized,
             authToken: authToken,
             isAuthenticated: isAuthenticateFn,
@@ -403,38 +428,46 @@ services.factory('CustomerFeedbackLoader', ['CustomerFeedback', '$route', '$q',
     }]);
 /******************** Customer Reservation **********************/
 services.service('ReservationService', function($q, $http, $auth, CustomerReservation, OwnerReservation) {
-    var customerfetchAll = function(userId, storeId, keyword){
+    var customerFetchAll = function(userId, storeId, keyword){
         return $q(function(resolve, reject) {
             CustomerReservation.query({user_id: userId, store_id: storeId, keyword: keyword}, function(responseData) {
                 resolve(responseData.data);
             })
         });
     }
-	var ownerfetchAll = function(userId, storeId, keyword){
+	var ownerFetchAll = function(userId, storeId, keyword, statusObj){
         return $q(function(resolve, reject) {
-            OwnerReservation.query({user_id: userId, store_id: storeId, keyword: keyword}, function(responseData) {
+            OwnerReservation.query({user_id: userId, store_id: storeId, keyword: keyword, "status[]": statusObj}, function(responseData) {
                 resolve(responseData.data);
             })
         });
     }
+	var ownerAnswer = function(userId, reservationData){
+        return $q(function(resolve, reject) {
+            OwnerReservation.answer({user_id: userId, id: reservationData.id}, reservationData).$promise.then(function(responseData) {
+                resolve(responseData);
+            })
+        });
+    }
+	
     return {
-        customerfetchAll: customerfetchAll,
-        ownerfetchAll: ownerfetchAll
+        customerFetchAll: customerFetchAll,
+        ownerFetchAll: ownerFetchAll,
+		ownerAnswer: ownerAnswer
     };
 });
 services.factory('CustomerReservation', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     var customerReservation = $resource(API_PARAM.apiUrl + 'profile/:user_id/reservations/:id',
         {user_id: '@user_id', id: '@id'},
-        {query:{params: {token: AuthService.authToken}},
-		 update:{method:'PUT'}
-        });
+        {query:{params: {token: AuthService.authToken}},update:{method:'PUT'}});
     return customerReservation;
 }]);
 services.factory('OwnerReservation', ['$resource', 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
-    var ownerReservation = $resource(API_PARAM.apiUrl + 'owner/:user_id/reservations/:id',
+    var ownerReservation = $resource(API_PARAM.apiUrl + 'owner/:user_id/reservations/:id/:extraFunction',
         {user_id: '@user_id', id: '@id'},
         {query:{params: {token: AuthService.authToken}},
-		 update:{method:'PUT'}
+		 update:{method:'PUT'},
+		 answer:{method:'PUT',params:{extraFunction: 'answer'}}
         });
     return ownerReservation;
 }]);
