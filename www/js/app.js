@@ -142,15 +142,15 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                     }
                 }
             })
-            .state('customer.admin', {
-                url: 'customer/admin',
+            .state('customer.favourite', {
+                url: 'customer/favourite',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/admin.html'
+                        templateUrl: 'templates/customer/favourite.html'
                     }
                 },
                 data: {
-                    authorizedRoles: [USER_ROLES.admin]
+                    authorizedRoles: [USER_ROLES.admin, USER_ROLES.customer]
                 }
             })
             .state('customer.info', {

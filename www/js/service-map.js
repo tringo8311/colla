@@ -1,5 +1,5 @@
 // Set up environment
-var env = "product";
+var env = "dev";
 if(env == "dev"){
     var baseUrl = "http://localhost:8000/v1/api/";
     angular.module('collaApp').constant('ENV_PARAM', {

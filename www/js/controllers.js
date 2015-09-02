@@ -255,7 +255,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.doSendContact = function(){
             $http({
                 method : 'POST',
-                url : API_PARAM.apiUrl + 'profile/contact?token=' + AuthService.authToken,
+                url : API_PARAM.apiUrl + 'profile/' + $scope.userProfile.id + '/contact?token=' + AuthService.authToken,
                 data : param($scope.formData), // pass in data as strings
                 headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
             }).success(function(data) {
@@ -266,9 +266,14 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
                     $scope.message.submission = true; //shows the error message
                 } else {
                     // if successful, bind success message to message
-                    angular.forEach(data.message, function(value, key) {
-                        $scope.message.submissionMessage += '<li>' + value + '</li>';
-                    });
+                    $scope.message.submissionMessage = "";
+                    if (angular.isObject(data.message)) {
+                        angular.forEach(data.message, function (value, key) {
+                            $scope.message.submissionMessage += '<li>' + value + '</li>';
+                        });
+                    }else{
+                        $scope.message.submissionMessage = data.message;
+                    }
                     $scope.message.submission = true; //shows the success message
                     $scope.formData = {
                         fullname: $scope.userProfile.username,
@@ -321,10 +326,11 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.data = {showDelete : false};
         $scope.formData = {keyword:""};
         $scope.reservationData = {user_id: $scope.userProfile.id};
+        $scope.customerReservations = [];
 		
 		$scope.doRefresh = function(){
             CustomerReservation.query({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}, function(responseData){
-                $scope.customerReservations = responseData.data;
+                $scope.customerReservations = responseData.data ? responseData.data : [];
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {
                 $scope.$broadcast('scroll.refreshComplete');
@@ -399,25 +405,28 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             $scope.openModal();
         }
         $scope.detailReservation = function(item){
-            $scope.modalTitle = "Update Reservation";
-			if(item.datetime){
-                item.datetime = new Date(item.datetime);
+            if(item.status == "pending"){
+                $scope.modalTitle = "Update Reservation";
+                if(item.datetime){
+                    item.datetime = new Date(item.datetime);
+                }
+                $scope.reservationData = item;
+                $scope.openModal();
             }
-            $scope.reservationData = item;
-            $scope.openModal();
         }
 
+		$scope.reservationModal = null;
         $ionicModal.fromTemplateUrl('templates/partial/reservation-tmp.html', {
             scope: $scope,
             animation: 'slide-in-up'
         }).then(function(modal) {
-            $scope.modal = modal;
+            $scope.reservationModal = modal;
         });
         $scope.openModal = function() {
-            $scope.modal.show();
+            $scope.reservationModal.show();
         };
         $scope.closeModal = function() {
-            $scope.modal.hide();
+            $scope.reservationModal.hide();
         };
     })
     .controller('CustomerNoteCtrl', ['$rootScope', '$scope', "$state", "$http", "$ionicModal", "$timeout", "AuthService", "CustomerNote", function($rootScope, $scope, $state, $http, $ionicModal, $timeout, AuthService, CustomerNote) {

@@ -5,7 +5,7 @@
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
         <h3>Get in touch</h3>
         <div class="message" ng-class="{active: message.submission}">
-            {{ message.submissionMessage }}
+            <ul ng-bind-html="message.submissionMessage"></ul>
         </div>
         <div class="list list-inset">
             <label class="item item-input item-stacked-label">
