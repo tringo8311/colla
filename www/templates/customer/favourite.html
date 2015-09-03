@@ -1,0 +1,27 @@
+<ion-view view-title="Favourite" name="customer-contact-view">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon icon ion-ios-minus-outline" ng-click="data.showDelete = !data.showDelete"></button>
+        <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true">
+        <ion-list show-delete="data.showDelete">
+            <ion-item class="list-item item-avatar item-positive-outline" ng-repeat="store in userProfile.stores"  ui-sref="customer.info({id:store.id})">
+                <div class="pull-right enable-pointer-events" style="margin-right: -35px;">
+                    <button class="button" ng-click="toggleBusinessHour($event, store)" ng-class="store.showBusinessHour ? 'button-positive' : 'button-default'">
+                        <i class="icon ion-clock"></i>
+                    </button>
+                </div>
+                <ion-delete-button class="ion-minus-circled" ng-click="doRemove($event,store)"></ion-delete-button>
+                <div class="item-char">{{store.title | firstChar }}</div>
+                <div class="detail animate-show" ng-hide="store.showBusinessHour">
+                    <h2>{{store.title}}</h2>
+                    <p class="address">{{ store.address }}, {{ store.city}}, {{store.state}}, {{ store.zipcode }}</p>
+                    <p>{{store.phone}}</p>
+                </div>
+                <div class="business-hour animate-show" ng-show="store.showBusinessHour">{{store.business_hour}}</div>
+                <!--ion-option-button class="button-info text-center" ng-click="toggleBusinessHour($event, store)" ng-class="store.showBusinessHour ? 'button-positive' : 'button-default'"><i class="icon ion-clock"></i></ion-option-button-->
+            </ion-item>
+        </ion-list>
+        <button class="button button-block button-outline icon-left ion-star button-positive" ui-sref="customer.store" ng-hide="{{userProfile.stores.length > 4    }}">Add Store to Favourite</button>
+    </ion-content>
+</ion-view>

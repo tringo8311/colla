@@ -23,7 +23,7 @@
             <ion-item class="list-item" ng-repeat="item in customerReservations" ng-class="statusClass(item.status)" ng-click="detailReservation(item)">
                 <ion-delete-button class="ion-minus-circled" ng-click="doRemove($event,item)"></ion-delete-button>
                 <span class="item-note date-time">{{ item.created_at | asDate | date: APP_CONFIG.FORMAT.DATE }}</span>
-                <p><span class="strong positive">Prefer:</span> {{ item.prefer }}</p>
+                <p><span class="strong positive">Prefer technican:</span> {{ item.prefer }}</p>
 				<p><span class="strong positive">Date time:</span> {{ item.datetime | asDate | date:APP_CONFIG.FORMAT.DATETIME }}</p>
 				<p><span class="strong positive">Status:</span> {{ item.status }}</p>
 				<p>{{ item.content }}</p>

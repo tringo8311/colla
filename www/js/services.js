@@ -212,7 +212,14 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
     var doFavourite = function(storeId){
         return $q(function(resolve, reject) {
             Profile.favourite({id: 1, store_id: storeId}, function(responseData) {
-                resolve(responseData.data);
+                resolve(responseData);
+            })
+        });
+    }
+    var unFavourite = function(storeId){
+        return $q(function(resolve, reject) {
+            Profile.unfavourite({id: 1, store_id: storeId}, function(responseData) {
+                resolve(responseData);
             })
         });
     }
@@ -222,18 +229,20 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
         doUpdate: doUpdate,
         doGetPlace: doGetPlace,
         doGetOffers: doGetOffers,
-        doFavourite: doFavourite
+        doFavourite: doFavourite,
+        unFavourite: unFavourite
     };
 });
 services.factory('Profile', ['$resource' , 'AuthService', 'API_PARAM', function($resource, AuthService, API_PARAM) {
     return $resource(API_PARAM.apiUrl + 'profile/:id/:extendController',
         {id: '@id', extendController: '@extendController'},{
-            query: {
-                params: {token: AuthService.authToken},
-                update: {method: "PUT"}
-            },
-            place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},
-            favourite: {method:'POST', params:{id: '@id', extendController: 'favourite', token: AuthService.authToken}
+        query: {
+            params: {token: AuthService.authToken},
+            update: {method: "PUT"}
+        },
+        place: {method:'GET', params:{id: '@id', extendController: 'place', token: AuthService.authToken}},
+        favourite: {method:'POST', params:{id: '@id', extendController: 'favourite', token: AuthService.authToken}},
+        unfavourite: {method:'POST', params:{id: '@id', extendController: 'unfavourite', token: AuthService.authToken}
         }
     });
 }]);
@@ -279,8 +288,15 @@ services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     }
     var doUpdate = function(formData, $storeId){
         return $q(function(resolve, reject) {
-            Store.save(angular.extend({id:$storeId}, formData), function(response){
-                resolve(response);
+            Store.save(angular.extend({id:$storeId}, formData), function(responseData){
+                resolve(responseData);
+            });
+        });
+    }
+    var fetchStore = function(formData){
+        return $q(function(resolve, reject) {
+            Store.query(formData, function(responseData){
+                resolve(responseData.data);
             });
         });
     }
@@ -288,7 +304,8 @@ services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     return {
         getFollower: getFollower,
         getStore: getStore,
-        doUpdate: doUpdate
+        doUpdate: doUpdate,
+        fetchStore: fetchStore
     };
 });
 /*************** Begin Store Model ******************/

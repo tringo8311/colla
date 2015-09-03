@@ -229,12 +229,103 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
                 });
             }
         });
+    })
+    .controller('StoreCtrl', function($scope, $state, $http, $ionicPopup, AuthService, ProfileService, StoreService, APP_CONFIG) {
+        $scope.formData = {keyword:""};
+        $scope.stores = [];
+
+        $scope.doRefresh = function(){
+            StoreService.fetchStore({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}).then(function(responseData) {
+                $scope.stores = responseData;
+                $scope.$broadcast('scroll.refreshComplete');
+            }, function(errResponse) {
+                $scope.$broadcast('scroll.refreshComplete');
+            });
+        }
+        $scope.doRefresh();
+
+        $scope.toggleBusinessHour = function(evt, item) {
+            evt.stopImmediatePropagation();
+            item.showBusinessHour = !item.showBusinessHour;
+        }
+
+        $scope.showPopup = function (store) {
+            $scope.dataPopup = store;
+            var buttons = [];
+            // check favorite is exist
+            var flag = false;
+            if($scope.userProfile.stores.length >= APP_CONFIG.STORE_CONFIG.MAX_ITEM){
+                flag = true;
+            }else{
+                angular.forEach($scope.userProfile.stores, function(value, key) {
+                    if(value.id == $scope.dataPopup.id){
+                        flag = true;
+                    }
+                });
+            }
+            if(!flag){
+                buttons.push({
+                    text: 'Favourite',
+                    type: 'button-positive button-outline',
+                    onTap: function(e) {
+                        var storeId = $scope.dataPopup.id;
+                        ProfileService.doFavourite(storeId).then(function(responseData) {
+                            if(responseData.status=="success"){
+                                // reload profile
+                                $scope.doReloadCurrentProfile();
+                            }
+                        }, function(error){
+                            console.log(error);
+                        });
+                        return true;
+                    }
+                });
+            }
+            buttons.push({
+                text: 'Close',
+                type: 'button-positive button-outline'
+            });
+
+            $ionicPopup.show({
+                title: "Information",
+                cssClass: '',
+                subTitle: '',
+                template: '',
+                templateUrl: '/templates/partial/place-tmp.html',
+                scope: $scope,
+                buttons: buttons
+            });
+        }
+    })
+    .controller('FavouriteCtrl', function($scope, $state, $http, $timeout, $ionicPopup, AuthService, ProfileService) {
+        $scope.data = {showDelete : false};
+        $scope.doRemove = function(evt, item){
+            evt.preventDefault();
+            $scope.doShowConfirm("Delete?", "Are you sure want to un-favourite this item?").then(function(answer){
+                if(answer){
+                    ProfileService.unFavourite(item.id).then(function(responseData){
+                        if(responseData.status=="success"){
+                            $scope.flashMessage.className = "success";
+                        }else{
+                            $scope.flashMessage.className = "error";
+                        }
+                        $scope.flashMessage.visibility = true;
+                        $scope.flashMessage.message = responseData.message;
+
+                        $timeout(function(){$scope.flashMessage.visibility = false;}, 2000);
+                        $scope.doReloadCurrentProfile();
+                        //$scope.userProfile.stores.splice( $scope.userProfile.stores.indexOf(item), 1 );
+                    });
+                }
+            });
+        }
+
         $scope.toggleBusinessHour = function(evt, item) {
             evt.stopImmediatePropagation();
             item.showBusinessHour = !item.showBusinessHour;
         }
     })
-	.controller('ContactCtrl', ['$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
+	.controller('ContactCtrl', ['$rootScope', '$scope', "$state", "$http", "$ionicPopup", "AuthService", "API_PARAM", function($rootScope, $scope, $state, $http, $ionicPopup, AuthService, API_PARAM) {
         $scope.formData = {
             fullname: $scope.userProfile.username,
             email: $scope.userProfile.email
@@ -253,12 +344,14 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             return returnString.slice( 0, returnString.length - 1 );
         };
         $scope.doSendContact = function(){
+            $rootScope.showLoading();
             $http({
                 method : 'POST',
                 url : API_PARAM.apiUrl + 'profile/' + $scope.userProfile.id + '/contact?token=' + AuthService.authToken,
                 data : param($scope.formData), // pass in data as strings
                 headers : { 'Content-Type': 'application/x-www-form-urlencoded' } // set the headers so angular passing info as form data (not request payload)
             }).success(function(data) {
+                $rootScope.hideLoading();
                 if (!data.status == "success") {
                     // if not successful, bind errors to error variables
                     //$scope.message.submissionMessage = data.messageError;
@@ -613,6 +706,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         $scope.mapDirection = {};
 
         $scope.currentPosition = $localStorage.getObject(CURRENT_LOCATION_STORAGE) || CURRENT_LOCATION_DEFAULT;
+        console.log($scope.currentPosition);
         $scope.$watch('currentPosition', function(newVal, oldVal){
             $localStorage.setObject(CURRENT_LOCATION_STORAGE, newVal);
         }, true);
@@ -734,7 +828,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             MapService.detectCurrentLocation().then(function (answer) {
                 if (answer.status == "success") {
                     var newLatLng = answer.result;
-                    $scope.currentPosition.coords = newLatLng;
+                    $scope.currentPosition.coords = {lat: newLatLng.G, lng: newLatLng.K};
                     currentPositionMarker.setPosition($scope.currentPosition.coords);
                     currentMap.setCenter(newLatLng);
                     currentInfoWindow.close();
@@ -884,7 +978,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
     })
     .controller('OwnerBusinessCtrl', function($rootScope, $scope, $state, $http, $ionicPopup, $timeout, AuthService, StoreService) {
-        storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
+        var storeId = $scope.userProfile.stores ? $scope.userProfile.stores[0].id : 0;
         var doRefresh = function(){
             StoreService.getStore(storeId).then(function(responseData){
                 $scope.formData = responseData;
@@ -901,7 +995,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         }
         $scope.updateBusiness = function(){
             $rootScope.showLoading();
-            StoreService.doUpdate($scope.data, $scope.userProfile.store_id).then(function(response){
+            StoreService.doUpdate($scope.formData, storeId).then(function(response){
                 $rootScope.hideLoading();
                 if(response.status=="success"){
                     $scope.flashMessage.className = "success";

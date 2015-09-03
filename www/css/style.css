@@ -235,7 +235,8 @@ select.form-control {
   vertical-align: middle; }
 .list .item .business-hour {
   animation-name: fadeOut;
-  animation-timing-function: ease-in; }
+  animation-timing-function: ease-in;
+  white-space: pre; }
 
 .card .item-pull-left {
   position: absolute;

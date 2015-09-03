@@ -12,20 +12,9 @@
                     <div id="qrcode"></div>
                 </div>
                 <h4 class="strong">{{userProfile.code}}</h4>
-                <ion-list>
-                    <ion-item class="list-item item-avatar item-positive-outline" ng-repeat="store in userProfile.stores"  ui-sref="customer.info({id:store.id})">
-                        <div class="item-char">{{store.title | firstChar }}</div>
-                        <div class="detail animate-show" ng-hide="store.showBusinessHour">
-                            <h2>{{store.title}}</h2>
-                            <p class="address">{{ store.address }}, {{ store.city}}, {{store.state}}, {{ store.zipcode }}</p>
-                            <p>{{store.phone}}</p>
-                        </div>
-                        <div class="business-hour animate-show" ng-show="store.showBusinessHour">{{store.business_hour}}</div>
-                        <ion-option-button class="button-info text-center" ng-click="toggleBusinessHour($event, store)" ng-class="store.showBusinessHour ? 'button-positive' : 'button-default'"><i class="icon ion-clock"></i></ion-option-button>
-                    </ion-item>
-                </ion-list>
+                <button class="button button-block button-outline icon-left ion-star button-positive" ui-sref="customer.favourite">Favourite</button>
 				<button class="button button-block button-outline icon-left ion-android-list button-positive" ui-sref="customer.reservation">Reservation</button>
-                <button class="button button-block button-outline icon-left ion-android-list button-positive" ui-sref="customer.note">Note</button>
+                <button class="button button-block button-outline icon-left ion-edit button-positive" ui-sref="customer.note">Note</button>
                 <br/><br/><br/>
             </div>
         </div>

@@ -142,11 +142,24 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
                     }
                 }
             })
+            .state('customer.store', {
+                url: 'customer/store',
+                views: {
+                    'main-content': {
+                        templateUrl: 'templates/customer/store.html',
+                        controller: 'StoreCtrl'
+                    }
+                },
+                data: {
+                    authorizedRoles: [USER_ROLES.admin, USER_ROLES.customer]
+                }
+            })
             .state('customer.favourite', {
                 url: 'customer/favourite',
                 views: {
                     'main-content': {
-                        templateUrl: 'templates/customer/favourite.html'
+                        templateUrl: 'templates/customer/favourite.html',
+                        controller: 'FavouriteCtrl'
                     }
                 },
                 data: {
