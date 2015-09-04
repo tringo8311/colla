@@ -18,6 +18,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             className: "",
             message: ''
         }
+        $scope.formDataTableDefault = {keyword:"", page: 1, pageSize: 10, take: 10};
 
         $scope.setCurrentProfile = function(profile) {
             $scope.userProfile = profile;
@@ -29,6 +30,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
         };
         if(AuthService.userProfile()){
             $scope.setCurrentProfile(AuthService.userProfile());
+            $scope.formDataTableDefault.user_id = $scope.userProfile.id;
         }
 
         $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
@@ -230,19 +232,57 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             }
         });
     })
-    .controller('StoreCtrl', function($scope, $state, $http, $ionicPopup, AuthService, ProfileService, StoreService, APP_CONFIG) {
-        $scope.formData = {keyword:""};
+    .controller('StoreCtrl', function($scope, $state, $http, $timeout, $ionicPopup, AuthService, ProfileService, StoreService, APP_CONFIG) {
+        // ResponseData: { totalItems: 100, pageItems: [], pageNumber: 1}
+        var noMoreItemsAvailable = false, keepInfiniteScroll = false;
+        $scope.formData = angular.extend({}, $scope.formDataTableDefault);
         $scope.stores = [];
 
         $scope.doRefresh = function(){
-            StoreService.fetchStore({user_id: $scope.userProfile.id, keyword: $scope.formData.keyword}).then(function(responseData) {
-                $scope.stores = responseData;
+            $scope.formData.page = 1;
+            StoreService.fetchStore($scope.formData).then(function(responseData) {
+                $scope.stores = responseData.pageItems;
                 $scope.$broadcast('scroll.refreshComplete');
             }, function(errResponse) {
+                console.log(errResponse);
                 $scope.$broadcast('scroll.refreshComplete');
             });
         }
-        $scope.doRefresh();
+        //$scope.doRefresh();
+
+        $scope.loadMore = function(){
+            console.log("loadMore");
+            if($scope.allowGetMoreItem) {
+                $scope.formData.page += 1;
+                keepInfiniteScroll = true;
+                StoreService.fetchStore($scope.formData).then(function (responseData) {
+                    if (responseData.pageNumber >= (responseData.totalItems / responseData.pageSize)) {
+                        noMoreItemsAvailable = true;
+                    } else {
+                        noMoreItemsAvailable = false;
+                    }
+                    keepInfiniteScroll = false;
+                    $scope.stores = $scope.stores.concat(responseData.pageItems);
+                    $timeout(function() {
+                        $scope.$broadcast('scroll.infiniteScrollComplete');
+                        $scope.$broadcast('scroll.resize')
+                    }, 500);
+                }, function (errResponse) {
+                    keepInfiniteScroll = false;
+                    $timeout(function() {
+                        $scope.$broadcast('scroll.infiniteScrollComplete');
+                        $scope.$broadcast('scroll.resize')
+                    }, 500);
+                });
+            }
+        }
+        $scope.allowGetMoreItem = function(){
+            return !noMoreItemsAvailable && !keepInfiniteScroll;
+        }
+
+        $scope.$on('$stateChangeSuccess', function() {
+            $scope.doRefresh();
+        });
 
         $scope.toggleBusinessHour = function(evt, item) {
             evt.stopImmediatePropagation();

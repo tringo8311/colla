@@ -19,7 +19,7 @@
                         <i class="icon ion-clock"></i>
                     </button>
                 </div>
-                <div class="item-char">{{store.title | firstChar }}</div>
+                <div class="item-char">{{$index}}</div>
                 <div class="detail animate-show" ng-hide="store.showBusinessHour">
                     <h2>{{store.title}}</h2>
                     <p class="address">{{ store.address }}, {{ store.city}}, {{store.state}}, {{ store.zipcode }}</p>
@@ -29,5 +29,6 @@
                 <!--ion-option-button class="button-info text-center" ng-click="toggleBusinessHour($event, store)" ng-class="store.showBusinessHour ? 'button-positive' : 'button-default'"><i class="icon ion-clock"></i></ion-option-button-->
             </ion-item>
         </ion-list>
+        <ion-infinite-scroll immediate-check="false" ng-if="allowGetMoreItem()" on-infinite="loadMore()"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

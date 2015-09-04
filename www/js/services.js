@@ -296,7 +296,10 @@ services.service('StoreService', function($q, $http, $auth, Profile, Store) {
     var fetchStore = function(formData){
         return $q(function(resolve, reject) {
             Store.query(formData, function(responseData){
-                resolve(responseData.data);
+                resolve(responseData);
+            }, function err(error) {
+                console.log(error);
+                reject(error);
             });
         });
     }
