@@ -136,24 +136,29 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
             $ionicSideMenuDelegate.toggleLeft();
         };
     })
-    .controller('ForgotPasswordCtrl', function($scope, $ionicPopup, $ionicSideMenuDelegate, ProfileService) {
+    .controller('ForgotPasswordCtrl', function($rootScope, $scope, $ionicPopup, $ionicSideMenuDelegate, ProfileService) {
         $scope.data = { username: "", code: "", haveCode: false};
         $scope.resetPassword = function(data){
-            ProfileService.confirmResetPassword(data.username).then(function(answer) {
-                if("success"==answer){
-                    $scope.securityCode = true;
+            $rootScope.showLoading();
+            ProfileService.doResetPassword(data.username).then(function(answer) {
+                if("success"==answer.status){
                     $ionicPopup.alert({
                         title: 'Reset password!',
-                        template: 'Please check your email!'
+                        template: answer.message
                     });
                 }else{
                     $ionicPopup.alert({
                         title: 'Reset password!',
-                        template: 'Your email/user is not exist. Please type another!'
+                        template: answer.message
                     });
                 }
+                $rootScope.hideLoading();
             }, function(err) {
-
+                $ionicPopup.alert({
+                    title: 'Reset password!',
+                    template: err
+                });
+                $rootScope.hideLoading();
             });
         }
     })
@@ -418,9 +423,11 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
     }])
     .controller('OfferCtrl', ['$scope', "$state", "$http", "$ionicPopup", "$ionicSlideBoxDelegate", "AuthService", "ProfileService", function($scope, $state, $http, $ionicPopup, $ionicSlideBoxDelegate, AuthService, ProfileService) {
         $scope.formData = {storeId: 0};
+		if($scope.userProfile.stores){
+			$scope.formData.storeId = $scope.userProfile.stores[0].id;
+		}
         $scope.doRefresh = function(){
             if($scope.userProfile.stores){
-                $scope.formData.storeId = $scope.userProfile.stores[0].id;
                 ProfileService.doGetOffers({store_id: $scope.formData.storeId}).then(function(responseData) {
                     $scope.offers = responseData;
                     $scope.$broadcast('scroll.refreshComplete');
@@ -534,7 +541,7 @@ collaApp.controller('AppCtrl', function($rootScope, $scope, $state, $ionicPopup,
 		$scope.modalTitle = "Create Reservation";
         $scope.createReservation = function(){
             $scope.modalTitle = "Create Reservation";
-            $scope.offerData = {user_id: $scope.userProfile.id};
+            $scope.reservationData = {user_id: $scope.userProfile.id};
             $scope.openModal();
         }
         $scope.detailReservation = function(item){

@@ -4,6 +4,14 @@
     </ion-nav-buttons>
     <ion-content class="tabbed-content-within-sidemenu-app padding" has-header="true" has-footer="true">
         <ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()"></ion-refresher>
+		<ion-header-bar class="bar bar-header item-input-inset">
+            <label class="item-input-wrapper">
+                <select class="form-control" ng-model="formData.storeId">
+					<option ng-repeat="store in userProfile.stores" value="{{store.id}}" ng-selected="{{formData.storeId == store.id}}">{{store.title}}</option>
+				</select>
+            </label>
+            <button class="button button-clear" ng-click="doRefresh()"><i class="ion ion-android-search"></i></button>
+        </ion-header-bar>
         <ion-slide-box on-slide-changed="slideHasChanged($index)">
             <ion-slide ng-repeat="offer in offers">
                 <div class="list">

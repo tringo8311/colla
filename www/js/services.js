@@ -169,14 +169,24 @@ services.service('AuthService', function($q, $http, $auth, API_PARAM, USER_ROLES
     }]);
 
 /*************** Profile Service/Model ******************/
-services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
-    var confirmResetPassword = function(username) {
+services.service('ProfileService', function($q, $http, $auth, Profile, Store, API_PARAM) {
+    var doResetPassword = function(username) {
         return $q(function(resolve, reject) {
-            if (username == 'admin' || username == 'customer') {
-                resolve('success');
-            } else {
-                reject('failed');
-            }
+            //var formdata = new FormData();
+            //formdata.append('email', username);
+            //var formdata = [{name: "email", value: username}];
+            var formdata = "email="+username;
+            $http({
+                method: 'PUT',
+                url: API_PARAM.baseUrl + 'password/reset',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                data: formdata,
+                transformRequest: angular.identity
+            }).success(function (response) {
+                resolve(response);
+            }).error(function (data, status, headers, config) {
+                reject(data);
+            });
         });
     };
     var doSignUp = function(data){
@@ -224,7 +234,7 @@ services.service('ProfileService', function($q, $http, $auth, Profile, Store) {
         });
     }
     return {
-        confirmResetPassword: confirmResetPassword,
+        doResetPassword: doResetPassword,
         doSignUp: doSignUp,
         doUpdate: doUpdate,
         doGetPlace: doGetPlace,

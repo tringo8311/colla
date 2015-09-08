@@ -393,11 +393,21 @@ angular.module('collaApp', ['ionic', 'ionic.utils', 'ngMockE2E', 'ngResource', '
         $httpBackend.whenPOST(/^\w+.*/).passThrough();
         $httpBackend.whenDELETE(/^\w+.*/).passThrough();
     })
-    .run(function($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH) {
+    .run(function($rootScope, $state, AuthService, AUTH_EVENTS, EXCLUDE_PATH, USER_ROLES) {
         $rootScope.$on('$stateChangeStart', function (event, next, nextParams, fromState) {
             // page required authentication
             //console.log(AuthService.isAuthenticated());
-            if(EXCLUDE_PATH.indexOf(next.name) > -1 || $state.current.name == "login") {
+            if(EXCLUDE_PATH.indexOf(next.name) > -1 ) {
+                if(($state.current.name == "login" || next.name == 'login') && AuthService.isAuthenticated()){
+                    event.preventDefault();
+                    if(AuthService.loadRole()== USER_ROLES.customer){
+                        $state.go('customer.dash');
+                    }else if(AuthService.loadRole() == USER_ROLES.owner){
+                        $state.go('owner.dash');
+                    }else{
+                        $state.go('landing');
+                    }
+                }
                 return;
             }else if (!AuthService.isAuthenticated()) {
                 if (next.name !== 'login') {

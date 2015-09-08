@@ -53,7 +53,10 @@ angular.module('collaApp').filter('first_char', function(){
 }).filter("asDate", function () {
     return function (input) {
         if(input != ""){
-            return new Date(input);
+			/*if(/^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/.test(input)){
+				return new Date(input);
+			}else{*/
+			return moment(input).toDate();
         }
         return null;
     }
